@@ -258,6 +258,8 @@ Hier, sind die Arbeitspakete, welche IPA-spezifische Arbeit erfordern, aufgelist
 	\hline
 \end{longtable}
 
+\newpage
+
 \begin{longtable}{p{.22\textwidth}|p{.78\textwidth}}
 	\hline
 	\textbf{Nummer}    				& 7.3 \\
@@ -292,4 +294,66 @@ Hier, sind die Arbeitspakete, welche IPA-spezifische Arbeit erfordern, aufgelist
 	\hline
 	\textbf{Erwartetes Ergebnis}	& Der Anhang ist erstellt und beinhaltet alle nötigen und verlangten Inhalte.\\
 	\hline
-\end{longtable}
+\end{longtable} 
+\newpage
+
+\section{Lösungskonzept Backend}
+
+In diesem Kapitel ist das Lösungskonzept für das Backend beschrieben. Das Konzept richtet sich nach den in Kapitel \ref{subsec:anforderungenBackend} definierten Anforderungen.
+
+\subsection{REST}
+
+Damit die SPA den 16-stelligen Aktivierungscode anzeigen kann, muss er mit Hilfe einer REST-Schnittstelle übermittelt werden. Dass er aber überhaupt von Futurae erstellt wird, muss er bei dem Enrollement, also dem Call der einen neuen Nutzer erstellt, explizit gefordert werden. 
+Dies funktioniert in dem man den Requestparameter \flqq short\_code\frqq{} auf true setzt. Für die Übermittlung an die SPA stehen 2 Optionen im Raum:
+
+\begin{itemize}
+	\item Option 1: Den Endpunkt, welcher alle Accountdaten von jedem Nutzer zurück gibt um den Activation Code erweitern. Dies hätte zur Folge das der Endpunkt um ein optionales Feld \flqq activation\_code\_short\frqq{}\space erweitert wird.
+	\label{"itm:restOption1"}
+	\item Option 2: Einen neuen Endpunkt erstellen, welcher den offenen Aktivierungscode zurück gibt. Dies wäre ein einfacher GET-Endpunkte, welcher, falls vorhanden den neusten, austehenden Aktivierungscode zurück gibt. Folgend eine kurze Spezifikation des Endpunktes:\\\\
+
+	\textbf{Pfad:} /auth-admin/rest/users/{userId}/tokens/airlock-2fa/activation-code-short\\
+	\textbf{HTTP-Methode:} GET\\
+	\textbf{Pfadparameter:} userid\\
+	\textbf{Response:} Optionaler Actiovation Code, kann leer sein \newline
+	\textbf{Status Codes:}
+	\begin{longtable}{p{.25\textwidth}|p{.55\textwidth}}
+		\hline
+		\textbf{200 Ok}    				& 16-stelliger Activationcode oder nichts \\
+		\hline
+		\textbf{401 Unauthorized}   				& Invalide oder fehlende Authentifizierung\\
+		\hline
+		\textbf{403 Forbidden}	& Der Zugriff ist verboten (z.B falsche Adminrolle) \\
+		\hline
+		\textbf{404 Not Found}	& Mögliche Error Codes:
+		\begin{itemize}
+			\item USER\_NOT\_FOUND 
+			\item ACCOUNT\_NOT\_FOUND
+		\end{itemize}\\
+		\hline
+	\end{longtable} 
+	
+	\label{"itm:restOption2"}	
+\end{itemize}
+
+In beiden Fällen müsste der Restflow so aussehen:
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=0.8\textwidth]{ressourcen/restflow}
+		\caption[Restflow]{Restflow um 16-stelligen Aktivierungscode zu bekommen}\label{fig:restflow}
+	\end{center}
+\end{figure}
+
+\begin{itemize}
+	\item[(1)] Die SPA macht als Reaktion auf einen Klick einen Request, ans IAM Backend. Je nach Option, geht dieser an einen anderen Endpunkt. 
+	\item[(2)] Das Backend macht folgenden Request an Futurae: \newline
+	/srv/admin/v1/enrollments?status=pending
+	\item[(3)] 	Da bei dem Enrollment Request zu Futurea der 16-stellige Activationcode explizit gefordert wurde, wird dieser Request, falls überhaupt ein austehendes Enrollment vorhanden ist, dieses auch zurück geben. Da mehere offene Enrollments vorhanden sein können, muss immer das Neuste genommen werden. Damit immer klar ist welcher Code zurück kommt. Helpdesk oder Schalter Mitarbeiter können so die Aktivierung direkt mit dem Kunden durchspielen.
+	\item[(4)] Das Backend gibt den Activationcode an die SPA weiter. Je nach Option auch noch die anderen Accountdaten. Falls keiner vorhanden ist, wird die Response einfach leer gelassen, resp. das Feld.
+\end{itemize}
+
+
+\subsection{Rollenlogik}
+Es gibt bereits eine Regel, welche das Ansehen von Aktivierungsdaten einschränkt. Diese Regel kann wiederverwendet werden. Dazu gibt es einen Airlock2FAAccessController.java. Dieser kann beim erstellen der Response injected werden. Mit der Methode \flqq isAllowedToSeeActivationSecrets\frqq{} \space kann dann überprüft werden, ob der Adminnutzer diese Info überhaupt sehen darf. Am besten wird dieser Check noch vor dem Futurae Request ausgführt, um einen unnötigen Rountrip zu vermeiden und es möglichst effizient zu halten.
+
+
+\section{Lösungskonzept SPA}

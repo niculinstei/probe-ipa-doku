@@ -1,10 +1,12 @@
 \chapter{Versionierung und Sicherung der Arbeitsergebnisse}\label{ch:versionierung-und-sicherung-der-arbeitsergebnisse}
 
-Die Arbeitsergebnisse sollten gesichert werden. Damit, im Falle eines unerwarteten Ausfalls während der Probe-IPA, z.B des Rechners, von einem anderen Gerät wieder auf den Stand zugegriffen werden kann. Zu dem sollte es generell möglich sein jeder Zeit auf einen älteren Stand zurück zukommen.
+Die Arbeitsergebnisse sollten gesichert werden. Damit, im Falle eines unerwarteten Ausfalls während der Probe-IPA, z.B des Rechners, von einem anderen Gerät wieder auf den Stand zugegriffen werden kann. Zu dem sollte es generell möglich sein jeder Zeit auf einen älteren Stand zurück zukommen. Dies gilt natürlich für den Quellcode und den Bericht.
 
 \section{Git als Versionierungstool}
 Für die Versionierung der Arbeitsergebnisse wurde Git verwendet. 
-Git ist weit verbreitet und ist auch aus der Schule und diversen anderen Projekten bekannt. Es wird verwendet um Änderungen am Code zu verfolgen und erstellt dabei eine Versionshistorie. 
+Git ist weit verbreitet und ist auch aus der Schule und diversen anderen Projekten bekannt. Es wird verwendet um Änderungen am Code zu verfolgen und erstellt dabei eine Versionshistorie. \newline Zur Sicherung werden die Zwischenstände regelmässig in das jeweilige Remote-Repository gepushed.
+Das Repository für den Bericht liegt auf dem Ergon Github Account des Kandidaten(\url{https://github.com/niculinstei/probe-ipa-doku.git}).
+Der Quellcode welcher das Produkt erweitert liegt in einem Repository auf Gerrit.
 
 \section{Git im Zusammenspiel mit Gerrit}
 Der Quellcode liegt in einem Git-Repository auf Gerrit. Gerrit dient dazu als Review und Code Management Tool. 

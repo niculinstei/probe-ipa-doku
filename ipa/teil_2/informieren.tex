@@ -12,6 +12,9 @@ Das ganze muss mit UI, Unit und Integration Tests getestet werden, und in der Ku
 \subsection*{Abgrenzug}
 Es gibt bereits die Funktionalität, dass Admins pro Nutzer Aktivierungsbriefe generieren können. Diese Briefe enthalten Bereits den Aktivierungscode. Im Rahmen dieses Auftrags, soll dieser Bereich nicht erweitert oder verändert werden.
 
+\subsection{Futurae}
+Die Airlock 2FA App wird von Futurae entwickelt. Das hat zur Folge das zwischen IAM und Futurae wichtige Informationen ausgetauscht werden müssen. Dafür bietet Futurea 3 verschiedene API's an: die Auth API, die Admin API und die Log API. Für die Probe-IPA ist nur die Admin-API relevant, da sich um Adminoperationen handelt. 
+
 \section{Technische Referenzen}
 Für die Techinschen Infos sind folgende zwei Links sehr hilfreich:
 \begin{itemize}
@@ -30,7 +33,7 @@ Folgende Abkürzungen werden verwendet:
 	\item NFA <Zahl> ... bedeutet nicht-funktionale Anforderung, mit nummerisch aufsteigendem Index.
 \end{itemize}
 
-\subsection{Rest / Backend}
+\subsection{Rest / Backend} \label{subsec:anforderungenBackend}
 
 Folgend, sind die Anforderungen für das Backend resp. den Rest teil definiert.
 
@@ -50,7 +53,7 @@ Folgend, sind die Anforderungen für das Backend resp. den Rest teil definiert.
 	\item NFA 4: Veränderte / neue Restendpoints werden um die notwendige Doku erweitert.
 \end{itemize}
 
-\subsection{SPA}
+\subsection{SPA} \label{subsec:anforderungenSPA}
 
 Folgend, sind die Anforderungen für die SPA definiert.
 
