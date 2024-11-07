@@ -1,0 +1,85 @@
+\chapter{Informieren}\label{ch:informieren}
+
+In diesem Kapitel geht es um die erste von 6 Phasen der IPERKA-Methode, dem Informieren. Es bietet Platz um aufzuzeigen, was während dieser Phase unternommen wurde.
+
+\section{Analyse}
+Als erster Schritt wurde die Aufgabe analysiert und einen Überblick verschaffen.
+\subsection*{Auftrag}
+Umzusetzen ist eine Funktion in der Admin App der Airlock IAM Applikation, welche es den Admin nuztern ermöglicht die 16 stelligen Airlock 2FA Aktivierungscodes der Nutzer anzeigen zu lassen. Dies hilft Ihnen, die Endnutzer bei der Aktivierung der Airlock 2FA zu unterstützen. Der Aktivierungscode sollte per Konpfdruck angezeigt werden können, zum Beispiel als Popup. Dies ist jedoch noch zu evaluieren, vieleicht bieten sich auch noch andere Optionen an. Sicher ist, dass der Code in im Airlock 2FA Management angezeigt werden soll und nur, falls durch den Admin gewollt. \newline
+Weiter soll es mögllich sein, dass nicht alle Admins den Code anzeigen können, sondern nur die mit der entsprechenden Rolle. \newline
+Das ganze muss mit UI, Unit und Integration Tests getestet werden, und in der Kundendokumentation erwähnt werden.
+
+\subsection*{Abgrenzug}
+Es gibt bereits die Funktionalität, dass Admins pro Nutzer Aktivierungsbriefe generieren können. Diese Briefe enthalten Bereits den Aktivierungscode. Im Rahmen dieses Auftrags, soll dieser Bereich nicht erweitert oder verändert werden.
+
+\section{Technische Referenzen}
+Für die Techinschen Infos sind folgende zwei Links sehr hilfreich:
+\begin{itemize}
+	\item Futurae API: \url{https://www.futurae.com/docs/api/auth/}\newline
+	 Da der Aktivierungs Code von Futurea kommt, ist dessen API Dokumentation eine wichtige Quelle.
+	\item IAM Kunden Dokumentation: \url{https://docs.airlock.com/iam/8.3/}´
+	Notwendig, um allgemeine Informationen bezüglich Airlock 2FA nachzulesen
+\end{itemize}
+
+\section{Anforderungen}
+Nach der Analyse und nachdem der Auftrag verstanden wurde konnten die Anforderungen definiert werden. Diese sind immer in funktionale und nicht-funktionale aufgeteilt.
+
+Folgende Abkürzungen werden verwendet:
+\begin{itemize}
+	\item FA <Zahl> ... bedeutet Funktionale Anforderung, mit nummerisch aufsteigendem Index.
+	\item NFA <Zahl> ... bedeutet nicht-funktionale Anforderung, mit nummerisch aufsteigendem Index.
+\end{itemize}
+
+\subsection{Rest / Backend}
+
+Folgend, sind die Anforderungen für das Backend resp. den Rest teil definiert.
+
+\subsection*{Funktionale Anforderungen}
+\begin{itemize}
+	\item FA 1: Das Backend soll der SPA den Activation Code anbieten.
+	\item FA 2: Der Activation Code darf nur angeboten werden, wenn der Admin auch die notwendige Rolle hat.
+	\item FA 3: Es soll geloggt werden, welcher Administrator zu welchem Zeitpunkt den 16-stelligen Aktivierungscode angezeigt hat.
+	\item FA 4: Neue Plugins oder Properties sollen einen klaren und vollständigen Hilfetext haben.
+\end{itemize}
+
+\subsection*{Nicht-funktionale Anforderungen}
+\begin{itemize}
+	\item NFA 1: Sämtliche Fehlerfälle werden korrekt behandelt.
+	\item NFA 2: Der Code entspricht dem bestehenden Codeschema.
+	\item NFA 3: Alle neuen Funktionalitäten werden durch Tests abgedeckt.
+	\item NFA 4: Veränderte / neue Restendpoints werden um die notwendige Doku erweitert.
+\end{itemize}
+
+\subsection{SPA}
+
+Folgend, sind die Anforderungen für die SPA definiert.
+
+\subsection*{Funktionale Anforderungen}
+\begin{itemize}
+	\item FA 5: Die SPA muss in der Lage sein den 16-stelligen QR-Code auf Knopfdruck anzuzeigen.
+	\item FA 6: Das neue UI verhält sich gleich wie das bisherige.
+	\item FA 7: Das neue UI hat den gleichen Style wie das bisherige.
+\end{itemize}
+
+\subsection*{Nicht-funktionale Anforderungen}
+\begin{itemize}
+	\item NFA 5: Es werden nur in der Adminapp existierende UI Komponenten verwendet.
+	\item NFA 6: Das UI lädt in jedem Fall ohne Probleme.
+	\item NFA 7: Alle neuen Funktionalitäten werden durch Selenium Integration Tests abgedeckt.
+\end{itemize}
+
+\subsection{Kundendokumentation}
+
+Folgend, sind die Anforderungen für die Kundendokumentation definiert.
+
+\subsection*{Funktionale Anforderungen}
+\begin{itemize}
+	\item FA 8: Die Kunden Doku wird sinnvoll um das neue Feature erweitert.
+	\item FA 9: Die Kundendoku ist auf Englisch geschrieben.
+\end{itemize}
+
+\subsection*{Nicht-funktionale Anforderungen}
+\begin{itemize}
+	\item NFA 8: Die Kundendoku hat keine Schreibfehler. 
+	\item NFA 9: Die Kundendoku passt in das bestehende Produkt.
+\end{itemize}

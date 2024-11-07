@@ -1,0 +1,88 @@
+\chapter{Aufgabenstellung}\label{ch:aufgabenstellung}
+In diesem Kapitel sind die Aufgabenstellung und die Rahmenbedingungen aufgeführt. Der grösste Teil des Inhalts stammt aus der originalen Aufgabenstellung.
+
+
+\section{Ausgangslage}\label{sec:ausgangslage}
+Airlock Identity and Access Management (IAM) ist ein bestehendes, in unserer Abteilung entwickeltes Produkt, das unter anderem Logins (Authentisierungen) ermöglicht. Eine weitere Funktionalität eines IAMs ist der Admin-Bereich (adminapp). Airlock IAM unterstützt unterschiedliche Stufen von Administratoren, um beispielsweise Mitarbeitenden im Support oder an einem Kundenschalter spezifisch eingeschränkten Zugriff für die Verwaltung von Usern zu erlauben.\newline\newline
+Airlock 2FA erlaubt es, nebst beispielsweise Usernamen und Passwort, einen weiteren Authentisierungsfaktor zu verwenden. Üblicherweise wird dazu die Airlock 2FA App auf dem Smartphone installiert und aktiviert.\newline
+Es gibt mehrere Möglichkeiten, wie Kund:innen für den eigenen Login die Airlock 2FA aktivieren können. Ein Weg ist beispielsweise über einen Brief mit einem QR Code, welchen Kund:innen dann mit der Airlock 2FA App scannen können. Die Aktivierung ist auch über einen 16-stelligen Aktivierungscode möglich.\newline\newline
+Immer wieder kommt es vor, dass Kund:innen Unterstützung bei der Aktivierung von Airlock 2FA benötigen und sich telefonisch beim Firmen-Helpdesk oder am physischen Schalter melden. Damit das Support- oder Schalterpersonal der Kundschaft helfen kann, die Airlock 2FA zu aktivieren, braucht es eine Möglichkeit, den 16-stelligen Aktivierungscode für den spezifischen User anzuzeigen.\newline
+Bisher gibt es in Airlock IAM noch kein Feature, damit der Administrator-Bereich solche 16-stelligen Aktivierungscodes pro User anzeigen kann. \pagebreak
+
+\section{Detaillierte Aufgabenstellung}\label{sec:detaillierte-aufgabenstellung}
+\subsection*{Ziele}
+\begin{itemize}
+	\item UC1: Helpdesk kann Kunden am Telefon helfen, ein Gerät zu aktivieren.
+	\item UC2: Schaltermitarbeiter kann Kunde am Schalter helfen, ein Gerät zu aktivieren
+	\item UC3: Es soll möglich sein, den Zugriff auf die userspezifischen 16-stelligen Aktivierungscodes nur für bestimmte Administratoren-Rollen (bspw. Rolle Helpdesk) freizugeben, damit nicht alle Administratoren sich den 16-stelligen Aktivierungscode anzeigen lassen können.
+	\item UC4: Im User Activities Logfile des spezifischen Users soll geloggt werden, welcher Administrator-Account zu welchem Zeitpunkt den 16-stelligen Aktivierungscode angezeigt hat, damit im Nachhinein nachvollziehbar ist, welche Administratoren je Zugriff auf den Aktivierungscode hatten.
+\end{itemize}
+
+\subsection*{Weitere Anforderungen}
+\begin{itemize}
+	\item Der Code soll auf Knopfdruck in der Adminapp angezeigt werden. Dabei sind UI-Komponenten zu verwenden, die an anderen Stellen in der Adminapp auch schon verwendet werden. Eine mögliche Lösung ist ein SPA Popup (kein Browser Popup) mit einem 'Schliessen' Knopf.
+	\item Neue Plugins oder Plugin Properties sollen einen klaren und vollständigen Hilfetext haben.
+\end{itemize}
+
+\subsection*{Erwartete Artefakte}
+Nebst der IPA Dokumentation werden diese technischen Artefakte erwartet:
+\begin{itemize}
+	\item Sinnvolles Slicing und Anzahl von Gerrit Changes mit der implementierten Lösung und Git Kommentaren, die unseren internen Konventionen entsprechen. Der Kandidat entscheidet selbst, wie viele Gerrit Changes sinnvoll sind. Er hat dabei zu beachten, dass die Changes aufeinander aufbauen sollten und \flqq verdaubare\frqq{} Review-Grössen haben.
+	\item Beschreibung wie das neue Feature konfiguriert werden kann in der Airlock IAM Kundendokumentation. Dazu soll das Kapitel 18.5 Airlock 2FA configuration sinnvoll erweitert werden. Die angepasste Kundendokumentation soll auf Englisch und in den restlichen PDF-Unterlagen enthalten sein (es ist nicht nötig, mit unserem Kundendokumentation-Tool SMC zu arbeiten).
+\end{itemize}
+
+\subsection*{Abgrenzung}
+\begin{itemize}
+	\item Administratoren können pro User bereits Aktivierungsbriefe erstellen oder anfordern. An dieser Logik soll im Rahmen dieses Issues nichts verändert oder erweitert werden.
+\end{itemize}
+
+
+
+
+\section{Mittel und Methoden}\label{sec:mittel-und-methoden}
+
+Es wird auf dem aktuellen Stand der Entwicklung von Airlock IAM 8.4 aufgebaut.
+
+\subsection*{REST Technologien}
+\begin{itemize}
+	\item Java(Guice als Dependency Injection Framework), JSON, JUnit
+	\item Jackson, Jersey, Guice
+	\item REST Integration Tests
+\end{itemize}
+
+\subsection*{SPA Technologien}
+\begin{itemize}
+	\item Angular (Typescript/RXJS)
+	\item Bootstrap (HTML/CSS/SASS)
+	\item Selenium UI Testing
+\end{itemize}
+
+\subsection*{Wichtigste Tools}
+\begin{itemize}
+	\item Intellij(IDE)
+	\item Gerrit + Git (SCM)
+\end{itemize}
+
+
+
+\section{Vorkenntnisse}\label{sec:vorkenntnisse}
+Der Kandidat war involviert in die Implementation von SPA und REST Features im Bereich IAM Protected Self-Service. \newline
+Das Grundgerüst der SPA und REST Endpunkte ist bekannt.
+
+
+\section{Vorarbeiten}\label{sec:vorarbeiten}
+    Der Kandidat hat für die Probe-IPA keine vorbereiteten Tätigkeiten erarbeitet, hat sich aber in das Thema Airlock 2FA eingelesen.
+\section{Neue Lerninhalte}\label{sec:neue-lerninhalte}
+Erfahrung bei der selbständigen Entwicklung einer produktrelevanten Erweiterung unter realistischen Bedingungen.
+\begin{itemize}
+\item Futurae API: \url{https://www.futurae.com/docs/api/auth/} 
+\item IAM Kunden Dokumentation: \url{https://docs.airlock.com/iam/8.3/}´
+\end{itemize}
+
+\section{Arbeiten in den letzten 6 Monaten}\label{sec:arbeiten-in-den-letzten-6-monaten}
+In den letzten sechs Monaten hat der Kandidat Erfahrungen in folgenden Bereichen gesammelt:
+\begin{itemize}
+    \item OAuth 2.0 / OpenID Connect Consent Management Self-Service, SPA und REST
+    \item Have I Been Pwnd Scriptable Step, 3rd Party REST API, Lua
+    \item HTTP Cache Control Konfiguration im Zusammenhang mit JWKS REST Endpoint
+\end{itemize}
