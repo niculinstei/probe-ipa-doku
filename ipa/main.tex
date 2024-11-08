@@ -27,6 +27,40 @@
     showspaces=false,
     showstringspaces=false}
 
+\lstdefinelanguage{TypeScript}{
+    	keywords={class, export, boolean, throw, implements, import, this, while, break, as, any, switch, else, case, let, number, string, get, module, type, instanceof, public, private, if, package, protected, static, yield, declare, constructor, typeof, new, void, return, never, default, for, try, async, await, catch, finally, from, interface, Promise},
+    	keywordstyle=\color{blue}\bfseries,
+    	ndkeywords={true, false, null, undefined},
+    	ndkeywordstyle=\color{orange}\bfseries,
+    	identifierstyle=\color{black},
+    	sensitive=false,
+    	comment=[l]{//},
+    	morecomment=[s]{/*}{*/},
+    	commentstyle=\color{gray}\ttfamily,
+    	stringstyle=\color{red}\ttfamily,
+    	morestring=[b]',
+    	morestring=[b]"}
+    
+\lstset{
+	language=TypeScript,
+	basicstyle=\ttfamily\small,
+	numbers=left,
+	numberstyle=\tiny\color{gray},
+	stepnumber=1,
+	numbersep=10pt,
+	backgroundcolor=\color{white},
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	frame=single,
+	tabsize=2,
+	captionpos=b,
+	breaklines=true,
+	breakatwhitespace=true,
+	title=\lstname,
+	escapeinside={\%*}{*)}
+}
+
 % Packages
 \usepackage[margin=1.4in]{geometry}
 \usepackage[T1]{fontenc}
@@ -73,7 +107,7 @@
 \usepackage[
     backend=biber,
 ]{biblatex}
-\addbibresource{global/quellens.bib}
+\addbibresource{global/quellen.bib}
 
 \usepackage[toc]{glossaries}
 \makeglossaries
@@ -82,7 +116,6 @@
 \pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0pt}
-%TODO Platzhalter ersetzen
 \lfoot{\fontsize{10}{15} \selectfont Niculin Steiner}
 \cfoot{\fontsize{10}{15} \selectfont \today}
 \rfoot{\fontsize{10}{15} \selectfont \thepage~von~\pageref*{LastPage}}
@@ -95,6 +128,8 @@
 \def\blx@citation#1#2{\blx@citation@entry{#1}{#2}}
 \makeatother
 \renewcommand{\arraystretch}{1.5}
+
+
 % Document
 \begin{document}
 

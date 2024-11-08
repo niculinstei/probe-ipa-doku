@@ -299,7 +299,7 @@ Hier, sind die Arbeitspakete, welche IPA-spezifische Arbeit erfordern, aufgelist
 
 \section{Lösungskonzept Backend}
 
-In diesem Kapitel ist das Lösungskonzept für das Backend beschrieben. Das Konzept richtet sich nach den in Kapitel \ref{subsec:anforderungenBackend} definierten Anforderungen.
+In diesem Kapitel ist das Lösungskonzept für das Backend beschrieben. Das Konzept richtet sich nach den in Kapitel \ref{subsec:anforderungenBackend} definierten Anforderungen. Es wurden diverse TODO's im Code hinzugefügt, dies macht die Implementation danach viel effizienter.
 
 \subsection{REST}
 
@@ -318,11 +318,11 @@ Dies funktioniert in dem man den Requestparameter \flqq short\_code\frqq{} auf t
 	\textbf{Status Codes:}
 	\begin{longtable}{p{.25\textwidth}|p{.55\textwidth}}
 		\hline
-		\textbf{200 Ok}    				& 16-stelliger Activationcode oder nichts \\
+		\textbf{200 Ok}    				& 16-stelliger Aktivierungscode oder nichts \\
 		\hline
 		\textbf{401 Unauthorized}   				& Invalide oder fehlende Authentifizierung\\
 		\hline
-		\textbf{403 Forbidden}	& Der Zugriff ist verboten (z.B falsche Adminrolle) \\
+		\textbf{403 Forbidden}	& Der Zugriff ist verboten (z.B fehlende Adminrolle) \\
 		\hline
 		\textbf{404 Not Found}	& Mögliche Error Codes:
 		\begin{itemize}
@@ -347,13 +347,189 @@ In beiden Fällen müsste der Restflow so aussehen:
 	\item[(1)] Die SPA macht als Reaktion auf einen Klick einen Request, ans IAM Backend. Je nach Option, geht dieser an einen anderen Endpunkt. 
 	\item[(2)] Das Backend macht folgenden Request an Futurae: \newline
 	/srv/admin/v1/enrollments?status=pending
-	\item[(3)] 	Da bei dem Enrollment Request zu Futurea der 16-stellige Activationcode explizit gefordert wurde, wird dieser Request, falls überhaupt ein austehendes Enrollment vorhanden ist, dieses auch zurück geben. Da mehere offene Enrollments vorhanden sein können, muss immer das Neuste genommen werden. Damit immer klar ist welcher Code zurück kommt. Helpdesk oder Schalter Mitarbeiter können so die Aktivierung direkt mit dem Kunden durchspielen.
-	\item[(4)] Das Backend gibt den Activationcode an die SPA weiter. Je nach Option auch noch die anderen Accountdaten. Falls keiner vorhanden ist, wird die Response einfach leer gelassen, resp. das Feld.
+	\item[(3)] 	Da bei dem Enrollment Request zu Futurae der 16-stellige Aktivierungscode explizit gefordert wurde, wird dieser Request, falls überhaupt ein austehendes Enrollment vorhanden ist, dieses auch zurück geben. Da mehere offene Enrollments vorhanden sein können, muss immer das Neuste genommen werden. Damit immer klar ist welcher Code zurück kommt. Helpdesk oder Schalter Mitarbeiter können so die Aktivierung direkt mit dem Kunden durchspielen.
+	\item[(4)] Das Backend gibt den Aktivierungscode an die SPA weiter. Je nach Option auch noch die anderen Accountdaten. Falls keiner vorhanden ist, wird die Response einfach leer gelassen, resp. das Feld.
 \end{itemize}
 
 
 \subsection{Rollenlogik}
-Es gibt bereits eine Regel, welche das Ansehen von Aktivierungsdaten einschränkt. Diese Regel kann wiederverwendet werden. Dazu gibt es einen Airlock2FAAccessController.java. Dieser kann beim erstellen der Response injected werden. Mit der Methode \flqq isAllowedToSeeActivationSecrets\frqq{} \space kann dann überprüft werden, ob der Adminnutzer diese Info überhaupt sehen darf. Am besten wird dieser Check noch vor dem Futurae Request ausgführt, um einen unnötigen Rountrip zu vermeiden und es möglichst effizient zu halten.
+Es gibt bereits eine Regel, welche das Ansehen von Aktivierungsdaten einschränkt. Diese Regel kann wiederverwendet werden. Dazu gibt es einen \flqq Airlock2FAAccessController.java.\frqq{} Dieser kann beim erstellen der Response injected werden. Mit der Methode \flqq isAllowedToSeeActivationSecrets\frqq{} \space kann dann überprüft werden, ob der Adminnutzer diese Info überhaupt sehen darf. Am besten wird dieser Check noch vor dem Futurae Request ausgführt, um einen unnötigen Rountrip zu vermeiden und es möglichst effizient zu halten. Falls die Option mit einem neuen Endpunkt gewählt wird, kann dieser separat protected werden, dann fällt die Logik weg.
+
+\subsection{Wichtige Klassen und Interfaces}
+\textbf{Option 1}
+\begin{itemize}
+	\item UserAirlock2FADeviceResource.java: In dieser Klasse befindet sich der Endpoint \flqq /auth-admin/rest/users/{userId}/tokens/airlock-2fa \frqq{}, welcher erweitert werden könnte. 
+	\item Airlock2FAUserAccount.java dies ist die Klasse welche die wichtigen Daten über den Acount beinhaltet. Diese Klasse muss um das Feld \flqq activationCodeShort\frqq{} erweitert werden.
+	\item Airlock2FAAdminService.java: Dieser Service wird aus der Resource aufgerufen, um den Account von der Datenbank zu bekommen.
+	\item Airlock2FAUserAccountRepository.java: Das Repository ist die Schnittstelle zwischen der Datenbank und dem Service. Die darin enthaltene \flqq findBy()\frqq{} Methode gibt schluss endlich den zusammengestellten \flqq Airlock2FAUserAccount.java\frqq{} zurück.
+\end{itemize}
+\textbf{Option 2}
+\begin{itemize}
+	\item UserAirlock2FADeviceResource.java: In dieser Klasse wird der oben definierte Endpunkt \flqq /auth-admin/rest/users/{userId}/tokens/airlock-2fa/activation-code-short \frqq{} erstellt.
+\end{itemize}
+\textbf{Request zu Futurae}\newline
+Der Request zu Futurae wird in beiden Optionen gleich aussehen. Lediglich der \flqq FuturaeAdminApiEnrollmentServiceImpl.java\frqq{} wird an verschiedenen Orten gebraucht.
+\begin{itemize}
+	\item FuturaeAdminApiEnrollmentServiceImpl.java: In diesem Serivce muss der\\ Airlock2FAAccessController injected werden. Zusätzlich wird es eine neue Methode geben müssen, welche zuerst mit Hilfe des Airlock2FAAccessController prüft, ob der Adminnutzer die richtige Rolle hat. Danach wird via die \flqq FuturaeAdminApiEnrollmentRequestFactory.java\frqq{} der Request zusammengestellt. Dieser Request wird dann via den RestClient ausgeführt. Die Response wird dann in ein neu erstelltes ...Response Objekt gespeichert und zurück gegeben.
+	\item FuturaeAdminApiEnrollmentRequestFactory.java: In dieser Klasse braucht es eine neue Methode welche einen Request zusammenstellt, der von Futurae die neueste offene Aktivierung anfragt.
+	\item AdminEnrollmentRequest.java: Diese Klasse bildet den Admin Request ab, welcher gesendet wird um neue Geräte zu aktivieren. Er muss um das Feld \flqq short\_code\frqq{} erweitert werden. Dieses Feld muss anschliessend auf true gestzt werden.
+	\item FuturaeAuthApiEnrollmentRequestFactory.java: Es ist wichtig auch in dieser Klasse auf dem Enrollmentrequest \flqq short\_code\frqq{} auf true zu setzen, ansonsten wird der 16-stellige Aktivierungscode nicht erzwungen, wenn das Enrollment von einem Endnutzer aus dem Self-Service gestartet wrid. Denn dann verläuft es über die Auth API. 
+\end{itemize}
+
 
 
 \section{Lösungskonzept SPA}
+In diesem Kapitel werden die Lösungsideen für das Frontend / die SPA dokumentiert.  Das Konzept richtet sich nach den in Kapitel \ref{subsec:anforderungenSPA} definierten Anforderungen. Es wurden diverse TODO's im Code hinzugefügt, dies macht die Implementation danach viel effizienter. 
+
+\subsection{Mockups}
+Um sich eine Vorstellung zu machen, wurden zuerst verschiedene Mockups erstellt. Da es fürs UI keine grosse Änderung ist, konnten die Mockups grössten Teils direkt im Code erstellt werden, natürlich ohne funktionalität. \newline\\
+Auf dem folgende Bild ist die Adminapp im Airlock 2FA Mangement des Nutzers \flqq itester\frqq{}. Es wird davon ausgegangen das der Admin die nötigen Rollen hat, um sich den Aktivierungscode anzuzeigen. 
+\begin{figure}[H]
+	\begin{center}
+		\caption[UI Mockup]{Das folgende Bild zeigt den UI Vorschlag}\label{fig:mockup1}
+	\end{center}
+\end{figure}
+\begin{landscape}
+	\includepdf[pages=-, angle=90]{ressourcen/Mockup1}
+\end{landscape}
+\noindent Es der Ansatz verfolgt, dass unten rechts ein weiterer Button hinzukommt. Dieser wird allerdings nur dann angezeigt, wenn der Admin auch die nötigen Rollen dazu hat und ein offener Aktivierungscode vorhanden ist(sprich nicht null zurück kommt). Wird der Button geklickt, soll sich ein Popup öffnen, in dem der 16-stellige Aktivierungscode angezeigt wird. Ev. könnte es auch eine Option sein, das Enrollmentdatum auch noch anzuzeigen, das könnte bei Fehlversuchen dem Admin eventuell hilfreich sein. Dies könnte dann in etwa so aussehen:
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=0.8\textwidth]{ressourcen/popup}
+		\caption[Popup mit Datum]{Popup Variante mit Datum}\label{fig:restflow}
+	\end{center}
+\end{figure}
+
+\subsection{Rollenlogik}
+Damit sichergestellt wird, dass der Button nur dann angezeigt wird, wenn der Benutzer dies möchte, kann ihm das Attribut \flqq hideOnAccessDenied\frqq{} gesetzt werden. Der Button braucht zudem ein sprechende ID. Diese ID wird dann im Access Controller im Backend, als Permissonkey verwendet.
+
+\subsection{Wichtige Komponenten und Services}
+\begin{itemize}
+	\item airlock-2fa.component.html: In diesem File wird die Darstellung des UI definiert. Hier muss der neue Button hinzugefügt werden.
+	\item airlock-2fa.service.ts: In diesem Service wird der Request an das IAM-Backend gemacht, um den Aktivierungscode zu bekommen. Anschliessend wird sie geparsed und zurückgegeben.
+	\item airlock-2fa.component.ts: In dieser Component, wird die Logik für den neuen Button implementiert. Konkret:
+	\begin{itemize}
+		\item Beim laden der Komponente wird via den obigen Service, der Aktivierungscode abgefragt.  
+		\item Er darf nur angezeigt werden, falls auch ein Aktivierungs Code vorhanden ist.
+		\item Wird er angecklickt, öffnet sich ein Popup mit dem aktuellsten, offenen, 16-stelligen Aktivierungscode.
+	\end{itemize}
+	\item Zudem wird es ein neues Model für den Aktivierungscode geben müssen, falls das Datum auch angezeigt werden soll. Das sollte wie folgt aussehen:
+		\begin{lstlisting}[language=TypeScript]
+			export interface Airlock2FAActivationCodeData {
+				activationCodeShort: string;
+				enrollmentDate: Date;
+			}
+		\end{lstlisting}
+\end{itemize}
+
+\section{Testkonzept}
+Das neue Feature soll fehlerfrei und nach den Anforderungen funktionieren. Um dies Sicherzustellen wird folgend ein Testkonzept zusammen gestellt, nach welchem das Feature später getestet werden sollte.
+Alle erwähnten Technologien sind in Kapitel \ref{sec:verwendete-tools} beschrieben.
+
+
+\subsection{Benötigte Testmittel}
+Unit-Tests und Integrations-Tests werden von der Entwicklungsumgebung Intellij ausgeführt. Da die Applikation lokal auch aus dem Intellij gestartet werden kann, werden auch die manuellen Tests mit der Hilfe von Intellij durchgeführt.  \newline
+\\
+Damit sichergegangen werden kann, dass nicht nur die neuen Funktionen funktionieren, sondern alles darum herum auch noch, führt Jenkins bei jedem Push eines neuen Patchsets alle Tests aus. Failed dieser Build, ist etwas kaputt.
+
+\subsection{Wiremock}
+In allen Tests wird Wiremock verwendet um den Futurae Server zu simulieren. Wiremock stellt dabei einen Dummy-Server zurverfügung, das heisst alle Anfragen gehen an diesen Server und somit nicht über das Netzwerk. Dies verhindert Flaky Tests und bietet eine konstante und auf den Testcase angepasste API. 
+
+\subsection{Unit-Tests}
+Unit-Tests werden verwendet um die Kernlogik in kleinen isolierten Einheiten zu testen. Hierfür werden komplexe Umsysteme oder Klassen gemockt. Dies wird mit Mockito gemacht. Die Tests ansich werden mit JUnit5 implementiert. Konkret für diesen Auftrag müssen folgende Kernfunktionalitäten mit Unit-Tests abgedeckt werden:
+\begin{itemize}
+	\item Check, ob ein Admin die richtigen Rollen besitzt.
+	\item Die neue Funktion im FuturaeAdminApiEnrollmentServiceImpl.java welche den neusten, offenen Aktivierungscode zurück gibt.	
+\end{itemize}
+
+\subsection{Rest-Integration-Tests}
+Die Rest-Integration-Tests werden auch mit hilfe von JUnit geschrieben. Anderst als bei den Unit-Tests wird hier nicht eine kleine Einheit getestet sondern der ganze Teil von der Restresource bis zur Datenbank.
+Mit den Integrationtests wird sicher gestellt, dass das ganze Feature im Backend richtig funktioniert. Für das sind folgende zwingende Fälle zu testen:
+
+\begin{itemize}
+	\item Es dürfen nur berechtigte Admins den Code erhalten.
+	\item Es muss eine 403 Response zurück kommen, wenn ein Admin nicht berechtigt ist.
+	\item Falls kein offenes Enrollment existiert, der Admin aber berechtigt wäre, muss die Response leer sein.
+	\item Es muss geloggt werden, welcher Admin, sich wann, welchen Aktivierungscode, angeschaut hat.
+\end{itemize}
+
+\subsection{UI-Integration-Tests}
+Zusätzlich zu den Rest-Integration-Tests werden auch UI-Integration-Tests erstellt. Diese Tests werden mit Selenium ausgeführt. Mit ihnen wird das UI / die SPA im Zusammenspiel mit dem IAM-Backend getestet.
+Folgende fälle sind zu Testen:
+\begin{itemize}
+	\item Hat der Admin keine Berechtigung, darf der Button gar nicht erst angezeigt werden.
+	\item Hat der Admin die Berechtigung, es gibt jedoch keinen Activation Code, darf der Button auch nicht angezeigt werden.
+	\item Hat der Admin die Berechtigung und es ist ein Activation Code vorhanden, muss der Button angezeigt werden.
+	\item Wird der Button geklickt wird ein Popup aufgehen, in welchem der Activation Code steht.
+	\item Klickt man in diesem Popup auf Schliessen sollte man wieder auf der Airlock 2FA Mangamentseite landen.
+\end{itemize}
+\newpage
+
+\subsection{Manuelle Tests}
+Die Funktionalitäten werden durch die vielen automatisierten Tests schon recht gut getestet. Allerdings ist es auch wichtig, das ganze manuell zu Testen. Der wichtigste Grund ist, dass der Futurae Server nicht mehr gemockt ist, sondern nun eine richtige Verbindung besteht. Damit es nicht zu unerwarteten Aktionen kommt, sind diese Test sehr wichtig. Für die manuellen Tests sind folgende Testfälle definiert:
+
+	\begin{longtable}{p{.25\textwidth}|p{.55\textwidth}}
+	\hline
+	\textbf{Testfall}    			& M1 \\
+	\hline
+	\textbf{Testumgebung}	& 
+	\begin{itemize}
+		\item IAM auf Localhost 
+		\item Demokonfiguration ergänzt mit der Konfiguration des Futurae Service.
+	\end{itemize}\\
+	\hline
+	\textbf{Beschreibung}   		& Der Admin hat die nötigen Rollen, damit er den Aktivierungscode ansehen kann und es gibt ein Enrollment welches offen ist. Der Admin klickt auf den Button, welcher ihm den Aktivierungscode anzeigen soll. \\
+	\hline
+	\textbf{Erwartetes Resultat}	& Es öffnet sich ein Popup (kein Browserpupop), mit dem Aktivierungscode, und allenfalls dem Enrollmentdatum. \\
+	\hline
+	
+\end{longtable} 
+	\begin{longtable}{p{.25\textwidth}|p{.55\textwidth}}
+	\hline
+	\textbf{Testfall}    			& M2 \\
+	\hline
+	\textbf{Testumgebung}	& 
+	\begin{itemize}
+		\item IAM auf Localhost 
+		\item Demokonfiguration ergänzt mit der Konfiguration des Futurae Service.
+		\item Postman um Request ohne SPA abzusetzen
+	\end{itemize}\\
+	\hline
+	\textbf{Beschreibung}   		& Der Admin hat die nötigen Rollen nicht, damit er den Aktivierungscode ansehen kann und es gibt ein Enrollment welches offen ist.\\
+	\hline
+	\textbf{Erwartetes Resultat}	& Der Button wird nicht angezeigt. Der Admin darf auch via Postman den Aktivierungscode nicht bekommen. \\
+	\hline
+	
+\end{longtable} 
+\newpage
+
+\begin{longtable}{p{.25\textwidth}|p{.55\textwidth}}
+\hline
+\textbf{Testfall}    			& M3 \\
+\hline
+\textbf{Testumgebung}	& 
+\begin{itemize}
+	\item IAM auf Localhost 
+	\item Demokonfiguration ergänzt mit der Konfiguration des Futurae Service.
+\end{itemize}\\
+\hline
+\textbf{Beschreibung}   		& Der Admin hat die nötigen Rollen nicht, damit er den Aktivierungscode ansehen kann und es gibt kein Enrollment welches offen ist.\\
+\hline
+\textbf{Erwartetes Resultat}	& Der Button wird nicht angezeigt. \\
+\hline
+
+\end{longtable}  
+
+\section{Qualitätssicherungskonzept}
+Das Qualitätssicherungskonzept wird definiert, um eine möglichst hohe Qualität des Codes zu erhalten.
+\newline
+Die Qualität des Codes ist im IAM-Repository schon sehr gut erzwungen. Durch Architecture Layering Tests und Checkstyle sind IAM-Spezifische Vorgaben getestet, damit der Code einheitlich bleibt. Zusätzlich gibt es auch noch PMD und Spotbugs Checks. Die PMD Checks prüfen den Code auf unschönheiten, basierend auf IAM-spezifischen Regeln. Das selbe gilt für SpotBugs.
+\newline
+Durch all diese Tests wird die Qualität sehr gut sichergestellt. 
+
+
+
+
+
+
+
