@@ -1,0 +1,1 @@
+	/users/[^/]+/tokens/airlock-2fa(?!/activation-code-short(?:/|$))(/.*)?\$

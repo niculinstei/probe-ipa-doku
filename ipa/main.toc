@@ -51,18 +51,25 @@
 \contentsline {subsection}{\numberline {10.2.3}Wichtige Klassen und Interfaces}{39}{subsection.10.2.3}%
 \contentsline {section}{\numberline {10.3}Lösungskonzept SPA}{40}{section.10.3}%
 \contentsline {subsection}{\numberline {10.3.1}Mockups}{40}{subsection.10.3.1}%
-\contentsline {subsection}{\numberline {10.3.2}Rollenlogik}{42}{subsection.10.3.2}%
-\contentsline {subsection}{\numberline {10.3.3}Wichtige Komponenten und Services}{42}{subsection.10.3.3}%
-\contentsline {section}{\numberline {10.4}Testkonzept}{43}{section.10.4}%
-\contentsline {subsection}{\numberline {10.4.1}Benötigte Testmittel}{43}{subsection.10.4.1}%
-\contentsline {subsection}{\numberline {10.4.2}Wiremock}{43}{subsection.10.4.2}%
-\contentsline {subsection}{\numberline {10.4.3}Unit-Tests}{43}{subsection.10.4.3}%
-\contentsline {subsection}{\numberline {10.4.4}Rest-Integration-Tests}{44}{subsection.10.4.4}%
-\contentsline {subsection}{\numberline {10.4.5}UI-Integration-Tests}{44}{subsection.10.4.5}%
-\contentsline {subsection}{\numberline {10.4.6}Manuelle Tests}{45}{subsection.10.4.6}%
-\contentsline {section}{\numberline {10.5}Qualitätssicherungskonzept}{46}{section.10.5}%
-\contentsline {chapter}{\numberline {11}Entscheiden}{47}{chapter.11}%
-\contentsline {chapter}{\numberline {12}Realisieren}{48}{chapter.12}%
-\contentsline {chapter}{\numberline {13}Kontrollieren}{49}{chapter.13}%
-\contentsline {chapter}{\numberline {14}Auswerten}{50}{chapter.14}%
-\contentsline {chapter}{Abbildungsverzeichnis}{50}{section*.6}%
+\contentsline {subsection}{\numberline {10.3.2}Lösungsvariante ohne Popup}{42}{subsection.10.3.2}%
+\contentsline {subsection}{\numberline {10.3.3}Rollenlogik}{43}{subsection.10.3.3}%
+\contentsline {subsection}{\numberline {10.3.4}Wichtige Komponenten und Services}{43}{subsection.10.3.4}%
+\contentsline {subsection}{\numberline {10.3.5}Translation Keys}{44}{subsection.10.3.5}%
+\contentsline {section}{\numberline {10.4}Testkonzept}{44}{section.10.4}%
+\contentsline {subsection}{\numberline {10.4.1}Benötigte Testmittel}{44}{subsection.10.4.1}%
+\contentsline {subsection}{\numberline {10.4.2}Wiremock}{45}{subsection.10.4.2}%
+\contentsline {subsection}{\numberline {10.4.3}Unit-Tests}{45}{subsection.10.4.3}%
+\contentsline {subsection}{\numberline {10.4.4}Rest-Integration-Tests}{45}{subsection.10.4.4}%
+\contentsline {subsection}{\numberline {10.4.5}UI-Integration-Tests}{45}{subsection.10.4.5}%
+\contentsline {subsection}{\numberline {10.4.6}Manuelle Tests}{47}{subsection.10.4.6}%
+\contentsline {section}{\numberline {10.5}Qualitätssicherungskonzept}{48}{section.10.5}%
+\contentsline {chapter}{\numberline {11}Entscheiden}{49}{chapter.11}%
+\contentsline {section}{\numberline {11.1}REST-Interface Backend}{49}{section.11.1}%
+\contentsline {section}{\numberline {11.2}SPA-Design}{50}{section.11.2}%
+\contentsline {chapter}{\numberline {12}Realisieren}{51}{chapter.12}%
+\contentsline {section}{\numberline {12.1}Backend erweitern}{51}{section.12.1}%
+\contentsline {subsection}{\numberline {12.1.1}Neuer REST-Endpunkt}{51}{subsection.12.1.1}%
+\contentsline {subsection}{\numberline {12.1.2}Request zu Futurae}{53}{subsection.12.1.2}%
+\contentsline {chapter}{\numberline {13}Kontrollieren}{54}{chapter.13}%
+\contentsline {chapter}{\numberline {14}Auswerten}{55}{chapter.14}%
+\contentsline {chapter}{Abbildungsverzeichnis}{55}{section*.9}%

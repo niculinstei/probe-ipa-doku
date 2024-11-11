@@ -1,1 +1,54 @@
 \chapter{Entscheiden}\label{ch:entscheiden}
+Dieses Kapitel bietet Platz, für die IPERKA-Phase \flqq Entscheiden\frqq{}. Es werden die verschiedenen Vorschläge aus der Planungsphase zu evaluiert und sich für den besten Weg entschieden.
+\section{REST-Interface Backend}
+In Abschnitt \ref{subsec:rest} wurden folgende 2 Lösungsvarianten für die REST-Schnittstelle definiert:
+\begin{itemize}
+	\item{Option 1:} Den bestehenden Endpunk, welcher den Account des Nutzers zurück gibt um das Activationcode Feld erweitern.
+	\item{Option 2:} Einen neuen separaten Endpunkt welcher nur den Activationcode, und eventuell noch weitere Daten wie das Enrollment Datum zurück gibt.
+\end{itemize}
+Die 2 Varianten werden basierend auf folgenden Eigenschaften verglichen:
+\newline\\
+\textbf{Flexibilität} Je flexibler der Activationcode angefragt werden kann desto besser. Dadurch kann er einfach durch weitere Infos ergänzt werden.\\\\
+\textbf{Beachtung der Rollen} Zugriffskontrolle basierend auf den Rollen des Adminnutzers kann einfach eingeschränkt werden.
+\\\\
+\textbf{Aufwand} Der Aufwand sollte sich in Grenzen halten, da nur begrenzt Zeit vorhanden ist.
+\\
+\\
+In der folgenden Nutzwertanalyse werden die beiden Varianten miteinander verglichen und jeweils mit 0-10 Punkten bewertet, welche mit der Gewichtung des Kriteriums multipliziert werden:
+\begin{longtable}{|p{.22\textwidth}|p{.40\textwidth}|p{.38\textwidth}|}
+	\hline
+	\textbf{Kriterium und Gewichtung} & \textbf{Option 1 (Endpunk erweitern)} & \textbf{Option 2 (Neuer Endpunkt)} \\ \hline
+	Flexibilität(20\%)& 2(0.4)  & 10(2.0)    \\ \hline 
+	Beachtung der Rollen(50\%) & 5(2.5)  &  10(5.0)   \\ \hline 
+	Aufwand(30\%) & 10(3.0)  &  5(1.5)   \\ \hline 
+	\textbf{Total} & 5.9  &  \textbf{8.5} \\ \hline 
+\end{longtable}
+\noindent Aufgrund des Resultats dieser Analyse wird ein neuer Endpunkt erstellt, um die Informationen des 16-stelligen Aktivierungscodes an die SPA zu übermitteln.
+
+\section{SPA-Design}
+In Abschnitt \ref{sec:lk-spa} wurden folgende 3 Lösungsvarianten für das UI der SPA vorgeschlagen:
+
+\begin{itemize}
+	\item Popup nur mit Aktivierungscode
+	\item Popup mit Aktivierungscode und Enrollment Datum
+	\item Darstellung in Accountübersicht mit Auge
+\end{itemize}
+Folgende Eigenschaften dienen als Grundlage zum Vergleich der 3 verschiedenen Lösungsvarianten:
+\newline\\
+\textbf{Aussehen} Die neue Komponente fügt sich einwandfrei in das bestehende UI ein. Dafür werden in der Adminapp bereits bekannte Komponenten verwendet.\\\\
+\textbf{Verhalten} Die neue Komponente verhält sich analog zu bereits implementierten Features in der Adminapp.
+\\\\
+\textbf{Aufwand} Der Aufwand sollte sich in Grenzen halten, da nur begrenzt Zeit vorhanden ist.
+\\
+\\
+In der folgenden Nutzwertanalyse werden die beiden Varianten miteinander verglichen und jeweils mit 0-10 Punkten bewertet, welche mit der Gewichtung des Kriteriums multipliziert werden:
+\begin{longtable}{|p{.40\textwidth}|p{.20\textwidth}|p{.20\textwidth}|p{.20\textwidth}|}
+	\hline
+	\textbf{Kriterium und Gewichtung} & \textbf{Popup ohne Datum} & \textbf{Popup mit Datum} &\textbf{Auge} \\ \hline
+	Aussehen(40\%)& 10(4.0)  & 10(4.0) & 2(0.8)\\ \hline 
+	Verhalten(40\%) & 10(4.0)  &  10(4.0) & 2(0.8)\\ \hline 
+	Aufwand(20\%) & 10(2.0)  &  5(1.0)   & 3(0.6)\\ \hline 
+	\textbf{Total} & \textbf{10}  &  9 & 2.2\\ \hline 
+\end{longtable}
+\noindent Aufgrund des Resultats dieser Analyse wird das bestehende UI um ein Button erweitert, welcher beim anklicken ein Popup öffnet, in welcher der Aktivierungscode angzeigt wird.
+

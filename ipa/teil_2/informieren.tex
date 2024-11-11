@@ -5,15 +5,15 @@ In diesem Kapitel geht es um die erste von 6 Phasen der IPERKA-Methode, dem Info
 \section{Analyse}
 Als erster Schritt wurde die Aufgabe analysiert und einen Überblick verschaffen.
 \subsection*{Auftrag}
-Umzusetzen ist eine Funktion in der Admin App der Airlock IAM Applikation, welche es den Admin nuztern ermöglicht die 16 stelligen Airlock 2FA Aktivierungscodes der Nutzer anzeigen zu lassen. Dies hilft Ihnen, die Endnutzer bei der Aktivierung der Airlock 2FA zu unterstützen. Der Aktivierungscode sollte per Konpfdruck angezeigt werden können, zum Beispiel als Popup. Dies ist jedoch noch zu evaluieren, vieleicht bieten sich auch noch andere Optionen an. Sicher ist, dass der Code in im Airlock 2FA Management angezeigt werden soll und nur, falls durch den Admin gewollt. \newline
-Weiter soll es mögllich sein, dass nicht alle Admins den Code anzeigen können, sondern nur die mit der entsprechenden Rolle. \newline
-Das ganze muss mit UI, Unit und Integration Tests getestet werden, und in der Kundendokumentation erwähnt werden.
+Umzusetzen ist eine Funktion in der Admin App der Airlock IAM Applikation, welche es den Adminnuztern ermöglicht, die 16 stelligen Airlock 2FA Aktivierungscodes der Nutzer anzeigen zu lassen. Dies hilft Ihnen, die Endnutzer bei der Aktivierung der Airlock 2FA zu unterstützen. Der Aktivierungscode sollte per Konpfdruck angezeigt werden können, zum Beispiel als Popup. Dies ist jedoch noch zu evaluieren, vieleicht bieten sich auch noch andere Optionen an. Sicher ist, dass der Code im Airlock 2FA Management angezeigt werden soll und nur, falls durch den Admin gewollt. \newline
+Weiter soll es mögllich sein, dass nicht alle Admins sich den Code anzeigen können, sondern nur die mit der entsprechenden Rollen. \newline
+Das ganze muss mit UI, Unit und Integration Tests getestet werden, und in der Kundendokumentation ergänzt werden.
 
 \subsection*{Abgrenzug}
-Es gibt bereits die Funktionalität, dass Admins pro Nutzer Aktivierungsbriefe generieren können. Diese Briefe enthalten Bereits den Aktivierungscode. Im Rahmen dieses Auftrags, soll dieser Bereich nicht erweitert oder verändert werden.
+Es gibt bereits die Funktionalität, dass Admins pro Nutzer Aktivierungsbriefe generieren können. Im Rahmen dieses Auftrags, soll dieser Bereich nicht erweitert oder verändert werden.
 
 \subsection{Futurae}
-Die Airlock 2FA App wird von Futurae entwickelt. Das hat zur Folge das zwischen IAM und Futurae wichtige Informationen ausgetauscht werden müssen. Dafür bietet Futurea 3 verschiedene API's an: die Auth API, die Admin API und die Log API. Für die Probe-IPA ist nur die Admin-API relevant, da sich um Adminoperationen handelt. 
+Die Airlock 2FA App wird von Futurae entwickelt. Das hat zur Folge das zwischen IAM und Futurae wichtige Informationen ausgetauscht werden müssen. Dafür bietet Futurae 3 verschiedene API's an: die Auth API, die Admin API und die Log API. Für die Probe-IPA ist nur die Admin-API relevant, da sich um Adminoperationen handelt. 
 
 \section{Technische Referenzen}
 Für die Techinschen Infos sind folgende zwei Links sehr hilfreich:
@@ -25,17 +25,17 @@ Für die Techinschen Infos sind folgende zwei Links sehr hilfreich:
 \end{itemize}
 
 \section{Anforderungen}
-Nach der Analyse und nachdem der Auftrag verstanden wurde konnten die Anforderungen definiert werden. Diese sind immer in funktionale und nicht-funktionale aufgeteilt.
+Nach der Analyse und nachdem der Auftrag verstanden wurde, konnten die Anforderungen definiert werden. Diese sind immer in funktionale und nicht-funktionale aufgeteilt.
 
 Folgende Abkürzungen werden verwendet:
 \begin{itemize}
-	\item FA <Zahl> ... bedeutet Funktionale Anforderung, mit nummerisch aufsteigendem Index.
+	\item FA <Zahl> ... bedeutet funktionale Anforderung, mit nummerisch aufsteigendem Index.
 	\item NFA <Zahl> ... bedeutet nicht-funktionale Anforderung, mit nummerisch aufsteigendem Index.
 \end{itemize}
 
 \subsection{Rest / Backend} \label{subsec:anforderungenBackend}
 
-Folgend, sind die Anforderungen für das Backend resp. den Rest teil definiert.
+Folgend, sind die Anforderungen für das Backend resp. den Rest-Teil definiert.
 
 \subsection*{Funktionale Anforderungen}
 \begin{itemize}

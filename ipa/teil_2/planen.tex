@@ -29,7 +29,7 @@ Hier, sind die Arbeitspakete, welche während der IPERKA-Phase \flqq Informieren
 	\hline
 	\textbf{Geschätzter Aufwand}	& 2h \\
 	\hline
-	\textbf{Erwartetes Ergebnis}	& Die funktionalen und nicht-funktionalen Anforderungen sind definiert und beschrieben\\
+	\textbf{Erwartetes Ergebnis}	& Die funktionalen und nicht-funktionalen Anforderungen sind definiert und beschrieben.\\
 	\hline
 \end{longtable}\pagebreak
 
@@ -122,7 +122,7 @@ Hier, sind die Arbeitspakete, welche während der IPERKA-Phase \flqq Realisieren
 	\hline
 	\textbf{Geschätzter Aufwand}	& 14h \\
 	\hline
-	\textbf{Erwartetes Ergebnis}	& Alle Anforderungen für das Backend sind nach dem definierten Lösungsansatz umgesetzt. Zugleich ist die Lösung dokumentiert \\
+	\textbf{Erwartetes Ergebnis}	& Alle Anforderungen für das Backend sind nach dem definierten Lösungsansatz umgesetzt. Zugleich ist die Lösung dokumentiert. \\
 	\hline
 \end{longtable}
 
@@ -301,7 +301,7 @@ Hier, sind die Arbeitspakete, welche IPA-spezifische Arbeit erfordern, aufgelist
 
 In diesem Kapitel ist das Lösungskonzept für das Backend beschrieben. Das Konzept richtet sich nach den in Kapitel \ref{subsec:anforderungenBackend} definierten Anforderungen. Es wurden diverse TODO's im Code hinzugefügt, dies macht die Implementation danach viel effizienter.
 
-\subsection{REST}
+\subsection{REST}\label{subsec:rest}
 
 Damit die SPA den 16-stelligen Aktivierungscode anzeigen kann, muss er mit Hilfe einer REST-Schnittstelle übermittelt werden. Dass er aber überhaupt von Futurae erstellt wird, muss er bei dem Enrollement, also dem Call der einen neuen Nutzer erstellt, explizit gefordert werden. 
 Dies funktioniert in dem man den Requestparameter \flqq short\_code\frqq{} auf true setzt. Für die Übermittlung an die SPA stehen 2 Optionen im Raum:
@@ -378,7 +378,7 @@ Der Request zu Futurae wird in beiden Optionen gleich aussehen. Lediglich der \f
 
 
 
-\section{Lösungskonzept SPA}
+\section{Lösungskonzept SPA}\label{sec:lk-spa}
 In diesem Kapitel werden die Lösungsideen für das Frontend / die SPA dokumentiert.  Das Konzept richtet sich nach den in Kapitel \ref{subsec:anforderungenSPA} definierten Anforderungen. Es wurden diverse TODO's im Code hinzugefügt, dies macht die Implementation danach viel effizienter. 
 
 \subsection{Mockups}
@@ -400,6 +400,17 @@ Auf dem folgende Bild ist die Adminapp im Airlock 2FA Mangement des Nutzers \flq
 	\end{center}
 \end{figure}
 
+\subsection{Lösungsvariante ohne Popup}
+Anstelle eines Popups, welches durch einen Button ausgelöst wird, könnte man in der Accountübersicht auch folgendes einbauen:
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=1.0\textwidth]{ressourcen/variant_2_spa}
+		\caption[Variante ohne Popup]{SPA Lösung ohne Popup}\label{fig:withoutpopup}
+	\end{center}
+\end{figure}
+\noindent Analog zu einer Passwortanzeige könnte man es mit einem Auge darstellen. Wird auf das durchgestrichene Auge geklickt wird der Code angezeigt. Wird dann wieder auf das offene Auge geklickt, verschwindet der Aktivierungscode wieder.\newline
+Diese neue Zeile wird nur dann angezeigt, wenn auch ein Aktivierungscode vorhanden ist und der Admin die erforderlichen Rechte hat.
+
 \subsection{Rollenlogik}
 Damit sichergestellt wird, dass der Button nur dann angezeigt wird, wenn der Benutzer dies möchte, kann ihm das Attribut \flqq hideOnAccessDenied\frqq{} gesetzt werden. Der Button braucht zudem ein sprechende ID. Diese ID wird dann im Access Controller im Backend, als Permissonkey verwendet.
 
@@ -415,11 +426,17 @@ Damit sichergestellt wird, dass der Button nur dann angezeigt wird, wenn der Ben
 	\end{itemize}
 	\item Zudem wird es ein neues Model für den Aktivierungscode geben müssen, falls das Datum auch angezeigt werden soll. Das sollte wie folgt aussehen:
 		\begin{lstlisting}[language=TypeScript]
-			export interface Airlock2FAActivationCodeData {
-				activationCodeShort: string;
-				enrollmentDate: Date;
-			}
+export interface Airlock2FAActivationCodeData {
+		activationCodeShort: string;
+		enrollmentDate: Date;
+}
 		\end{lstlisting}
+\end{itemize}
+\subsection{Translation Keys}
+Um in der Adminapp die Sprachen Deutsch, Englisch und Französisch zu unterstützen wird i18n verwendet. Dafür wird für jeden String in der SPA ein Translation Key definiert. Hierfür gibt es 3 verschiedene JSON-Files; für jede Sprache eines. Das Value ist, dann der übersetzte Text in die jeweilige Sprache. Je nach Sprache wird nun ein anderes JSON-File angezogen, dies führt dazu, dass immer die korrekte Übersetzung verwendet wird. In diesem Fall benötigt es mindestens folgende 2 Keys:
+\begin{itemize}
+	\item user.airlock-2fa.activation.button.view-activation-code: Text im Button
+	\item user.airlock-2fa.activation.popup.activation-code: Text im Popup
 \end{itemize}
 
 \section{Testkonzept}
@@ -525,7 +542,7 @@ Das Qualitätssicherungskonzept wird definiert, um eine möglichst hohe Qualitä
 \newline
 Die Qualität des Codes ist im IAM-Repository schon sehr gut erzwungen. Durch Architecture Layering Tests und Checkstyle sind IAM-Spezifische Vorgaben getestet, damit der Code einheitlich bleibt. Zusätzlich gibt es auch noch PMD und Spotbugs Checks. Die PMD Checks prüfen den Code auf unschönheiten, basierend auf IAM-spezifischen Regeln. Das selbe gilt für SpotBugs.
 \newline
-Durch all diese Tests wird die Qualität sehr gut sichergestellt. 
+Durch all diese Tests wird die Qualität sehr gut sichergestellt. Bei jedem Push eines neuen Patchsets werden diese Checks, zusätzlich zu den normalen Tests, auch in der Jenkinspipeline ausgeführt.
 
 
 

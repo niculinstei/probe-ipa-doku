@@ -1,67 +1,62 @@
 %! Author = PERSON
 %! Date = DATE
 
-
 \documentclass[11pt, a4paper]{report}
 
-% Listings
+% Listings und Farben für das Darcula-Thema
 \usepackage{listings}
+\usepackage{xcolor}
+\usepackage{inconsolata}
 
+% Farbanpassungen
+\definecolor{bgcolor}{HTML}{2B2B2B}       % Hintergrundfarbe
+\definecolor{keywordcolor}{HTML}{CC7832}  % Orange für Keywords
+\definecolor{annotationcolor}{HTML}{FFCB6B} % Gelb für Annotationen
+\definecolor{stringcolor}{HTML}{6A8759}   % Grün für Strings
+\definecolor{commentcolor}{HTML}{808080}  % Grau für Kommentare
+\definecolor{javadoccolor}{HTML}{629755}  % Grün für Javadoc-Kommentare
+\definecolor{numbercolor}{HTML}{6897BB}   % Blau für Zahlen
+
+% Listings-Einstellungen
 \lstset{
-    literate={ö}{{\"o}}1
-        {ä}{{\"a}}1
-        {ü}{{\"u}}1
-}
-
-\lstset{language=Java,
-    basicstyle=\ttfamily,
-    keywordstyle=\color{javapurple}\bfseries,
-    stringstyle=\color{javared},
-    commentstyle=\color{javagreen},
-    morecomment=[s][\color{javadocblue}]{/**}{*/},
-    numbers=left,
-    numberstyle=\tiny\color{black},
-    stepnumber=2,
-    numbersep=10pt,
-    tabsize=4,
-    showspaces=false,
-    showstringspaces=false}
-
-\lstdefinelanguage{TypeScript}{
-    	keywords={class, export, boolean, throw, implements, import, this, while, break, as, any, switch, else, case, let, number, string, get, module, type, instanceof, public, private, if, package, protected, static, yield, declare, constructor, typeof, new, void, return, never, default, for, try, async, await, catch, finally, from, interface, Promise},
-    	keywordstyle=\color{blue}\bfseries,
-    	ndkeywords={true, false, null, undefined},
-    	ndkeywordstyle=\color{orange}\bfseries,
-    	identifierstyle=\color{black},
-    	sensitive=false,
-    	comment=[l]{//},
-    	morecomment=[s]{/*}{*/},
-    	commentstyle=\color{gray}\ttfamily,
-    	stringstyle=\color{red}\ttfamily,
-    	morestring=[b]',
-    	morestring=[b]"}
-    
-\lstset{
-	language=TypeScript,
-	basicstyle=\ttfamily\small,
-	numbers=left,
-	numberstyle=\tiny\color{gray},
+	backgroundcolor=\color{bgcolor},      % Hintergrundfarbe
+	basicstyle=\ttfamily\color{white},     % Schriftart und Textfarbe
+	keywordstyle=\color{keywordcolor}\bfseries,   % Normale Schlüsselwörter in Orange
+	stringstyle=\color{stringcolor},       % Strings in Grün
+	commentstyle=\color{commentcolor}\itshape, % Kommentare in Grau und kursiv
+	morecomment=[s][\color{javadoccolor}]{/**}{*/}, % Javadoc-Kommentare
+	numberstyle=\tiny\color{numbercolor},  % Zeilennummern in Blau
 	stepnumber=1,
-	numbersep=10pt,
-	backgroundcolor=\color{white},
+	numbersep=8pt,
+	tabsize=4,
 	showspaces=false,
 	showstringspaces=false,
-	showtabs=false,
-	frame=single,
-	tabsize=2,
-	captionpos=b,
 	breaklines=true,
 	breakatwhitespace=true,
-	title=\lstname,
-	escapeinside={\%*}{*)}
+	frame=single,
+	captionpos=b
 }
 
-% Packages
+% TypeScript und Java als unterstützte Sprachen definieren
+\lstdefinelanguage{TypeScript}{
+	keywords={class, export, boolean, throw, implements, import, this, while, break, as, any, switch, else, case, let, number, string, get, module, type, instanceof, public, private, if, package, protected, static, yield, declare, constructor, typeof, new, void, return, never, default, for, try, async, await, catch, finally, from, interface, Promise},
+	keywordstyle=\color{keywordcolor}\bfseries,
+	ndkeywords={true, false, null, undefined},
+	ndkeywordstyle=\color{stringcolor}\bfseries,
+	identifierstyle=\color{white},
+	sensitive=false,
+	comment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	commentstyle=\color{commentcolor}\ttfamily,
+	stringstyle=\color{stringcolor}\ttfamily,
+	morestring=[b]',
+	morestring=[b]"
+}
+
+% Sprachspezifische Anpassungen für Java
+\lstset{language=Java}
+
+% Packages für den Rest des Dokuments
 \usepackage[margin=1.4in]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -72,7 +67,7 @@
 \usepackage{float}
 \usepackage{pdfpages}
 \usepackage[
-    singlelinecheck=false
+singlelinecheck=false
 ]{caption}
 \usepackage[raggedright]{titlesec}
 \usepackage[nottoc]{tocbibind}
@@ -92,8 +87,6 @@
 \usepackage{pdfpages}
 \usepackage{pdflscape}
 
-
-
 \titleformat{\chapter}{\normalfont\bfseries\LARGE\raggedright}{\thechapter}{1ex}{}
 \titlespacing*{\chapter}{0pt}{30pt}{30pt}
 \setcounter{secnumdepth}{3}
@@ -105,7 +98,7 @@
 \renewcommand{\headrulewidth}{0pt}
 
 \usepackage[
-    backend=biber,
+backend=biber,
 ]{biblatex}
 \addbibresource{global/quellen.bib}
 
@@ -129,33 +122,30 @@
 \makeatother
 \renewcommand{\arraystretch}{1.5}
 
-
-% Document
+% Dokumentinhalt
 \begin{document}
-
-    \input{titel}
-    \input{global/inhalt}
-    \input{teil_1/umfeld_und_ablauf}
-    \input{teil_1/aufgabenstellung}
-    \input{teil_1/projektaufbauorganisation}
-    \input{teil_1/benuetzte_firmenstandards}
-    \input{teil_1/arbeitsumgebung}
-    \input{teil_1/versionierung_und_sicherung_der_arbeitsergebnisse}
-    \input{teil_1/projektmanagementmethode}
-    \input{teil_1/arbeitsprotokoll}
-    \input{teil_1/zeitplan}
-
-
-
-    \input{teil_2/projekt}
-    % Projekt Kapitel
+	
+	\input{titel}
+	\input{global/inhalt}
+	\input{teil_1/umfeld_und_ablauf}
+	\input{teil_1/aufgabenstellung}
+	\input{teil_1/projektaufbauorganisation}
+	\input{teil_1/benuetzte_firmenstandards}
+	\input{teil_1/arbeitsumgebung}
+	\input{teil_1/versionierung_und_sicherung_der_arbeitsergebnisse}
+	\input{teil_1/projektmanagementmethode}
+	\input{teil_1/arbeitsprotokoll}
+	\input{teil_1/zeitplan}
+	
+	\input{teil_2/projekt}
+	% Projekt Kapitel
 	\input{teil_2/informieren}
 	\input{teil_2/planen}
 	\input{teil_2/entscheiden}
 	\input{teil_2/realisieren}
 	\input{teil_2/kontrollieren}
 	\input{teil_2/auswerten}
-    \input{global/glossar}
-    \input{global/abbildungsverzeichnis}
-
+	\input{global/glossar}
+	\input{global/abbildungsverzeichnis}
+	
 \end{document}
