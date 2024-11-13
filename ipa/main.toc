@@ -69,7 +69,10 @@
 \contentsline {chapter}{\numberline {12}Realisieren}{51}{chapter.12}%
 \contentsline {section}{\numberline {12.1}Backend erweitern}{51}{section.12.1}%
 \contentsline {subsection}{\numberline {12.1.1}Neuer REST-Endpunkt}{51}{subsection.12.1.1}%
-\contentsline {subsection}{\numberline {12.1.2}Request zu Futurae}{53}{subsection.12.1.2}%
-\contentsline {chapter}{\numberline {13}Kontrollieren}{54}{chapter.13}%
-\contentsline {chapter}{\numberline {14}Auswerten}{55}{chapter.14}%
-\contentsline {chapter}{Abbildungsverzeichnis}{55}{section*.9}%
+\contentsline {subsection}{\numberline {12.1.2}Requests zu Futurae}{53}{subsection.12.1.2}%
+\contentsline {subsection}{\numberline {12.1.3}Logging}{58}{subsection.12.1.3}%
+\contentsline {subsection}{\numberline {12.1.4}Resultat}{59}{subsection.12.1.4}%
+\contentsline {subsection}{\numberline {12.1.5}Tests}{59}{subsection.12.1.5}%
+\contentsline {chapter}{\numberline {13}Kontrollieren}{60}{chapter.13}%
+\contentsline {chapter}{\numberline {14}Auswerten}{61}{chapter.14}%
+\contentsline {chapter}{Abbildungsverzeichnis}{61}{section*.11}%
