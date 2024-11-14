@@ -436,7 +436,8 @@ export interface Airlock2FAActivationCodeData {
 Um in der Adminapp die Sprachen Deutsch, Englisch und Französisch zu unterstützen wird i18n verwendet. Dafür wird für jeden String in der SPA ein Translation Key definiert. Hierfür gibt es 3 verschiedene JSON-Files; für jede Sprache eines. Das Value ist, dann der übersetzte Text in die jeweilige Sprache. Je nach Sprache wird nun ein anderes JSON-File angezogen, dies führt dazu, dass immer die korrekte Übersetzung verwendet wird. In diesem Fall benötigt es mindestens folgende 2 Keys:
 \begin{itemize}
 	\item user.airlock-2fa.activation.button.view-activation-code: Text im Button
-	\item user.airlock-2fa.activation.popup.activation-code: Text im Popup
+	\item user.airlock-2fa.activation.popup.activation-code.title: Titel des Popup's
+	\item user.airlock-2fa.activation.popup.activation-code.text: Text im Popup
 \end{itemize}
 
 \section{Testkonzept}
@@ -449,8 +450,8 @@ Unit-Tests und Integrations-Tests werden von der Entwicklungsumgebung Intellij a
 \\
 Damit sichergegangen werden kann, dass nicht nur die neuen Funktionen funktionieren, sondern alles darum herum auch noch, führt Jenkins bei jedem Push eines neuen Patchsets alle Tests aus. Failed dieser Build, ist etwas kaputt.
 
-\subsection{Wiremock}
-In allen Tests wird Wiremock verwendet um den Futurae Server zu simulieren. Wiremock stellt dabei einen Dummy-Server zurverfügung, das heisst alle Anfragen gehen an diesen Server und somit nicht über das Netzwerk. Dies verhindert Flaky Tests und bietet eine konstante und auf den Testcase angepasste API. 
+\subsection{Wiremock} \label{subsec:wiremock}
+In gewissen Unit- sowie allen Integration- Tests wird Wiremock verwendet um den Futurae Server zu simulieren. Wiremock stellt dabei einen Dummy-Server zurverfügung, das heisst alle Anfragen gehen an diesen Server und somit nicht über das Netzwerk. Dies verhindert Flaky Tests und bietet eine konstante und auf den Testcase angepasste API. 
 
 \subsection{Unit-Tests}
 Unit-Tests werden verwendet um die Kernlogik in kleinen isolierten Einheiten zu testen. Hierfür werden komplexe Umsysteme oder Klassen gemockt. Dies wird mit Mockito gemacht. Die Tests ansich werden mit JUnit5 implementiert. Konkret für diesen Auftrag müssen folgende Kernfunktionalitäten mit Unit-Tests abgedeckt werden:

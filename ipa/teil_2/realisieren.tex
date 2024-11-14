@@ -54,7 +54,7 @@ Anschliessend folgt die Response:
 	\end{center}
 \end{figure}
 
-\subsection{Requests zu Futurae}
+\subsection{Requests zu Futurae}\label{subsec:reqtofuturae}
 Damit die SPA den 16-stelligen Aktivierungscode wie geplant angeboten bekommt, müssen in der Kommunikation zwischen IAM und Futurae einige Erweiterungen getroffen werden.\\
 \\
 \textbf{16-stelliger Aktivierungscode erzwingen}\\
@@ -192,6 +192,7 @@ return restClient.read(request, response -> {
 		LOG.info("Could not find a pending enrollment for account with id: " + accountId.getId());
 		return Optional.empty();
 	}
+	LOG.info("Latest pending Enrollment fetched successfully for account with id: " + accountId.getId());
 	return Optional.of(mapEnrollment(result
 	.getEnrollmentResponseList().getFirst()));
 });
@@ -200,23 +201,23 @@ Falls die Response einen 400 beinhaltet wird eine Info geloggt und Optional.empt
 Da dies der einzige von Futurae definierte Error für diesen Request ist, werden die anderen mit dem darauf folgenden if-Statement abgefangen.\\
 Danach wird in einem bereits bestehenden ResponseReader die Response in das Erwartete Objekt geparst. Ist das zurückkommende Result präsent, wird geprüft, ob es Einträge in der Enrollmentliste gibt, falls ja wird ein Optional vom ersten Eintrag genommen. Dies geht, da davon ausgegangen werden kann, dass entweder genau 0 oder 1 Eintrag vorhanden ist. Dies weil im Request die limit auf 1 gesetzt wurde.\\
 \\
-Dieses Optional wird dann über den Airlock2FAAdminService.java an die Resource überliefert, welche dann schlussendlich den Code oder null, falls nichts vorhanden, zurückgibt.
+Dieses Optional wird dann über den Airlock2FAAdminService.java an die Resource überliefert, welche dann schlussendlich den 16-stelligen Aktivierungscode oder nichts, falls nichts vorhanden, als ResourceDocument zurückgibt.
 \subsection{Logging}
 Das Logging muss die Anforderung \flqq FA 3\frqq , definiert in Abschnitt \ref{subsec:anforderungenBackend} erfüllen. Hierfür wurde im Airlock2FAAdminService.java folgende Methode imlementiert:
 \begin{lstlisting}[language=Java]
-public Optional<String> findLatestPendingEnrollment (Airlock2FAUserAccount account) {
+	public Optional<String> findLatestPendingShortActivationCode (Airlock2FAUserAccount account) {
 	return adminApiEnrollmentService
 	.getLatestPendingEnrollment(account.getAccountId())
 	.map(enrollment -> {
+		signingLogger.log(format("Administrator '%s' accessed the Airlock 2FA short activation code of user '%s'.", administrator.getName(), account.getUserId()));
 		helpdeskLogger.log(account.getUserId(), format("Administrator '%s' accessed the Airlock 2FA short activation code.", administrator.getName()));
 		return enrollment.getActivationCodeShort();
 	})
-	.or(() -> {
-		helpdeskLogger.log(account.getUserId(), format("Administrator '%s' tried to access the Airlock 2FA short activation code but no value was present.", administrator.getName()));
-		return Optional.empty();
-	});
+	.or(Optional::empty);
+}
 \end{lstlisting}
-In dieser Methode wrid aus dem erhaltenen Optional Enrollment der 16-stellige Aktivierungscode herausgefiltert und je nache fall, ob präsent oder nicht, wird ein Optional String oder Empty zurückgegeben. Da dies der Service ist, welcher der Resource dient, in welcher der neue Endpunkt ist, wurde hier dann das Logging eingebaut. Das heisst diese Methode ist weniger allgemein, als jene im Enrollmentservice und es kann davon ausgegangen werden, dass sie nicht von anderen Features genutzt wird. Da es im User Activities Logfile stehen muss, wurde der Helpdesklogger verwendet. In der Adminapp im Activities Tab des aktuellen Nutzers, sieht dies nun wie folgt aus:
+In dieser Methode wrid aus dem erhaltenen Optional Enrollment der 16-stellige Aktivierungscode herausgefiltert und je nache fall, ob präsent oder nicht, wird ein Optional String oder Empty zurückgegeben. Da dies der Service ist, welcher der Resource dient, in welcher der neue Endpunkt ist, wurde hier dann das Logging eingebaut. Das heisst diese Methode ist weniger allgemein, als jene im Enrollmentservice und es kann davon ausgegangen werden, dass sie nur für diesen Zweck verwendet wird. Der Signing Logger ist für das Audit Log, diese Message darf deshalb auch technisch sein, und muss nicht für jeden verständlich sein.
+Damit es auch im User Activities Logfile nachvoll ziehbar ist, welcher Admin wann auf einen Aktivierungscode zugegriffen hat, wurde der Helpdesklogger verwendet. In der Adminapp im Activities Tab des aktuellen Nutzers, sieht dies nun wie folgt aus:
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=1.0\textwidth]{ressourcen/logpresent}
@@ -224,30 +225,146 @@ In dieser Methode wrid aus dem erhaltenen Optional Enrollment der 16-stellige Ak
 	\end{center}
 \end{figure}
 \noindent Im obigen Bild links, ist der Zeitpunkt, zudem der Admin auf den Code zugegriffen hat, zusehen. Auf der rechten Seite dann der Text, welcher im obigen Code im ersten Logstatement steht. 
-\begin{figure}[H]
-	\begin{center}
-		\includegraphics[width=1.0\textwidth]{ressourcen/lognotpresent}
-		\caption[Logeintrag bei \textbf{nicht} vorhandenem Aktivierungscode]{Logeintrag bei \textbf{nicht} vorhandenem Aktivierungscode}\label{fig:lognotpresent}
-	\end{center}
-\end{figure}
-\noindent Im obigen Bild links, ist der Zeitpunkt, zudem der Admin auf den Code zugegriffen hat, zusehen. Auf der rechten Seite dann der Text, welcher im obigen Code im zweiten Logstatement steht.  
 
 \subsection{Resultat}
 Die oben aufgezeigten Schritte führten schlussendlich zum gewollten Resulat. Der Endpunkt liefert nun den neusten, offenen Aktivierungscode, falls er vorhanden ist
 \begin{verbatim}
 {
-	"shortActivationCode": "60b9 7irw xad1 2w8v"
+	"meta": {
+		"type": "jsonapi.metadata.document",
+		"timestamp": "2024-11-14T13:12:29.093+01:00"
+	},
+	"data": {
+		"type": "user.token.airlock-2fa.short-activation-code",
+		"id": "2600345384",
+		"attributes": {
+			"shortActivationCode": "wdgj zjt4 m5h2 faxw"
+		}
+	}
 }
 \end{verbatim}
-und sonst null resp. nichts.
+und sonst nichts.
 \begin{verbatim}
-	{
-		{}
+{
+	"meta": {
+		"type": "jsonapi.metadata.document",
+		"timestamp": "2024-11-14T13:10:25.036+01:00"
+	},
+	"data": {
+		"type": "user.token.airlock-2fa.short-activation-code",
+		"id": "0",
+		"attributes": {
+			"shortActivationCode": ""
+		}
 	}
+}
 \end{verbatim}
 Der Endpunkt ist durch den Role Based Access Controller geschützt, sodass nur Admins mit den nötigen Rollen Zugriff haben. Alle anderen erhalten einen 403. Jeder erlaubte Zugriff wird nach den Anforderungen geloggt.
 \subsection{Tests}
+Die Unit-Tests so wie die Integrationtests werden nach dem AAA(Arrange, Act, Assert) Pattern gegliedert. Dies bedeuted das im ersten Abschnitt(Arrange) alles was für den Test gebraucht wird zusammengestellt wird. Im zweiten Abschnitt(Act) wird die zu testende Methode, resp. in den Integrationtests der zu testende Endpunkt, aufgerufen. Und in einem dritten Abschnitt(Assert), wird das erwartete Resultat mit dem tatsächlichen Resultat verglichen. Dies dient der Übersicht und der Leserlichkeit des Tests. In einigen Fällen kann es sein, dass der erste Schritt weg fällt, da z.B nichts arranged werden muss, oder auf der Testklasse bereits arranged wurde. Nach jedem der Abschnitte kommt jeweils eine leere Zeile. \\
+\\
+\textbf{Ausbau Api Stubber}\\
+Wie in der Planung unter \ref{subsec:wiremock} bereits angesprochen, laufen die Tests nicht gegen das originale Futurae API, sondern gegen einen mit Wiremock simulierten Server.\\
+Da der Endpunkt, der für den neuen Call zu Futurae (\ref{subsec:reqtofuturae}) angesprochen wird, auf dem Stubber noch nicht existiert, muss dieser zuerst erstellt werden. Dabei wird der Pfad definiert inkl. allen Queryparametern und die Response. Da als Response nicht immer das selbe erwartet wird, gibt es 2 verschiedene Methoden im Stubber:
+\begin{lstlisting}[language=Java]
+	public FuturaeAdminApiStubber withPendingEnrollmentList (String accountId, int limit) {
+	wireMockClient.register(
+	get(urlPathEqualTo(FUTURAE_ADMIN_ENROLLMENTS_PATH))
+	.withQueryParams(getQueryParams(accountId, limit))
+	.willReturn(aJsonResponse(
+	defaultEnrollmentList(List.of(
+	defaultEnrollment(DEFAULT_ACTIVATION_CODE)
+	.activationCodeShort(DEFAULT_ACTIVATION_CODE_SHORT)
+	.toJsonObject()), limit)
+	.toJsonObject()))
+	);
+	return this;
+}
 
+public FuturaeAdminApiStubber withEmptyPendingEnrollmentList (String accountId) {
+	wireMockClient.register(
+	get(FUTURAE_ADMIN_ENROLLMENTS_PATH)
+	.withQueryParams(getQueryParams(accountId, 1))
+	.willReturn(aJsonResponse(emptyEnrollmentList()
+	.toJsonObject()))
+	);
+	return this;
+}
+
+private static Map<String, StringValuePattern> getQueryParams (String airlock2FAAccountId, int limit) {
+	return Map.of("user_id", equalTo(airlock2FAAccountId),
+	"status", equalTo("pending"),
+	"sort_by", equalTo("created_at"),
+	"order", equalTo("desc"),
+	"limit", equalTo(valueOf(limit)));
+}
+\end{lstlisting}
+Die erste gibt eine Response, welche erfolgreich ist zurück. Die zweite eine Response in der die Enrollment Liste leer ist, heisst es wird simuliert, dass kein offens Enrollment existiert. Diese 2 Fälle reichen aus um das neue Feature zu testen.
+Dieser Stubber wird für alle REST-Integrationtests verwendet. Für die Unit-Tests wird direkt im Test gestubbed. Das prinzip ist aber das gleiche.\\\\
+\textbf{Integration Tests}\\
+Für die Integrationtests ist wichtig, dass eine IAM-Instanz läuft. In jedem Test wird eine IAM-Konfiguration zusammengestellt, welche die für die Tests notwendigen Plugins einkonfiguriert hat.
+Hier ist ein Beispiel wie die zuvor erstellten Stubbermethoden genutzt werden:
+ 
+\begin{lstlisting}[language=Java]
+@Test
+void shouldGetAirlock2FAShortActivationCode (FuturaeAdminApiStubber stubber) {
+	addAirlock2FAAccount(DEFAULT_USERNAME);
+	stubber.withPendingEnrollmentList(defaultAccount().userId().toString(), 1);
+	
+	JsonApiResourceResponse<Airlock2FAShortActivationCodeAttributes> response = getAirlock2FAShortActivationCode(DEFAULT_USERNAME);
+	
+	assertThat(response)
+	.satisfies(r -> {
+		assertThat(r.getData().getAttributes()).isNotNull();
+		String actualCode = r.getData().getAttributes().getShortActivationCode();
+		assertThat(actualCode).isNotNull();
+		assertThat(actualCode)
+		.isEqualTo(DEFAULT_ACTIVATION_CODE_SHORT);
+	})
+	.hasStatus(OK);
+}
+\end{lstlisting}
+Zuerst wird ein neuer Airlock2FA Account hinzugefügt. Danach kommt die neue Stubbermethode zum einsatz. Sie registriert auf dem Server den in der Methode definierten Endpunkt. Der Test macht danach den Call auf den neuen Endpunkt im IAM. Dieser löst dann den Request zum Mock-Server aus, welcher die definerte Response liefert. Am Schluss wird die Response des Endpunktes im IAM verifiziert. So kann sichergestellt werden, ob der neue Endpunkt wie erwartet funktioniert.\\
+\\
+\textbf{Unit-Tests}\\
+Für den Unit-Test des FuturaeAdminApiEnrollmentServiceImpl.java musste der Futurae Server auch gemockt werden. Da die Aktionen dieses Services von den Antworten des Servers abhängig sind.
+\begin{lstlisting}[language=Java]
+@Test
+void getLatestPendingEnrollmentShouldBeEmtpy () {
+	withEnrollmentListResponse(EXISTING_FUTURAE_USER_ID.getId(),
+	aJsonResponse()
+	.withBody(emptyEnrollmentList()));
+	
+	Optional<Airlock2FAEnrollment> enrollmentOptional = adminApiEnrollmentService()
+	.getLatestPendingEnrollment(EXISTING_FUTURAE_USER_ID);
+	
+	assertThat(enrollmentOptional).isEmpty();
+	
+}
+\end{lstlisting}
+Das obige Beispiel zeigt einen Unit-Test welcher sicherstellt, dass falls von Futurae eine Response ohne Enrollments zurück kommt, die Response der neuen Methode wie erwartet Optional Empty zurück gibt.\\
+Für die Unit-Tests des Airlock2FAAdminService.java konnte schon der\\
+Airlock2FAAdminApiEnrollmentService.java gemockt werden, das heisst hier war Wiremock nicht mehr nötig. Nebst dem richtigen Resultat wurde in diesen Tests, auch das Logging getestet. Mit der Hilfe von Mockito.verify, konnte einfach verifiziert werden, ob die Logger die erwarteten Statements geloggt hätten:
+\begin{lstlisting}[language=Java]
+verify(signingLogger).log("Administrator 'admin' accessed the Airlock 2FA short activation code of user 'user'.");
+verify(helpdeskLogger).log(account.getUserId(), "Administrator 'admin' accessed the Airlock 2FA short activation code.");
+\end{lstlisting}
+\subsection{Testen der Access Control}
+Um mit Automatisierten Tests sicherzustellen, dass nur berechtigte Admins Zugriff auf den 16-stelligen Aktivierungscode haben, musste zuerst die Konfiguration im REST-Integrationtest angepasst werden. Hierfür wurde zuerst im AdminappConfigBuilder.java eine neue Methode hinzugefügt, dammit man die Role Based Access Controller Config dynamisch setzen kann. Danach musste musste diese im Test konfiguriert werden. Da es je nach Test eine andere Konfiguration der berechtigten Rollen braucht musste dies dynamisch wie Parameter und Custom Configs gelöst werden. Das bedeutet, die Defaultconfig hat den Wert \flqq superadmin\frqq. Dies erlaubt dem Defaultuser den Zugriff auf die Airlock2FA Activation Secrets. Um zu testen ob ein Admin ohne die Erforderliche Rolle auch wirklich kein Zugriff haben, kann man nun die Konfiguration bearbeiten, und manuel aktivieren:
+\begin{lstlisting}[language=Java]
+@Test
+@CustomConfig
+void shouldGet403IfAccessNotAllowed () {
+	adminApp("helpdesk").activate();
+	addAirlock2FAAccount(DEFAULT_USERNAME);
+	
+	var response = getAirlock2FAShortActivationCode(DEFAULT_USERNAME);
+	
+	assertThat(response).hasStatus(FORBIDDEN);
+}
+\end{lstlisting}
+Damit der Rest der Konfiguration gleich bleibt, wurde nur der Inhalt des Rollenfelds, für die Action \flqq viewAirlock2FAActivationCode\frqq als Parameter definert. Hier wird jetzt die Defaultconfig überschrieben und der Inhalt auf helpdesk gesetzt. Da der Adminnutzer in diesem Test, nur die Rolle superadmin hat, wird der Status FORBIDDEN erwartet.
+\section{SPA erweitern}
 
 
 

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2024.10.28)  13 NOV 2024 17:14
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2024.10.28)  14 NOV 2024 17:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1037,9 +1037,6 @@ Package biblatex Warning: 'babel/polyglossia' detected but 'csquotes' missing.
 \@quotereset=\count472
 (./main.aux
 
-LaTeX Warning: Label `tab:arbeitsprotokoll-tag6' multiply defined.
-
-
 LaTeX Warning: Label `fig:restflow' multiply defined.
 
 )
@@ -1165,7 +1162,7 @@ Package biblatex Info: ... file 'main.bbl' found.
 Package biblatex Info: Reference section=0 on input line 126.
 Package biblatex Info: Reference segment=0 on input line 126.
 (./titel.tex
-<ressourcen/ergon_logo_gross.png, id=313, 556.2381pt x 118.7637pt>
+<ressourcen/ergon_logo_gross.png, id=321, 556.2381pt x 118.7637pt>
 File: ressourcen/ergon_logo_gross.png Graphic file (type png)
 <use ressourcen/ergon_logo_gross.png>
 Package pdftex.def Info: ressourcen/ergon_logo_gross.png  used on input line 5.
@@ -1241,7 +1238,7 @@ Kapitel 3.
 
 ]
 Kapitel 4.
-<ressourcen/arbeitsplatz.jpeg, id=459, 1606.0pt x 1204.5pt>
+<ressourcen/arbeitsplatz.jpeg, id=469, 1606.0pt x 1204.5pt>
 File: ressourcen/arbeitsplatz.jpeg Graphic file (type jpg)
 <use ressourcen/arbeitsplatz.jpeg>
 Package pdftex.def Info: ressourcen/arbeitsplatz.jpeg  used on input line 7.
@@ -1408,7 +1405,7 @@ Kapitel 8.
 
 pdfTeX warning: /usr/bin/pdflatex (file ./ressourcen/zeitplan.pdf): PDF inclusi
 on: found PDF version <1.7>, but at most version <1.5> allowed
-<ressourcen/zeitplan.pdf, id=542, 845.07718pt x 597.55246pt>
+<ressourcen/zeitplan.pdf, id=552, 845.07718pt x 597.55246pt>
 File: ressourcen/zeitplan.pdf Graphic file (type pdf)
 <use ressourcen/zeitplan.pdf>
 Package pdftex.def Info: ressourcen/zeitplan.pdf  used on input line 4.
@@ -1429,7 +1426,7 @@ on: found PDF version <1.7>, but at most version <1.5> allowed
 
 pdfTeX warning: /usr/bin/pdflatex (file ./ressourcen/zeitplan.pdf): PDF inclusi
 on: found PDF version <1.7>, but at most version <1.5> allowed
-<ressourcen/zeitplan.pdf, id=545, page=1, 845.07718pt x 597.55246pt>
+<ressourcen/zeitplan.pdf, id=555, page=1, 845.07718pt x 597.55246pt>
 File: ressourcen/zeitplan.pdf Graphic file (type pdf)
 <use ressourcen/zeitplan.pdf, page 1>
 Package pdftex.def Info: ressourcen/zeitplan.pdf , page1 used on input line 4.
@@ -1457,7 +1454,7 @@ Package pdftex.def Info: ressourcen/zeitplan.pdf , page1 used on input line 4.
 
 pdfTeX warning: /usr/bin/pdflatex (file ./ressourcen/zeitplan.pdf): PDF inclusi
 on: found PDF version <1.7>, but at most version <1.5> allowed
-<ressourcen/zeitplan.pdf, id=566, page=2, 845.07718pt x 597.55246pt>
+<ressourcen/zeitplan.pdf, id=576, page=2, 845.07718pt x 597.55246pt>
 File: ressourcen/zeitplan.pdf Graphic file (type pdf)
 <use ressourcen/zeitplan.pdf, page 2>
 Package pdftex.def Info: ressourcen/zeitplan.pdf , page2 used on input line 4.
@@ -1824,7 +1821,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 312--313
 
  []
 
-<ressourcen/restflow.png, id=644, 511.9125pt x 507.8975pt>
+<ressourcen/restflow.png, id=654, 511.9125pt x 507.8975pt>
 File: ressourcen/restflow.png Graphic file (type png)
 <use ressourcen/restflow.png>
 Package pdftex.def Info: ressourcen/restflow.png  used on input line 341.
@@ -1850,7 +1847,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 385--391
 
 pdfTeX warning: /usr/bin/pdflatex (file ./ressourcen/Mockup1.pdf): PDF inclusio
 n: found PDF version <1.7>, but at most version <1.5> allowed
-<ressourcen/Mockup1.pdf, id=666, 845.04686pt x 597.50786pt>
+<ressourcen/Mockup1.pdf, id=676, 845.04686pt x 597.50786pt>
 File: ressourcen/Mockup1.pdf Graphic file (type pdf)
 <use ressourcen/Mockup1.pdf>
 Package pdftex.def Info: ressourcen/Mockup1.pdf  used on input line 393.
@@ -1871,7 +1868,7 @@ n: found PDF version <1.7>, but at most version <1.5> allowed
 
 pdfTeX warning: /usr/bin/pdflatex (file ./ressourcen/Mockup1.pdf): PDF inclusio
 n: found PDF version <1.7>, but at most version <1.5> allowed
-<ressourcen/Mockup1.pdf, id=669, page=1, 845.04686pt x 597.50786pt>
+<ressourcen/Mockup1.pdf, id=679, page=1, 845.04686pt x 597.50786pt>
 File: ressourcen/Mockup1.pdf Graphic file (type pdf)
 <use ressourcen/Mockup1.pdf, page 1>
 Package pdftex.def Info: ressourcen/Mockup1.pdf , page1 used on input line 393.
@@ -1901,12 +1898,12 @@ Package pdftex.def Info: ressourcen/Mockup1.pdf , page1 used on input line 393.
 
 
  <./ressourcen/Mockup1.pdf>]
-<ressourcen/popup.png, id=678, 563.10374pt x 331.2375pt>
+<ressourcen/popup.png, id=688, 563.10374pt x 331.2375pt>
 File: ressourcen/popup.png Graphic file (type png)
 <use ressourcen/popup.png>
 Package pdftex.def Info: ressourcen/popup.png  used on input line 398.
 (pdftex.def)             Requested size: 334.60571pt x 196.82845pt.
-<ressourcen/variant_2_spa.png, id=679, 1053.9375pt x 562.1pt>
+<ressourcen/variant_2_spa.png, id=689, 1053.9375pt x 562.1pt>
 File: ressourcen/variant_2_spa.png Graphic file (type png)
 <use ressourcen/variant_2_spa.png>
 Package pdftex.def Info: ressourcen/variant_2_spa.png  used on input line 407.
@@ -1917,22 +1914,22 @@ Package pdftex.def Info: ressourcen/variant_2_spa.png  used on input line 407.
 LaTeX Font Info:    Font shape `T1/zi4/b/n' will be
 (Font)              scaled to size 10.95pt on input line 429.
 
-Underfull \hbox (badness 10000) in paragraph at lines 448--451
+Underfull \hbox (badness 10000) in paragraph at lines 449--452
 
  []
 
 [44] [45] [46]
-Underfull \hbox (badness 2990) in paragraph at lines 500--500
+Underfull \hbox (badness 2990) in paragraph at lines 501--501
 []|\T1/cmr/bx/n/10.95 Erwartetes Re-sul-
  []
 
 
-Underfull \hbox (badness 2990) in paragraph at lines 517--517
+Underfull \hbox (badness 2990) in paragraph at lines 518--518
 []|\T1/cmr/bx/n/10.95 Erwartetes Re-sul-
  []
 
 [47]
-Underfull \hbox (badness 2990) in paragraph at lines 535--535
+Underfull \hbox (badness 2990) in paragraph at lines 536--536
 []|\T1/cmr/bx/n/10.95 Erwartetes Re-sul-
  []
 
@@ -2026,7 +2023,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 28--33
 
  []
 
-<ressourcen/requestdoc.png, id=755, 1413.28pt x 347.2975pt>
+<ressourcen/requestdoc.png, id=765, 1413.28pt x 347.2975pt>
 File: ressourcen/requestdoc.png Graphic file (type png)
 <use ressourcen/requestdoc.png>
 Package pdftex.def Info: ressourcen/requestdoc.png  used on input line 42.
@@ -2041,7 +2038,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 35--45
 
  []
 
-<ressourcen/responsedoc.png, id=756, 1051.93pt x 748.7975pt>
+<ressourcen/responsedoc.png, id=766, 1051.93pt x 748.7975pt>
 File: ressourcen/responsedoc.png Graphic file (type png)
 <use ressourcen/responsedoc.png>
 Package pdftex.def Info: ressourcen/responsedoc.png  used on input line 52.
@@ -2080,25 +2077,54 @@ Underfull \hbox (badness 10000) in paragraph at lines 124--133
  []
 
 [55] [56]
-Underfull \hbox (badness 10000) in paragraph at lines 199--204
+Underfull \hbox (badness 10000) in paragraph at lines 200--205
 
  []
 
 [57]
-<ressourcen/logpresent.png, id=884, 1135.24126pt x 59.22125pt>
+<ressourcen/logpresent.png, id=895, 1135.24126pt x 59.22125pt>
 File: ressourcen/logpresent.png Graphic file (type png)
 <use ressourcen/logpresent.png>
-Package pdftex.def Info: ressourcen/logpresent.png  used on input line 222.
+Package pdftex.def Info: ressourcen/logpresent.png  used on input line 223.
 (pdftex.def)             Requested size: 418.25555pt x 21.81844pt.
-<ressourcen/lognotpresent.png, id=885, 1208.515pt x 42.1575pt>
-File: ressourcen/lognotpresent.png Graphic file (type png)
-<use ressourcen/lognotpresent.png>
-Package pdftex.def Info: ressourcen/lognotpresent.png  used on input line 229.
-(pdftex.def)             Requested size: 418.25555pt x 14.59001pt.
- [58 <./ressourcen/logpresent.png> <./ressourcen/lognotpresent.png>])
-(./teil_2/kontrollieren.tex [59]
+ [58 <./ressourcen/logpresent.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 264--269
+
+ []
+
+[59] [60]
+Underfull \hbox (badness 10000) in paragraph at lines 302--307
+
+ []
+
+
+Overfull \hbox (81.06848pt too wide) in paragraph at lines 312--314
+[][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (35.07811pt too wide) in paragraph at lines 314--316
+[][][][][][][][][] 
+ []
+
+
+Overfull \hbox (2.51768pt too wide) in paragraph at lines 319--320
+[][][][][][][][][][][][]  
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 327--331
+
+ []
+
+[61]
+Overfull \hbox (2.22784pt too wide) in paragraph at lines 334--335
+[][][][][][][][][][][]  
+ []
+
+[62]) (./teil_2/kontrollieren.tex [63]
 Kapitel 13.
-) (./teil_2/auswerten.tex [60
+) (./teil_2/auswerten.tex [64
 
 ]
 Kapitel 14.
@@ -2112,7 +2138,7 @@ Package glossaries Warning: No \printglossary or \printglossaries found.
 (Remove \makeglossaries if you don't want any glossaries.) 
 This document will not have a glossary.
 
-[61
+[65
 
 ] 
 enddocument/afterlastpage: lastpage setting LastPage.
@@ -2126,16 +2152,16 @@ L3 programming layer <2024-01-22>
 LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: F397C742245244260ECE99718144AF32;10557.
+(rerunfilecheck)             Checksum: AAAEFAB8E604AD7494541EBDCD3C39C7;10880.
 Package logreq Info: Writing requests to 'main.run.xml'.
 \openout1 = `main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 34143 strings out of 474222
- 612821 string characters out of 5748732
- 1995975 words of memory out of 5000000
- 55562 multiletter control sequences out of 15000+600000
+ 34270 strings out of 474222
+ 614822 string characters out of 5748732
+ 2005975 words of memory out of 5000000
+ 55607 multiletter control sequences out of 15000+600000
  574418 words of font info for 73 fonts, out of 8000000 for 9000
  1143 hyphenation exceptions out of 8191
  109i,19n,117p,2373b,2463s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -2150,10 +2176,10 @@ fb></usr/share/texmf/fonts/type1/public/cm-super/sfbx2074.pfb></usr/share/texmf
 cm-super/sfrm1000.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm1095.pf
 b></usr/share/texmf/fonts/type1/public/cm-super/sfrm1200.pfb></usr/share/texmf/
 fonts/type1/public/cm-super/sfrm1440.pfb>
-Output written on main.pdf (62 pages, 1073537 bytes).
+Output written on main.pdf (66 pages, 1078534 bytes).
 PDF statistics:
- 1061 PDF objects out of 1200 (max. 8388607)
- 931 compressed objects within 10 object streams
- 316 named destinations out of 1000 (max. 500000)
- 707 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1180 PDF objects out of 1200 (max. 8388607)
+ 1047 compressed objects within 11 object streams
+ 398 named destinations out of 1000 (max. 500000)
+ 718 words of extra memory for PDF output out of 10000 (max. 10000000)
 

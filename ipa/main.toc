@@ -73,6 +73,8 @@
 \contentsline {subsection}{\numberline {12.1.3}Logging}{58}{subsection.12.1.3}%
 \contentsline {subsection}{\numberline {12.1.4}Resultat}{59}{subsection.12.1.4}%
 \contentsline {subsection}{\numberline {12.1.5}Tests}{59}{subsection.12.1.5}%
-\contentsline {chapter}{\numberline {13}Kontrollieren}{60}{chapter.13}%
-\contentsline {chapter}{\numberline {14}Auswerten}{61}{chapter.14}%
-\contentsline {chapter}{Abbildungsverzeichnis}{61}{section*.11}%
+\contentsline {subsection}{\numberline {12.1.6}Testen der Access Control}{62}{subsection.12.1.6}%
+\contentsline {section}{\numberline {12.2}SPA erweitern}{63}{section.12.2}%
+\contentsline {chapter}{\numberline {13}Kontrollieren}{64}{chapter.13}%
+\contentsline {chapter}{\numberline {14}Auswerten}{65}{chapter.14}%
+\contentsline {chapter}{Abbildungsverzeichnis}{65}{section*.10}%
