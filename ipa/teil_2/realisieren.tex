@@ -71,7 +71,7 @@ Nebst dem Request musste natürlich auch die Response geändert werden, und um d
 \\
 Zum serealisieren und deserealisieren des Requests- / Response-Body wird Jackson verwendet. Dabei werden mit einfachen Annotationen die Javaobjekte auf die verlangten JSON-Felder gemapped oder umgekehrt:
 \captionsetup[lstlisting]{labelformat=empty}
-\begin{lstlisting}[language=Java, caption={Beispiel, wie Jackson auf dem Futurae Request zur Auth API (verwendet für die Self-Services) verwendet wird. (Enthält bereits das neue Feld \flqq short\_code\frqq).}]
+\begin{lstlisting}[language=Java, caption={Beispiel, wie Jackson auf dem Futurae Request zur Auth API (verwendet für die Self-Services) verwendet wird. (Enthält bereits das neue Feld \flqq short\_code\frqq{}).}]
 @NoArgsConstructor
 @Getter
 @Setter
@@ -121,7 +121,7 @@ private static Map<String, Object> getQueryParams (String airlock2FAAccountId) {
 	"limit", "1");
 }
 \end{lstlisting}
-Diese Methode \flqq getLatestPendingEnrollment\frqq mit der statischen Hilfsmethode \flqq getQueryParams \frqq baut einen GET Request mit folgendem Pfad zusammen:\\\\
+Diese Methode \flqq getLatestPendingEnrollment\frqq{} mit der statischen Hilfsmethode \flqq getQueryParams \frqq{} baut einen GET Request mit folgendem Pfad zusammen:\\\\
 /srv/admin/v1/enrollments?user\_id={userid}
 \newline\&status=pending 
 \newline\&sort\_by=created\_at 
@@ -164,7 +164,7 @@ Dieses Objekt bildet folgende JSON-Response, welche von Futurae so definiert wur
 	"total": 0
 }
 \end{verbatim}
-Der FuturaeAdminApiEnrollmentServiceImpl.java ist die Schnittstelle zwischen IAM und Futurae, für alle Aktionen welche das Enrollment betreffen. Für das wurde im seinem Interface die Methode \flqq getLatestPendingEnrollment\frqq definiert. Die Implentation sieht folgendermassen aus:
+Der FuturaeAdminApiEnrollmentServiceImpl.java ist die Schnittstelle zwischen IAM und Futurae, für alle Aktionen welche das Enrollment betreffen. Für das wurde im seinem Interface die Methode \flqq getLatestPendingEnrollment\frqq{} definiert. Die Implentation sieht folgendermassen aus:
 \begin{lstlisting}[language=Java]
 @Override
 public Optional<Airlock2FAEnrollment> getLatestPendingEnrollment (Airlock2FAAccountId accountId) {
@@ -203,7 +203,7 @@ Danach wird in einem bereits bestehenden ResponseReader die Response in das Erwa
 \\
 Dieses Optional wird dann über den Airlock2FAAdminService.java an die Resource überliefert, welche dann schlussendlich den 16-stelligen Aktivierungscode oder nichts, falls nichts vorhanden, als ResourceDocument zurückgibt.
 \subsection{Logging}
-Das Logging muss die Anforderung \flqq FA 3\frqq , definiert in Abschnitt \ref{subsec:anforderungenBackend} erfüllen. Hierfür wurde im Airlock2FAAdminService.java folgende Methode imlementiert:
+Das Logging muss die Anforderung \flqq FA 3\frqq{} , definiert in Abschnitt \ref{subsec:anforderungenBackend} erfüllen. Hierfür wurde im Airlock2FAAdminService.java folgende Methode imlementiert:
 \begin{lstlisting}[language=Java]
 	public Optional<String> findLatestPendingShortActivationCode (Airlock2FAUserAccount account) {
 	return adminApiEnrollmentService
@@ -350,7 +350,7 @@ verify(signingLogger).log("Administrator 'admin' accessed the Airlock 2FA short 
 verify(helpdeskLogger).log(account.getUserId(), "Administrator 'admin' accessed the Airlock 2FA short activation code.");
 \end{lstlisting}
 \subsection{Testen der Access Control}
-Um mit Automatisierten Tests sicherzustellen, dass nur berechtigte Admins Zugriff auf den 16-stelligen Aktivierungscode haben, musste zuerst die Konfiguration im REST-Integrationtest angepasst werden. Hierfür wurde zuerst im AdminappConfigBuilder.java eine neue Methode hinzugefügt, dammit man die Role Based Access Controller Config dynamisch setzen kann. Danach musste musste diese im Test konfiguriert werden. Da es je nach Test eine andere Konfiguration der berechtigten Rollen braucht musste dies dynamisch wie Parameter und Custom Configs gelöst werden. Das bedeutet, die Defaultconfig hat den Wert \flqq superadmin\frqq. Dies erlaubt dem Defaultuser den Zugriff auf die Airlock2FA Activation Secrets. Um zu testen ob ein Admin ohne die Erforderliche Rolle auch wirklich kein Zugriff haben, kann man nun die Konfiguration bearbeiten, und manuel aktivieren:
+Um mit Automatisierten Tests sicherzustellen, dass nur berechtigte Admins Zugriff auf den 16-stelligen Aktivierungscode haben, musste zuerst die Konfiguration im REST-Integrationtest angepasst werden. Hierfür wurde zuerst im AdminappConfigBuilder.java eine neue Methode hinzugefügt, dammit man die Role Based Access Controller Config dynamisch setzen kann. Danach musste musste diese im Test konfiguriert werden. Da es je nach Test eine andere Konfiguration der berechtigten Rollen braucht musste dies dynamisch wie Parameter und Custom Configs gelöst werden. Das bedeutet, die Defaultconfig hat den Wert \flqq superadmin\frqq{}. Dies erlaubt dem Defaultuser den Zugriff auf die Airlock2FA Activation Secrets. Um zu testen ob ein Admin ohne die Erforderliche Rolle auch wirklich kein Zugriff haben, kann man nun die Konfiguration bearbeiten, und manuel aktivieren:
 \begin{lstlisting}[language=Java]
 @Test
 @CustomConfig
@@ -363,9 +363,168 @@ void shouldGet403IfAccessNotAllowed () {
 	assertThat(response).hasStatus(FORBIDDEN);
 }
 \end{lstlisting}
-Damit der Rest der Konfiguration gleich bleibt, wurde nur der Inhalt des Rollenfelds, für die Action \flqq viewAirlock2FAActivationCode\frqq als Parameter definert. Hier wird jetzt die Defaultconfig überschrieben und der Inhalt auf helpdesk gesetzt. Da der Adminnutzer in diesem Test, nur die Rolle superadmin hat, wird der Status FORBIDDEN erwartet.
+Damit der Rest der Konfiguration gleich bleibt, wurde nur der Inhalt des Rollenfelds, für die Action \flqq viewAirlock2FAActivationCode\frqq{} als Parameter definert. Hier wird jetzt die Defaultconfig überschrieben und der Inhalt auf helpdesk gesetzt. Da der Adminnutzer in diesem Test, nur die Rolle superadmin hat, wird der Status FORBIDDEN erwartet.
 \section{SPA erweitern}
+Im folgenden Abschnitt wird beschrieben wie die Adminseite in der SPA erweitert wurde.
 
+\subsection{Request zur IAM API}
+Zuerst musste ein neues Model erstellt werden, welches auf die JSON-Response gemapped werden kann:
+\begin{lstlisting}[language=TypeScript]
+export class Airlock2FAShortActivationCode {
+	activationCodeShort: string;
+}
+\end{lstlisting}
+Im Rahmen der Probe-VA ist dies ein Objekt mit einem Property, welches den 16-stelligen Aktivierungscode abbildet. \\
+Danach wurden die Funktionalitäten eingebaut um den neuen Endpunkt aus der SPA anzusteuern. Dazu wurde der \flqq airlock-2fa.service.ts\frqq{} um folgende 2 Methoden erweitert:
+\begin{itemize}
+	\item getLatestPendingActivationCode: Diese Methode führt den Request mit Hilfe des Http Client aus dem Angular common Package. 
+	\item toAirlock2FAShortActivationCode: Dies ist die Mappermethode, welche die JsonApiResponse ausliest und in ein neues Objekt des zuerst erstellte Model's parsed. 
+\end{itemize}
+Dieses Objekt wird schlussendlich von der ersten Methode \flqq getLatestPendingActivationCode\frqq{} zurückgegeben.
+
+\subsection{Darstellung im UI}
+Damit der 16-stellige Aktivierungscode wie erwartet im Popup angezeigt wird, musste die bestehende airlock-2fa Komponente im HTML für die Struktur, und im Typescript für die Logik, erweitert werden.
+\\
+\\
+\textbf{airlock-2fa.component.html}
+\\
+Zuerst wurde das HTML erweitert. Es wurde der neue Button hinzugefüt welcher, das Popup triggert:
+\begin{lstlisting}
+<iam-button
+	*ngIf="isCodePresent"
+	[id]="viewShortActivationCodeButtonId"
+	[hideOnAccessDenied]="true"
+	[text]="'Activation code'"
+	[right]="true"
+	[outsideOfCard]="true"
+	(buttonClick)="viewActivationCode()">
+</iam-button>
+\end{lstlisting}
+Ohne implementation des Typescript's funktioniert dieser Button natürlich noch noch nicht.\\
+\\
+\textbf{airlock-2fa.component.ts}
+\\
+Im Typescript wurde dann die ganze Logik des Buttons implementiert. Sprich wann darf er angezeigt werden und was passiert, wenn man in anklickt. \\
+Damit sichergestellt wird, dass der Button nur angezeigt wird wenn der Admin auch die erforderlichen Rollen hat, gibt es auf der iam-button Komponente ein Feld, namens \flqq hideOnAccessDenied\frqq{}. Wird dieses Feld auf true gesetzt, wird der Button nur angezeigt, wenn, die in Airlock2FATokenPermissions.java definierte Action, für diesen Button von dem Access Controller für diesen Admin erlaubt wird:
+\begin{lstlisting}[language=Java]
+private void addActivationCodePermissions (PagePermissionsBuilder page) {
+	page.permission("viewShortActivationCode", accessController
+	.isActionAllowed(viewAirlock2FAActivationSecret));
+}
+\end{lstlisting}
+Dieses Mapping funktioniert über die Button ID. Sprich der Key der Permisson muss den selben Stringwert haben, wie die ID des Buttons. Doch wie in der Anforderung \flqq FA 8\frqq{} in Kapitel\ref{subsec:anforderungenSPA} beschrieben, sollte der Button auch nur angzeigt werden, falls auch ein offener Aktivierungscode existiert. Für das wird in der ngOnInit Methode, falls der Admin die nötigen Rollen hat, der Request ausgeführt, und falls die Response nicht leer ist, das boolean Flag \flqq isCodePreset auf true gesetzt. Um den Request auszuführen wird die zuvor im Service erstellte Methode aufgerufen. Der 16-stellige Aktivierungscode wird bewusst nicht im ngOnInit lokal in die Komponente gespeichert, da es sein kann, dass er plötzlich nicht mehr offen ist, oder nicht mehr der neuste ist. Der Aktivierungscode wird deshalb immer neu angefragt wenn der Button geklickt wird. Mit anderen Worten, im ngOnInit wird nur validiert, ob der Button angezeigt werden darf oder nicht. Wird der Button geklickt, führt er folgene Methode aus:
+\begin{lstlisting}[language=TypeScript]
+viewActivationCode () {
+	this.findPendingActivationCode().subscribe(
+	res => {
+			this.pageDialog.show({
+				showCancel: false,
+				closeOnOk: true,
+				okText: 'Close',
+				title: '16-digits activation code',
+				text: this.isCodePresent ?
+					this.languageService
+					.translate('Activation code:')
+					+ ' '
+					+ res.activationCodeShort :
+					'Code is not pending anymore.'
+			});
+		}
+	);
+}
+\end{lstlisting}
+Diese führt zuerst wieder den Request aus. Sobald eine Antwort zurück kommt wird der Dialog angezeigt. Das Aussehen und Verhalten des Dialog's kann ein Stück weit über die PageDialogSettings, welche der show-Methode übergeben werden, beeinflusst werden. So sorgen bspw. showCancel: false, und closeOnOk: true dafür, dass nur der Ok Button angezeigt wird, welcher bei einem Klick, das Popup schliesst. Die PageDialog Komponente existierte bereits. Jedoch hatte sie gerade bei diesen 2 Feldern noch einen Bug, welcher noch nicht entdeckt wurde, da diese beiden Felder noch nirgends, versucht worden sind zu überschreiben. Das Problem war folgendes:\\
+Die Booleans wurden in der show-Methode bisher wie folgt versucht zu überschreiben:
+\begin{lstlisting}[language=TypeScript]
+this.showCancel = settings.showCancel || true;
+\end{lstlisting}
+Dies hat zwar für alle Stringvalues gut funkioniert, denn bei einem String kann so direkt geprüft werden ob er undefined, empty oder null ist, falls ja wird der Defaultwert verwendet.
+Bei einem Boolean funktioniert das nicht, da dieser false als einen gültigen Wert hat. Sprich setzt man showCancel beim Aufruf auf false, wird hier automatisch true verwendet. Dies weil das erste Statement false ist und der Operator || auf falsy-Werte prüft, welches unteranderem auch der Wert false ist. Die Lösung für dieses Problem war, dass man den Boolean mit dem Nullish Coalescing Operator explizit nur auf null und undefined prüft, und nicht auf andere falsy Werte, wie false:
+\begin{lstlisting}[language=TypeScript]
+this.showCancel = settings.showCancel ?? true;
+\end{lstlisting}
+Also falls dieses Flag nicht von aussen gesetzt wird, dann ist es undefined, und wird auf den Standartwert true gesetzt. Ansonsten, falls es von aussen gesetzt wird, wird dieser Wert verwendet.
+\\
+Der Inhalt des Dialogs, wird über das erforderliche Feld \flqq text\frqq{} gesetzt. Hier wird dann die Antwort aus dem Request, sprich der 16-stellige Aktivierungscode, eingefüllt und sommit im Popup angezeigt.
+\begin{lstlisting}[language=TypeScript]
+text: this.isCodePresent ? 
+				'Activation code:'
+				+ ' '
+				+ res.activationCodeShort :
+				'The activation is not pending anymore.'
+
+\end{lstlisting}
+Falls nun der Button geklickt wird, der Akivierungscode aber im Hintergrund bereits nicht mehr offen ist, wird dies in Form von Text, im Popup mitgeteilt. 
+\subsection{i18n Translation Keys}
+Da die Admin-App die 3 Sprachen, Deutsch, Englisch und Französisch unterstützt, können die Texte nicht, so wie sie aktuell sind, hardcoded im gesetzt werden. Alle Texte, also Titel, Popuptext oder der Text im Button, müssen über Translation Keys verfügen. Für jede Sprache gibt es nun ein JSON-File, welches zu diesen Keys jeweils den richtig übersetzten Wert hat. Mithilfe des Language Services, können diese dann auf die gewünschte Sprache eingefügt werden. Das Json für die deutsche Sprache sieht so aus:
+\begin{verbatim}
+"activation": {
+	"view-activation-code": {
+		"button": "Aktivierungs-Code anzeigen",
+		"popup": {
+			"close": "Schliessen",
+			"title": "16-stelliger Aktivierungs-Code",
+			"text": {
+				"code": "Aktivierungs-Code:",
+				"not-pending": "Die Aktivierung ist nicht mehr offen."
+			}
+		}
+	}
+}
+\end{verbatim}
+Dies ist die Struktur für die folgenden Keys:
+\begin{itemize}
+	\item user.airlock-2fa.activation.view-activation-code.button
+	\item user.airlock-2fa.activation.view-activation-code.popup.close
+	\item user.airlock-2fa.activation.view-activation-code.popup.title
+	\item user.airlock-2fa.activation.view-activation-code.popup.text.code
+	\item user.airlock-2fa.activation.view-activation-code.popup.text.not-pending
+\end{itemize}
+Am Beispiel des Popup Textes sieht man, wie diese verwendet werden:
+\begin{itemize}
+	\item Ohne Keys:
+	\begin{lstlisting}[language=TypeScript]
+		text: this.isCodePresent ? 
+		'Activation code:'
+		+ ' '
+		+ res.activationCodeShort :
+		'The activation is not pending anymore.'
+		
+	\end{lstlisting}
+	\item Mit Keys:
+	\begin{lstlisting}[language=TypeScript]
+        this.languageService
+        	.translate('user.airlock-2fa.activation
+        		.view-activation-code.popup.text.code')
+		+ ' '
+		+ res.activationCodeShort :
+		'user.airlock-2fa.activation
+			.view-activation-code.popup.text.not-pending'
+	\end{lstlisting}
+	Da hier im Fall, dass keine Aktivierung mehr offen ist, keine Variable im Text ist, muss er nicht in dieser Komponente mit dem Language Serivce translated werden. In diesem Fall wird es direkt von der Popup Komponente gemacht.	
+\end{itemize}
+Im tatsächlichen UI sieht das ganze mit den Keys dann so aus:
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=1.0\textwidth]{ressourcen/popup-de}
+		\caption[Popup deutsch]{Popup deutsch}\label{fig:popup-de}
+	\end{center}
+\end{figure}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=1.0\textwidth]{ressourcen/popup-en}
+			\caption[Popup englisch]{Popup englisch}\label{fig:popup-en}
+	\end{center}
+\end{figure}	
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=1.0\textwidth]{ressourcen/popup-fr}
+		\caption[Popup französisch]{Popup französisch}\label{fig:popup-fr}
+	\end{center}
+\end{figure}
+\noindent Wie man sieht, wird der Text im Popup nun immer auf die aktive Sprache der SPA übersetzt.
+\subsection{UI Integration-Tests}
+Die UI Integration-Tests werden im IAM mit der Hilfe von Selenium durchgeführt. Durch dies wird das komplette Feature von der SPA bis zum Backend / der DB (Futurae (Wiremock-) Server und wieder zurück getestet.
 
 
 
