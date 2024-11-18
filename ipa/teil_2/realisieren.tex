@@ -260,10 +260,10 @@ und sonst nichts.
 }
 \end{verbatim}
 Der Endpunkt ist durch den Role Based Access Controller geschützt, sodass nur Admins mit den nötigen Rollen Zugriff haben. Alle anderen erhalten einen 403. Jeder erlaubte Zugriff wird nach den Anforderungen geloggt.
-\subsection{Tests}
-Die Unit-Tests so wie die Integrationtests werden nach dem AAA(Arrange, Act, Assert) Pattern gegliedert. Dies bedeuted das im ersten Abschnitt(Arrange) alles was für den Test gebraucht wird zusammengestellt wird. Im zweiten Abschnitt(Act) wird die zu testende Methode, resp. in den Integrationtests der zu testende Endpunkt, aufgerufen. Und in einem dritten Abschnitt(Assert), wird das erwartete Resultat mit dem tatsächlichen Resultat verglichen. Dies dient der Übersicht und der Leserlichkeit des Tests. In einigen Fällen kann es sein, dass der erste Schritt weg fällt, da z.B nichts arranged werden muss, oder auf der Testklasse bereits arranged wurde. Nach jedem der Abschnitte kommt jeweils eine leere Zeile. \\
+\subsection{Tests}\label{subsec:testbackend}
+Die Unit-Tests so wie die Integration-Tests werden nach dem AAA(Arrange, Act, Assert) Pattern gegliedert. Dies bedeuted das im ersten Abschnitt(Arrange) alles was für den Test gebraucht wird zusammengestellt wird. Im zweiten Abschnitt(Act) wird die zu testende Methode, resp. in den Integration-Tests der zu testende Endpunkt, aufgerufen. Und in einem dritten Abschnitt(Assert), wird das erwartete Resultat mit dem tatsächlichen Resultat verglichen. Dies dient der Übersicht und der Leserlichkeit des Tests. In einigen Fällen kann es sein, dass der erste Schritt weg fällt, da z.B nichts arranged werden muss, oder auf der Testklasse bereits arranged wurde. Nach jedem der Abschnitte kommt jeweils eine leere Zeile. \\
 \\
-\textbf{Ausbau Api Stubber}\\
+\textbf{Ausbau Api Stubber}\label{head:stubber}\\
 Wie in der Planung unter \ref{subsec:wiremock} bereits angesprochen, laufen die Tests nicht gegen das originale Futurae API, sondern gegen einen mit Wiremock simulierten Server.\\
 Da der Endpunkt, der für den neuen Call zu Futurae (\ref{subsec:reqtofuturae}) angesprochen wird, auf dem Stubber noch nicht existiert, muss dieser zuerst erstellt werden. Dabei wird der Pfad definiert inkl. allen Queryparametern und die Response. Da als Response nicht immer das selbe erwartet wird, gibt es 2 verschiedene Methoden im Stubber:
 \begin{lstlisting}[language=Java]
@@ -300,11 +300,26 @@ private static Map<String, StringValuePattern> getQueryParams (String airlock2FA
 }
 \end{lstlisting}
 Die erste gibt eine Response, welche erfolgreich ist zurück. Die zweite eine Response in der die Enrollment Liste leer ist, heisst es wird simuliert, dass kein offens Enrollment existiert. Diese 2 Fälle reichen aus um das neue Feature zu testen.
-Dieser Stubber wird für alle REST-Integrationtests verwendet. Für die Unit-Tests wird direkt im Test gestubbed. Das prinzip ist aber das gleiche.\\\\
-\textbf{Integration Tests}\\
-Für die Integrationtests ist wichtig, dass eine IAM-Instanz läuft. In jedem Test wird eine IAM-Konfiguration zusammengestellt, welche die für die Tests notwendigen Plugins einkonfiguriert hat.
-Hier ist ein Beispiel wie die zuvor erstellten Stubbermethoden genutzt werden:
- 
+Dieser Stubber wird für alle REST-Integration-Tests verwendet. Für die Unit-Tests wird direkt im Test gestubbed. Das prinzip ist aber das gleiche.\\\\
+\textbf{Integration-Tests}\label{header:inttest}\\
+Für die Integration-Tests ist wichtig, dass eine IAM-Instanz läuft. In jedem Test wird eine IAM-Konfiguration zusammengestellt, welche die für die Tests notwendigen Plugins einkonfiguriert hat:
+\begin{lstlisting}[language=Java]
+private IamConfig adminApp (String allowedToViewAirlock2FAActivationSecrets) {
+	return iamConfig()
+		.newAdminapp()
+		.addRoleBasedAccessControl(roleBasedAccessControl()
+			.viewAirlock2FAActivationSecret(
+			allowedToViewAirlock2FAActivationSecrets))
+		.withStartPages(MANAGE_USER)
+		.addTokenController(
+			airlock2FATokenController(futuraeApiUrl)
+			.build())
+		.build();
+}
+\end{lstlisting}
+In diesem Fall sieht es so aus.  Diese Methode hat einen Parameter um die Role Based Access Control je nach Testcase zu beeinflussen.
+Vor jedem Test wird nun diese Config geladen und Aktiviert, es sei denn, es werden Custom Configs verwendent. Dieser Fall ist in Kaptitel \ref{subsec:testacc} beschrieben.\\
+Hier ist ein Beispiel wie die zuvor erstellten Stubbermethoden in einem Test genutzt werden können:
 \begin{lstlisting}[language=Java]
 @Test
 void shouldGetAirlock2FAShortActivationCode (FuturaeAdminApiStubber stubber) {
@@ -349,8 +364,8 @@ Airlock2FAAdminApiEnrollmentService.java gemockt werden, das heisst hier war Wir
 verify(signingLogger).log("Administrator 'admin' accessed the Airlock 2FA short activation code of user 'user'.");
 verify(helpdeskLogger).log(account.getUserId(), "Administrator 'admin' accessed the Airlock 2FA short activation code.");
 \end{lstlisting}
-\subsection{Testen der Access Control}
-Um mit Automatisierten Tests sicherzustellen, dass nur berechtigte Admins Zugriff auf den 16-stelligen Aktivierungscode haben, musste zuerst die Konfiguration im REST-Integrationtest angepasst werden. Hierfür wurde zuerst im AdminappConfigBuilder.java eine neue Methode hinzugefügt, dammit man die Role Based Access Controller Config dynamisch setzen kann. Danach musste musste diese im Test konfiguriert werden. Da es je nach Test eine andere Konfiguration der berechtigten Rollen braucht musste dies dynamisch wie Parameter und Custom Configs gelöst werden. Das bedeutet, die Defaultconfig hat den Wert \flqq superadmin\frqq{}. Dies erlaubt dem Defaultuser den Zugriff auf die Airlock2FA Activation Secrets. Um zu testen ob ein Admin ohne die Erforderliche Rolle auch wirklich kein Zugriff haben, kann man nun die Konfiguration bearbeiten, und manuel aktivieren:
+\subsection{Testen der Access Control}\label{subsec:testacc}
+Um mit Automatisierten Tests sicherzustellen, dass nur berechtigte Admins Zugriff auf den 16-stelligen Aktivierungscode haben, musste zuerst die Konfiguration im REST-Integration-Ttest angepasst werden. Hierfür wurde zuerst im AdminappConfigBuilder.java eine neue Methode hinzugefügt, dammit man die Role Based Access Controller Config dynamisch setzen kann. Danach musste musste diese im Test konfiguriert werden. Da es je nach Test eine andere Konfiguration der berechtigten Rollen braucht musste dies dynamisch wie Parameter und Custom Configs gelöst werden. Das bedeutet, die Defaultconfig hat den Wert \flqq superadmin\frqq{}. Dies erlaubt dem Defaultuser den Zugriff auf die Airlock2FA Activation Secrets. Um zu testen ob ein Admin ohne die Erforderliche Rolle auch wirklich kein Zugriff haben, kann man nun die Konfiguration bearbeiten, und manuel aktivieren:
 \begin{lstlisting}[language=Java]
 @Test
 @CustomConfig
@@ -447,14 +462,23 @@ Also falls dieses Flag nicht von aussen gesetzt wird, dann ist es undefined, und
 \\
 Der Inhalt des Dialogs, wird über das erforderliche Feld \flqq text\frqq{} gesetzt. Hier wird dann die Antwort aus dem Request, sprich der 16-stellige Aktivierungscode, eingefüllt und sommit im Popup angezeigt.
 \begin{lstlisting}[language=TypeScript]
-text: this.isCodePresent ? 
-				'Activation code:'
-				+ ' '
-				+ res.activationCodeShort :
-				'The activation is not pending anymore.'
+text: 'Activation code:'
+		+ ' '
+		+ res.activationCodeShort
 
 \end{lstlisting}
-Falls nun der Button geklickt wird, der Akivierungscode aber im Hintergrund bereits nicht mehr offen ist, wird dies in Form von Text, im Popup mitgeteilt. 
+Falls nun der Button geklickt wird, der Akivierungscode aber im Hintergrund bereits nicht mehr offen ist, wird dies in Form von einem Page Alert gelöst:
+\begin{lstlisting}[language=TypeScript]
+this.pageAlertService.error('The activation is not pending anymore.').display();
+\end{lstlisting}
+Dieser Alert sieht im UI dann so aus:
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=1.0\textwidth]{ressourcen/pagealert}
+		\caption[Page Alert]{Page Alert, falls der Aktivierungscode bereits nicht mehr offen ist.}\label{fig:pagealert}
+	\end{center}
+\end{figure}
+
 \subsection{i18n Translation Keys}
 Da die Admin-App die 3 Sprachen, Deutsch, Englisch und Französisch unterstützt, können die Texte nicht, so wie sie aktuell sind, hardcoded im gesetzt werden. Alle Texte, also Titel, Popuptext oder der Text im Button, müssen über Translation Keys verfügen. Für jede Sprache gibt es nun ein JSON-File, welches zu diesen Keys jeweils den richtig übersetzten Wert hat. Mithilfe des Language Services, können diese dann auf die gewünschte Sprache eingefügt werden. Das Json für die deutsche Sprache sieht so aus:
 \begin{verbatim}
@@ -484,24 +508,19 @@ Am Beispiel des Popup Textes sieht man, wie diese verwendet werden:
 \begin{itemize}
 	\item Ohne Keys:
 	\begin{lstlisting}[language=TypeScript]
-		text: this.isCodePresent ? 
-		'Activation code:'
+	text:'Activation code:'
 		+ ' '
-		+ res.activationCodeShort :
-		'The activation is not pending anymore.'
+		+ res.activationCodeShort
 		
 	\end{lstlisting}
 	\item Mit Keys:
 	\begin{lstlisting}[language=TypeScript]
-        this.languageService
-        	.translate('user.airlock-2fa.activation
-        		.view-activation-code.popup.text.code')
-		+ ' '
-		+ res.activationCodeShort :
-		'user.airlock-2fa.activation
-			.view-activation-code.popup.text.not-pending'
-	\end{lstlisting}
-	Da hier im Fall, dass keine Aktivierung mehr offen ist, keine Variable im Text ist, muss er nicht in dieser Komponente mit dem Language Serivce translated werden. In diesem Fall wird es direkt von der Popup Komponente gemacht.	
+   	this.languageService
+        .translate('user.airlock-2fa.activation
+        	.view-activation-code.popup.text.code')
+	+ ' '
+	+ res.activationCodeShort
+	\end{lstlisting}	
 \end{itemize}
 Im tatsächlichen UI sieht das ganze mit den Keys dann so aus:
 \begin{figure}[H]
@@ -524,8 +543,87 @@ Im tatsächlichen UI sieht das ganze mit den Keys dann so aus:
 \end{figure}
 \noindent Wie man sieht, wird der Text im Popup nun immer auf die aktive Sprache der SPA übersetzt.
 \subsection{UI Integration-Tests}
-Die UI Integration-Tests werden im IAM mit der Hilfe von Selenium durchgeführt. Durch dies wird das komplette Feature von der SPA bis zum Backend / der DB (Futurae (Wiremock-) Server und wieder zurück getestet.
-
+Die UI Integration-Tests werden im IAM mit der Hilfe von Selenium durchgeführt. Durch dies wird das komplette Feature von der SPA bis zum Backend / der DB (Futurae (Wiremock-) Server) und wieder zurück getestet. \\
+Wie bei den REST-Integration-Tests braucht es auch bei den UI-Integration-Tests für jeden Tests eine Config und einen Default User. In diesem Fall sind diese dieselben wie in Kapitel \ref{header:inttest} beschrieben. Auch der Stubber konnte wiederverwendet werden. 
+\\
+\\
+\textbf{Java Component erweitern}\\
+Damit die Testklasse frei von Seleniumlogik bleibt, werden die einzelnen SPA-Seiten in separaten Klassen abgebildet. Diese Klassen beinhalten dann die notewendigen Methoden, mit den passenden Selektoren, um auf der Seite zu navigieren und die Seite zu asserten. Diese Methoden werden dann von den Testklassen aufgerufen. Für das neue Popup wurde, eine neue Dialog Component erstellt. Sie besitzt folgende Methoden:
+\begin{itemize}
+	\item assertNoCancelButton()
+	\item assertCloseButton()
+	\item assertShortActivationCode(String shortActivationCode)
+	\item clickCloseButton()
+\end{itemize}
+Mit Hilfe dieser Methoden konnte dann, das ganze Popup getestet werden. Das Prinzip der Methoden ist immer das selbe. Sie selektieren ein HTML-Element mit einem Selektor erbend vom Typ \flqq By\frqq{}. Auf dem selektierten Element wird dann die gewünschte Aktion durchgeführt. Bspw: assertShortActivationCode(String shortActivationCode):
+\begin{lstlisting}[language=Java]
+public Airlock2FAShortActivationCodeDialogComponent assertShortActivationCode (String shortActivationCode) {
+	assertTagWithIdContains("pageDialog", translate("user.airlock-2fa.activation
+	.view-activation-code.popup.text.code") 
+	+ " " 
+	+ shortActivationCode);
+	return this;
+}
+\end{lstlisting}
+Hier wird der HTML-Tag mit der ID \flqq pageDialog\frqq{} selektiert. Dies entspricht dem Popup-Element. Danach wird verglichen, ob der Wert welcher im JSON-Key steht, plus der erwartete Aktivierungscode, auch wirklich im Popup enthalten sind. Schlussendlich wird die aktuelle Component wieder zurück gegeben, um weitere Aktionen darauf zu tätigen.
+\\
+Nebst dieser neuen Dialog Component, muss die UserDetailsAirlock2FATabComponent.java auch noch um 3 Methoden erweitert werden, da der Button um das Popup zu öffnen auf dieser Component ist:
+\begin{itemize}
+	\item assertViewShortActivationCodeButtonPresent()
+	\item clickViewActivationButton()
+	\item reload()
+\end{itemize}
+\textbf{Refactoring API Stubber}\\
+Im Rahmen der Selenium Tests wurden die Methoden im API-Stubber, welche im Abschnitt \ref{head:stubber} erstellt wurden, umgebaut. Den für die UI-Integration-Tests muss es möglich sein, für einen einzelnen Test, sprich dem selben Stubber, den gleichen Endpunkt auf verschiedene Arten zu simulieren. Deshalb wurde auf der Stubber Klasse ein neues Feld \flqq private Optional<MappingBuilder> pendingEnrollmentList; \frqq{} hinzugefügt. Dieses Feld enthält immer die aktuelle Verison des Endpunktes. Danach wurde eine neue Methode hinzugefügt: 
+\begin{lstlisting}[language=Java]
+private void withPendingEnrollmentList (MappingBuilder newEnrollmentListMapping) {
+	if (pendingEnrollmentList.isPresent()) {
+		wireMockClient
+		.removeStubMapping(pendingEnrollmentList.get());
+	}
+	pendingEnrollmentList = Optional.of(newEnrollmentListMapping);
+	wireMockClient.register(newEnrollmentListMapping);
+}
+\end{lstlisting}
+Diese Methode wird nun von den beiden bisherigen Methoden aufgerufen, jedoch mit anderen Endpunktkonfigurationen. Sie stellt sicher, dass immer nur eine Version des Endpunktes registriert ist. Sie löscht im Falle, dass bereits ein Mapping vorhanden ist, das bestehende Mapping und speichert das neue. So kann in den Tests, zwischen den beiden Versionen hin und her gewechselt werden, ohne dass es zu unerwarteten Antworten kommt, weil das alte Mapping verwendet wird.
+\\
+\\
+\textbf{Beispiel Test}\\
+Mit Hilfe all dieser Methoden, kann nun getestet werden:
+\begin{lstlisting}[language=Java]
+@Test
+void 
+shouldRemoveViewShortCodeButtonOnUserReloadIfNoCodePendingAnymore 
+(FuturaeAdminApiStubber stubber) {
+	stubber.withPresentPendingEnrollmentList(defaultAccount()
+	.userId()
+	.toString(), 1);
+	UserDetailsAirlock2FATabComponent airlock2FATabComponent = addAirlock2FA();
+	
+	airlock2FATabComponent
+	.assertViewShortActivationCodeButtonPresent(true)
+	.clickViewActivationButton()
+	.assertShortActivationCode(DEFAULT_ACTIVATION_CODE_SHORT)
+	.clickCloseButton();
+	
+	stubber.withEmptyPendingEnrollmentList(defaultAccount()
+	.userId()
+	.toString());
+	
+	airlock2FATabComponent
+	.reload()
+	.assertViewShortActivationCodeButtonPresent(false);
+}
+\end{lstlisting}
+In diesem Test wird sichergestellt, dass falls die Aktivierung nicht mehr offen ist, und die Page reloaded wurde, der Button um das Popup zu öffnen verschwindet. Hierfür wird im ersten Abschnitt zuerst eine offene Aktivierung simuliert, und assertet, dass der Button noch hier ist. Danach, im zweiten Abschnitt, wird simuliert, dass die Aktivierung nicht mehr offen ist, in dem einfach eine leere Liste von Futurae(Wiremock-Server) zurück kommen soll. Dies ist nur möglich so, dank dem Refactoring im API Stubber. Ohne dem, würde hier nun immer noch das alte Mapping verwendet werden, und es käme keine leere Liste zurück.\\ 
+Vor dem Assert, ob der Button noch hier ist, wird nun der Reload durchgeführt. Danch sollte der Button nicht mehr angezeigt werden.
+\section{Kundendokumentation}
+In den Anforderungen steht, dass die IAM-Kundendokumentation um das neue Feature erweitert werden soll. Da nicht mit dem Kundendokumentations-Tool SMC gearbeitet werden muss, folgt die Erweiterung in diesem Kapitel.
+\subsection{Kapitel 18.5 Airlock 2FA Configuration erweitern}
+Unter dem <<How to verify>> Abschnitt wird folgender neuer Abschnitt erstellt:\\\\
+\textbf{16-digits activation code}\\
+The 16-digits activation code can be used to activate an Airlock 2FA Account. In case a user needs support during activation admins can help them using this short activation code. The provided code is always from the latest pending enrollment. He is provided by a popup which displays by clicking follwoing button in the \textbf{Adminapp -> \{current user\} -> Airlock 2FA Tab -> View activation code}.\\
+Note: As this is a sensitive activation secret the access is regulated by the <<View Airlock 2FA Activation Secret>> Action in the \textbf{Access Control}. So only administrators which are allowed to see the Airlock 2FA activation secrets can see this short activation code.
 
 
 

@@ -440,7 +440,7 @@ Um in der Adminapp die Sprachen Deutsch, Englisch und Französisch zu unterstüt
 	\item user.airlock-2fa.activation.view-activation-code.popup.text: Text im Popup
 \end{itemize}
 
-\section{Testkonzept}
+\section{Testkonzept} \label{sec:testkonzept}
 Das neue Feature soll fehlerfrei und nach den Anforderungen funktionieren. Um dies Sicherzustellen wird folgend ein Testkonzept zusammen gestellt, nach welchem das Feature später getestet werden sollte.
 Alle erwähnten Technologien sind in Kapitel \ref{sec:verwendete-tools} beschrieben.
 
@@ -460,8 +460,8 @@ Unit-Tests werden verwendet um die Kernlogik in kleinen isolierten Einheiten zu 
 	\item Die neue Funktion im FuturaeAdminApiEnrollmentServiceImpl.java welche den neusten, offenen Aktivierungscode zurück gibt.	
 \end{itemize}
 
-\subsection{Rest-Integration-Tests}
-Die Rest-Integration-Tests werden auch mit hilfe von JUnit geschrieben. Anderst als bei den Unit-Tests wird hier nicht eine kleine Einheit getestet sondern der ganze Teil von der Restresource bis zur Datenbank.
+\subsection{REST-Integration-Tests}
+Die REST-Integration-Tests werden auch mit hilfe von JUnit geschrieben. Anderst als bei den Unit-Tests wird hier nicht eine kleine Einheit getestet sondern der ganze Teil von der Restresource bis zur Datenbank.
 Mit den Integrationtests wird sicher gestellt, dass das ganze Feature im Backend richtig funktioniert. Für das sind folgende zwingende Fälle zu testen:
 
 \begin{itemize}
@@ -483,7 +483,7 @@ Folgende fälle sind zu Testen:
 \end{itemize}
 \newpage
 
-\subsection{Manuelle Tests}
+\subsection{Manuelle Tests} \label{subsec:mtests}
 Die Funktionalitäten werden durch die vielen automatisierten Tests schon recht gut getestet. Allerdings ist es auch wichtig, das ganze manuell zu Testen. Der wichtigste Grund ist, dass der Futurae Server nicht mehr gemockt ist, sondern nun eine richtige Verbindung besteht. Damit es nicht zu unerwarteten Aktionen kommt, sind diese Test sehr wichtig. Für die manuellen Tests sind folgende Testfälle definiert:
 
 	\begin{longtable}{p{.25\textwidth}|p{.55\textwidth}}

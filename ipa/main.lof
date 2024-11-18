@@ -20,8 +20,13 @@
 \contentsline {figure}{\numberline {12.1}{\ignorespaces REST-Dokumentation Request}}{55}{figure.caption.7}%
 \contentsline {figure}{\numberline {12.2}{\ignorespaces REST-Dokumentation Response}}{56}{figure.caption.8}%
 \contentsline {figure}{\numberline {12.3}{\ignorespaces Logeintrag bei vorhandenem Aktivierungscode}}{61}{figure.caption.9}%
-\contentsline {figure}{\numberline {12.4}{\ignorespaces Popup deutsch}}{70}{figure.caption.10}%
-\contentsline {figure}{\numberline {12.5}{\ignorespaces Popup englisch}}{71}{figure.caption.11}%
-\contentsline {figure}{\numberline {12.6}{\ignorespaces Popup französisch}}{71}{figure.caption.12}%
+\contentsline {figure}{\numberline {12.4}{\ignorespaces Page Alert}}{69}{figure.caption.10}%
+\contentsline {figure}{\numberline {12.5}{\ignorespaces Popup deutsch}}{71}{figure.caption.11}%
+\contentsline {figure}{\numberline {12.6}{\ignorespaces Popup englisch}}{71}{figure.caption.12}%
+\contentsline {figure}{\numberline {12.7}{\ignorespaces Popup französisch}}{72}{figure.caption.13}%
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {13.1}{\ignorespaces Unit-Test Resultate FuturaeAdminApiEnrollmentServiceImpl.java}}{77}{figure.caption.14}%
+\contentsline {figure}{\numberline {13.2}{\ignorespaces Unit-Test Resultate Airlock2FAAdminService.java}}{77}{figure.caption.15}%
+\contentsline {figure}{\numberline {13.3}{\ignorespaces REST-Integration-Tests Resultate}}{78}{figure.caption.16}%
+\contentsline {figure}{\numberline {13.4}{\ignorespaces UI-Integration-Tests Resultate}}{78}{figure.caption.17}%
 \addvspace {10\p@ }
