@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2024.10.28)  18 NOV 2024 16:55
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2024.10.28)  20 NOV 2024 16:37
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1046,11 +1046,7 @@ Package biblatex Warning: 'babel/polyglossia' detected but 'csquotes' missing.
 
 \@quotelevel=\count471
 \@quotereset=\count472
-(./main.aux
-
-LaTeX Warning: Label `fig:restflow' multiply defined.
-
-)
+(./main.aux)
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 127.
@@ -1173,7 +1169,7 @@ Package biblatex Info: ... file 'main.bbl' found.
 Package biblatex Info: Reference section=0 on input line 127.
 Package biblatex Info: Reference segment=0 on input line 127.
 (./titel.tex
-<ressourcen/ergon_logo_gross.png, id=369, 556.2381pt x 118.7637pt>
+<ressourcen/ergon_logo_gross.png, id=377, 556.2381pt x 118.7637pt>
 File: ressourcen/ergon_logo_gross.png Graphic file (type png)
 <use ressourcen/ergon_logo_gross.png>
 Package pdftex.def Info: ressourcen/ergon_logo_gross.png  used on input line 5.
@@ -1259,7 +1255,7 @@ Kapitel 3.
 
 ]
 Kapitel 4.
-<ressourcen/arbeitsplatz.jpeg, id=530, 1606.0pt x 1204.5pt>
+<ressourcen/arbeitsplatz.jpeg, id=540, 1606.0pt x 1204.5pt>
 File: ressourcen/arbeitsplatz.jpeg Graphic file (type jpg)
 <use ressourcen/arbeitsplatz.jpeg>
 Package pdftex.def Info: ressourcen/arbeitsplatz.jpeg  used on input line 7.
@@ -1471,7 +1467,7 @@ Kapitel 8.
 
 pdfTeX warning: /usr/bin/pdflatex (file ./ressourcen/zeitplan.pdf): PDF inclusi
 on: found PDF version <1.7>, but at most version <1.5> allowed
-<ressourcen/zeitplan.pdf, id=629, 845.07718pt x 597.55246pt>
+<ressourcen/zeitplan.pdf, id=639, 845.07718pt x 597.55246pt>
 File: ressourcen/zeitplan.pdf Graphic file (type pdf)
 <use ressourcen/zeitplan.pdf>
 Package pdftex.def Info: ressourcen/zeitplan.pdf  used on input line 4.
@@ -1492,7 +1488,7 @@ on: found PDF version <1.7>, but at most version <1.5> allowed
 
 pdfTeX warning: /usr/bin/pdflatex (file ./ressourcen/zeitplan.pdf): PDF inclusi
 on: found PDF version <1.7>, but at most version <1.5> allowed
-<ressourcen/zeitplan.pdf, id=632, page=1, 845.07718pt x 597.55246pt>
+<ressourcen/zeitplan.pdf, id=642, page=1, 845.07718pt x 597.55246pt>
 File: ressourcen/zeitplan.pdf Graphic file (type pdf)
 <use ressourcen/zeitplan.pdf, page 1>
 Package pdftex.def Info: ressourcen/zeitplan.pdf , page1 used on input line 4.
@@ -1520,7 +1516,7 @@ Package pdftex.def Info: ressourcen/zeitplan.pdf , page1 used on input line 4.
 
 pdfTeX warning: /usr/bin/pdflatex (file ./ressourcen/zeitplan.pdf): PDF inclusi
 on: found PDF version <1.7>, but at most version <1.5> allowed
-<ressourcen/zeitplan.pdf, id=652, page=2, 845.07718pt x 597.55246pt>
+<ressourcen/zeitplan.pdf, id=662, page=2, 845.07718pt x 597.55246pt>
 File: ressourcen/zeitplan.pdf Graphic file (type pdf)
 <use ressourcen/zeitplan.pdf, page 2>
 Package pdftex.def Info: ressourcen/zeitplan.pdf , page2 used on input line 4.
@@ -1748,160 +1744,166 @@ Underfull \hbox (badness 10000) in paragraph at lines 188--188
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 191--191
+Underfull \hbox (badness 10000) in paragraph at lines 190--190
 []|\T1/cmr/bx/n/10.95 Erwartetes Er-
  []
 
 
-Overfull \hbox (23.99998pt too wide) in alignment at lines 182--193
+Overfull \hbox (23.99998pt too wide) in alignment at lines 182--192
  [] [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 201--201
+Underfull \hbox (badness 10000) in paragraph at lines 200--200
 []|\T1/cmr/bx/n/10.95 Geschätzter
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 203--203
+Underfull \hbox (badness 10000) in paragraph at lines 202--202
 []|\T1/cmr/bx/n/10.95 Erwartetes Er-
  []
 
 
-Overfull \hbox (23.99998pt too wide) in alignment at lines 195--205
+Overfull \hbox (23.99998pt too wide) in alignment at lines 194--204
  [] [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 213--213
+Underfull \hbox (badness 10000) in paragraph at lines 212--212
 []|\T1/cmr/bx/n/10.95 Geschätzter
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 215--215
+Underfull \hbox (badness 10000) in paragraph at lines 214--214
 []|\T1/cmr/bx/n/10.95 Erwartetes Er-
  []
 
 
-Overfull \hbox (23.99998pt too wide) in alignment at lines 207--217
+Overfull \hbox (23.99998pt too wide) in alignment at lines 206--216
  [] [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 228--228
+Underfull \hbox (badness 10000) in paragraph at lines 227--227
 []|\T1/cmr/bx/n/10.95 Geschätzter
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 230--230
+Underfull \hbox (badness 10000) in paragraph at lines 229--229
 []|\T1/cmr/bx/n/10.95 Erwartetes Er-
  []
 
 
-Overfull \hbox (23.99998pt too wide) in alignment at lines 222--232
+Overfull \hbox (23.99998pt too wide) in alignment at lines 221--231
  [] [] 
  []
 
 [37]
-Underfull \hbox (badness 10000) in paragraph at lines 243--243
+Underfull \hbox (badness 10000) in paragraph at lines 242--242
 []|\T1/cmr/bx/n/10.95 Geschätzter
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 245--245
+Underfull \hbox (badness 10000) in paragraph at lines 244--244
 []|\T1/cmr/bx/n/10.95 Erwartetes Er-
  []
 
 
-Overfull \hbox (23.99998pt too wide) in alignment at lines 237--247
+Overfull \hbox (23.99998pt too wide) in alignment at lines 236--246
  [] [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 255--255
+Underfull \hbox (badness 10000) in paragraph at lines 254--254
 []|\T1/cmr/bx/n/10.95 Geschätzter
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 257--257
+Underfull \hbox (badness 10000) in paragraph at lines 256--256
 []|\T1/cmr/bx/n/10.95 Erwartetes Er-
  []
 
 
-Overfull \hbox (23.99998pt too wide) in alignment at lines 249--259
+Overfull \hbox (23.99998pt too wide) in alignment at lines 248--258
  [] [] 
  []
 
 [38]
-Underfull \hbox (badness 10000) in paragraph at lines 269--269
+Underfull \hbox (badness 10000) in paragraph at lines 268--268
 []|\T1/cmr/bx/n/10.95 Geschätzter
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 271--271
+Underfull \hbox (badness 10000) in paragraph at lines 270--270
 []|\T1/cmr/bx/n/10.95 Erwartetes Er-
  []
 
 
-Overfull \hbox (23.99998pt too wide) in alignment at lines 263--273
+Overfull \hbox (23.99998pt too wide) in alignment at lines 262--272
  [] [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 281--281
+Underfull \hbox (badness 10000) in paragraph at lines 280--280
 []|\T1/cmr/bx/n/10.95 Geschätzter
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 283--283
+Underfull \hbox (badness 10000) in paragraph at lines 282--282
 []|\T1/cmr/bx/n/10.95 Erwartetes Er-
  []
 
 
-Overfull \hbox (23.99998pt too wide) in alignment at lines 275--285
+Overfull \hbox (23.99998pt too wide) in alignment at lines 274--284
  [] [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 293--293
+Underfull \hbox (badness 10000) in paragraph at lines 292--292
 []|\T1/cmr/bx/n/10.95 Geschätzter
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 295--295
+Underfull \hbox (badness 10000) in paragraph at lines 294--294
 []|\T1/cmr/bx/n/10.95 Erwartetes Er-
  []
 
 
-Overfull \hbox (23.99998pt too wide) in alignment at lines 287--297
+Overfull \hbox (23.99998pt too wide) in alignment at lines 286--296
  [] [] 
  []
 
 [39]
-Underfull \hbox (badness 10000) in paragraph at lines 312--313
+Underfull \hbox (badness 10000) in paragraph at lines 311--312
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 312--313
+Underfull \hbox (badness 10000) in paragraph at lines 311--312
 
  []
 
-<ressourcen/restflow.png, id=730, 511.9125pt x 507.8975pt>
+<ressourcen/restflow.png, id=740, 511.9125pt x 507.8975pt>
 File: ressourcen/restflow.png Graphic file (type png)
 <use ressourcen/restflow.png>
-Package pdftex.def Info: ressourcen/restflow.png  used on input line 341.
+Package pdftex.def Info: ressourcen/restflow.png  used on input line 340.
 (pdftex.def)             Requested size: 334.60571pt x 331.98169pt.
-[40]
-Overfull \hbox (13.08228pt too wide) in paragraph at lines 356--357
-\T1/cmr/m/n/10.95 Re-gel kann wie-der-ver-wen-det wer-den. Da-zu gibt es einen 
-^^SAir-lock2FAAccessController.java.^^T
+[40] [41 <./ressourcen/restflow.png>]
+Overfull \hbox (86.86256pt too wide) in paragraph at lines 355--356
+\T1/cmr/m/n/10.95 schränkt. Die-se Re-gel kann wie-der-ver-wen-det wer-den. Da-
+zu gibt es einen ^^SAir-lock2FAAccessController.java.^^T
  []
 
-[41 <./ressourcen/restflow.png>]
-Overfull \hbox (12.0029pt too wide) in paragraph at lines 361--362
+
+Overfull \hbox (14.9886pt too wide) in paragraph at lines 360--361
+[]\T1/cmr/m/n/10.95 UserAirlock2FADeviceResource.java: In die-ser Klas-se be-fi
+n-det sich der GET-Endpunkt
+ []
+
+
+Overfull \hbox (11.8216pt too wide) in paragraph at lines 360--361
 \T1/cmr/m/n/10.95 ^^S/auth-admin/rest/users/userId/tokens/airlock-2fa ^^T, wel-
-cher er-wei-tert wer-den könn-
+cher er-wei-tert wer-den muss. 
  []
 
 [42]
@@ -1913,7 +1915,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 385--391
 
 pdfTeX warning: /usr/bin/pdflatex (file ./ressourcen/Mockup1.pdf): PDF inclusio
 n: found PDF version <1.7>, but at most version <1.5> allowed
-<ressourcen/Mockup1.pdf, id=753, 845.04686pt x 597.50786pt>
+<ressourcen/Mockup1.pdf, id=763, 845.04686pt x 597.50786pt>
 File: ressourcen/Mockup1.pdf Graphic file (type pdf)
 <use ressourcen/Mockup1.pdf>
 Package pdftex.def Info: ressourcen/Mockup1.pdf  used on input line 393.
@@ -1934,7 +1936,7 @@ n: found PDF version <1.7>, but at most version <1.5> allowed
 
 pdfTeX warning: /usr/bin/pdflatex (file ./ressourcen/Mockup1.pdf): PDF inclusio
 n: found PDF version <1.7>, but at most version <1.5> allowed
-<ressourcen/Mockup1.pdf, id=756, page=1, 845.04686pt x 597.50786pt>
+<ressourcen/Mockup1.pdf, id=766, page=1, 845.04686pt x 597.50786pt>
 File: ressourcen/Mockup1.pdf Graphic file (type pdf)
 <use ressourcen/Mockup1.pdf, page 1>
 Package pdftex.def Info: ressourcen/Mockup1.pdf , page1 used on input line 393.
@@ -1964,12 +1966,12 @@ Package pdftex.def Info: ressourcen/Mockup1.pdf , page1 used on input line 393.
 
 
  <./ressourcen/Mockup1.pdf>]
-<ressourcen/popup.png, id=765, 563.10374pt x 331.2375pt>
+<ressourcen/popup.png, id=775, 563.10374pt x 331.2375pt>
 File: ressourcen/popup.png Graphic file (type png)
 <use ressourcen/popup.png>
 Package pdftex.def Info: ressourcen/popup.png  used on input line 398.
 (pdftex.def)             Requested size: 334.60571pt x 196.82845pt.
-<ressourcen/variant_2_spa.png, id=766, 1053.9375pt x 562.1pt>
+<ressourcen/variant_2_spa.png, id=776, 1053.9375pt x 562.1pt>
 File: ressourcen/variant_2_spa.png Graphic file (type png)
 <use ressourcen/variant_2_spa.png>
 Package pdftex.def Info: ressourcen/variant_2_spa.png  used on input line 407.
@@ -1980,26 +1982,26 @@ Package pdftex.def Info: ressourcen/variant_2_spa.png  used on input line 407.
 LaTeX Font Info:    Font shape `T1/zi4/b/n' will be
 (Font)              scaled to size 10.95pt on input line 429.
 
-Underfull \hbox (badness 10000) in paragraph at lines 449--452
+Underfull \hbox (badness 10000) in paragraph at lines 448--451
 
  []
 
 [47] [48] [49]
-Underfull \hbox (badness 2990) in paragraph at lines 501--501
+Underfull \hbox (badness 2990) in paragraph at lines 504--504
 []|\T1/cmr/bx/n/10.95 Erwartetes Re-sul-
  []
 
 
-Underfull \hbox (badness 2990) in paragraph at lines 518--518
+Underfull \hbox (badness 2990) in paragraph at lines 521--521
 []|\T1/cmr/bx/n/10.95 Erwartetes Re-sul-
  []
 
-[50]
-Underfull \hbox (badness 2990) in paragraph at lines 536--536
+[50] [51]
+Underfull \hbox (badness 2990) in paragraph at lines 539--539
 []|\T1/cmr/bx/n/10.95 Erwartetes Re-sul-
  []
 
-) (./teil_2/entscheiden.tex [51]
+) (./teil_2/entscheiden.tex [52]
 Kapitel 11.
 
 Underfull \hbox (badness 10000) in paragraph at lines 9--18
@@ -2031,7 +2033,7 @@ Overfull \hbox (35.99998pt too wide) in alignment at lines 18--25
  [] [] [] 
  []
 
-[52
+[53
 
 ]
 Underfull \hbox (badness 10000) in paragraph at lines 36--45
@@ -2063,7 +2065,7 @@ Overfull \hbox (47.99359pt too wide) in alignment at lines 45--52
  [] [] [] [] 
  []
 
-) (./teil_2/realisieren.tex [53]
+) (./teil_2/realisieren.tex [54]
 Kapitel 12.
 
 Overfull \hbox (7.14328pt too wide) in paragraph at lines 15--19
@@ -2082,14 +2084,14 @@ Overfull \hbox (2.51768pt too wide) in paragraph at lines 24--25
 ][][][][][][][][][][][]  
  []
 
-[54
+[55
 
 ]
 Underfull \hbox (badness 10000) in paragraph at lines 28--33
 
  []
 
-<ressourcen/requestdoc.png, id=842, 1413.28pt x 347.2975pt>
+<ressourcen/requestdoc.png, id=856, 1413.28pt x 347.2975pt>
 File: ressourcen/requestdoc.png Graphic file (type png)
 <use ressourcen/requestdoc.png>
 Package pdftex.def Info: ressourcen/requestdoc.png  used on input line 42.
@@ -2104,182 +2106,176 @@ Underfull \hbox (badness 10000) in paragraph at lines 35--45
 
  []
 
-<ressourcen/responsedoc.png, id=843, 1051.93pt x 748.7975pt>
+<ressourcen/responsedoc.png, id=857, 1051.93pt x 748.7975pt>
 File: ressourcen/responsedoc.png Graphic file (type png)
 <use ressourcen/responsedoc.png>
 Package pdftex.def Info: ressourcen/responsedoc.png  used on input line 52.
 (pdftex.def)             Requested size: 418.25555pt x 297.73128pt.
-[55 <./ressourcen/requestdoc.png>]
+[56 <./ressourcen/requestdoc.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 58--63
 
  []
 
-
+[57 <./ressourcen/responsedoc.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 67--74
 
  []
 
-[56 <./ressourcen/responsedoc.png>]
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
 nput line 74.
- [57]
-Overfull \hbox (48.50806pt too wide) in paragraph at lines 113--114
+[58]
+Overfull \hbox (48.50806pt too wide) in paragraph at lines 108--109
 [][][][][][][][][][][] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 124--133
+Underfull \hbox (badness 10000) in paragraph at lines 119--128
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 124--133
+Underfull \hbox (badness 10000) in paragraph at lines 119--128
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 124--133
+Underfull \hbox (badness 10000) in paragraph at lines 119--128
 
  []
 
-[58] [59]
-Underfull \hbox (badness 10000) in paragraph at lines 200--205
+[59] [60]
+Underfull \hbox (badness 10000) in paragraph at lines 195--200
 
  []
 
-[60]
-<ressourcen/logpresent.png, id=972, 1135.24126pt x 59.22125pt>
+[61]
+<ressourcen/logpresent.png, id=980, 1135.24126pt x 59.22125pt>
 File: ressourcen/logpresent.png Graphic file (type png)
 <use ressourcen/logpresent.png>
-Package pdftex.def Info: ressourcen/logpresent.png  used on input line 223.
+Package pdftex.def Info: ressourcen/logpresent.png  used on input line 218.
 (pdftex.def)             Requested size: 418.25555pt x 21.81844pt.
- [61 <./ressourcen/logpresent.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 264--269
+ [62 <./ressourcen/logpresent.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 259--264
 
  []
 
-[62] [63]
-Underfull \hbox (badness 10000) in paragraph at lines 302--306
+[63] [64]
+Underfull \hbox (badness 10000) in paragraph at lines 297--301
 
  []
 
 
-Overfull \hbox (81.06848pt too wide) in paragraph at lines 327--329
+Overfull \hbox (81.06848pt too wide) in paragraph at lines 322--324
 [][][][][][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (35.07811pt too wide) in paragraph at lines 329--331
+Overfull \hbox (35.07811pt too wide) in paragraph at lines 324--326
 [][][][][][][][][] 
  []
 
-[64]
-Overfull \hbox (2.51768pt too wide) in paragraph at lines 334--335
+[65]
+Overfull \hbox (2.51768pt too wide) in paragraph at lines 329--330
 [][][][][][][][][][][][]  
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 342--346
+Underfull \hbox (badness 10000) in paragraph at lines 337--341
 
  []
 
 
-Overfull \hbox (2.22784pt too wide) in paragraph at lines 349--350
+Overfull \hbox (2.22784pt too wide) in paragraph at lines 344--345
 [][][][][][][][][][][]  
  []
 
-[65]
-Overfull \hbox (4.07121pt too wide) in paragraph at lines 368--369
-\T1/cmr/m/n/10.95 Integration-Ttest an-ge-passt wer-den. Hier-für wur-de zu-ers
-t im Ad-mi-napp-Con-fig-Buil-der.java
- []
-
 [66]
-Underfull \hbox (badness 10000) in paragraph at lines 401--407
+Overfull \hbox (11.02628pt too wide) in paragraph at lines 363--364
+\T1/cmr/m/n/10.95 Integration-Test an-ge-passt wer-den. Hier-für wur-de zu-erst
+ im <<Ad-mi-napp-Con-fig-Buil-der.java>>
+ []
+
+[67]
+Underfull \hbox (badness 10000) in paragraph at lines 396--402
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 418--424
+Underfull \hbox (badness 10000) in paragraph at lines 413--419
 
  []
 
-[67] [68]
-<ressourcen/pagealert.png, id=1153, 584.1825pt x 74.2775pt>
+[68] [69]
+<ressourcen/pagealert.png, id=1160, 584.1825pt x 74.2775pt>
 File: ressourcen/pagealert.png Graphic file (type png)
 <use ressourcen/pagealert.png>
-Package pdftex.def Info: ressourcen/pagealert.png  used on input line 477.
+Package pdftex.def Info: ressourcen/pagealert.png  used on input line 471.
 (pdftex.def)             Requested size: 418.25555pt x 53.18167pt.
- [69 <./ressourcen/pagealert.png>]
-<ressourcen/popup-de.png, id=1170, 526.96875pt x 196.735pt>
+ [70 <./ressourcen/pagealert.png>] [71]
+<ressourcen/popup-de.png, id=1181, 526.96875pt x 196.735pt>
 File: ressourcen/popup-de.png Graphic file (type png)
 <use ressourcen/popup-de.png>
-Package pdftex.def Info: ressourcen/popup-de.png  used on input line 528.
+Package pdftex.def Info: ressourcen/popup-de.png  used on input line 533.
 (pdftex.def)             Requested size: 418.25555pt x 156.1574pt.
- [70]
-<ressourcen/popup-en.png, id=1185, 526.96875pt x 196.735pt>
+<ressourcen/popup-en.png, id=1182, 528.97626pt x 198.7425pt>
 File: ressourcen/popup-en.png Graphic file (type png)
 <use ressourcen/popup-en.png>
-Package pdftex.def Info: ressourcen/popup-en.png  used on input line 534.
-(pdftex.def)             Requested size: 418.25555pt x 156.1574pt.
-<ressourcen/popup-fr.png, id=1186, 526.96875pt x 196.735pt>
+Package pdftex.def Info: ressourcen/popup-en.png  used on input line 539.
+(pdftex.def)             Requested size: 418.25555pt x 157.14433pt.
+<ressourcen/popup-fr.png, id=1183, 526.96875pt x 196.735pt>
 File: ressourcen/popup-fr.png Graphic file (type png)
 <use ressourcen/popup-fr.png>
-Package pdftex.def Info: ressourcen/popup-fr.png  used on input line 540.
+Package pdftex.def Info: ressourcen/popup-fr.png  used on input line 545.
 (pdftex.def)             Requested size: 418.25555pt x 156.1574pt.
- [71 <./ressourcen/popup-de.png> <./ressourcen/popup-en.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 546--552
-
- []
-
-[72 <./ressourcen/popup-fr.png>]
-Overfull \hbox (10.82172pt too wide) in paragraph at lines 568--571
+ [72 <./ressourcen/popup-de.png>] [73 <./ressourcen/popup-en.png> <./ressourcen
+/popup-fr.png>]
+Overfull \hbox (10.82172pt too wide) in paragraph at lines 572--575
 \T1/cmr/m/n/10.95 Nebst die-ser neu-en Dia-log Com-po-nent, muss die User-De-ta
 il-sAir-lock2FATabComponent.java
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 588--593
+[74]
+Underfull \hbox (badness 10000) in paragraph at lines 592--597
 
  []
 
-[73]
-Overfull \hbox (8.7979pt too wide) in paragraph at lines 596--597
+
+Overfull \hbox (8.7979pt too wide) in paragraph at lines 600--601
 [][][][]  
  []
 
-[74]
-Underfull \hbox (badness 10000) in paragraph at lines 623--627
+[75]
+Underfull \hbox (badness 10000) in paragraph at lines 627--631
 
  []
 
-) (./teil_2/kontrollieren.tex [75]
+) (./teil_2/kontrollieren.tex [76]
 Kapitel 13.
 
 Overfull \hbox (24.0pt too wide) in alignment at lines 5--11
  [] [] 
  []
 
-<ressourcen/unittestapi.png, id=1259, 521.95pt x 346.29375pt>
+<ressourcen/unittestapi.png, id=1266, 521.95pt x 346.29375pt>
 File: ressourcen/unittestapi.png Graphic file (type png)
 <use ressourcen/unittestapi.png>
 Package pdftex.def Info: ressourcen/unittestapi.png  used on input line 21.
 (pdftex.def)             Requested size: 334.60571pt x 222.0024pt.
-[76
+[77
 
 ]
-<ressourcen/testadmin.png, id=1265, 311.1625pt x 128.48pt>
+<ressourcen/testadmin.png, id=1272, 311.1625pt x 128.48pt>
 File: ressourcen/testadmin.png Graphic file (type png)
 <use ressourcen/testadmin.png>
 Package pdftex.def Info: ressourcen/testadmin.png  used on input line 28.
 (pdftex.def)             Requested size: 418.25555pt x 172.70142pt.
-<ressourcen/resttest.png, id=1266, 488.82625pt x 151.56625pt>
+<ressourcen/resttest.png, id=1273, 488.82625pt x 151.56625pt>
 File: ressourcen/resttest.png Graphic file (type png)
 <use ressourcen/resttest.png>
 Package pdftex.def Info: ressourcen/resttest.png  used on input line 37.
 (pdftex.def)             Requested size: 418.25555pt x 129.6876pt.
- [77 <./ressourcen/unittestapi.png> <./ressourcen/testadmin.png>]
-<ressourcen/uitests.png, id=1275, 692.5875pt x 192.72pt>
+ [78 <./ressourcen/unittestapi.png> <./ressourcen/testadmin.png>]
+<ressourcen/uitests.png, id=1283, 692.5875pt x 192.72pt>
 File: ressourcen/uitests.png Graphic file (type png)
 <use ressourcen/uitests.png>
 Package pdftex.def Info: ressourcen/uitests.png  used on input line 45.
@@ -2304,7 +2300,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 54--56
 
  []
 
-[78 <./ressourcen/resttest.png> <./ressourcen/uitests.png>]
+[79 <./ressourcen/resttest.png> <./ressourcen/uitests.png>]
 Underfull \hbox (badness 1946) in paragraph at lines 60--60
 []|\T1/cmr/m/n/10.95 Es öff-net sich ein Po-pup (kein
  []
@@ -2312,6 +2308,16 @@ Underfull \hbox (badness 1946) in paragraph at lines 60--60
 
 Underfull \hbox (badness 1946) in paragraph at lines 60--60
 []|\T1/cmr/m/n/10.95 Es öff-net sich ein Po-pup (kein
+ []
+
+
+Underfull \hbox (badness 8170) in paragraph at lines 61--61
+[]|\T1/cmr/m/n/10.95 Der But-ton wird nicht an-ge-
+ []
+
+
+Underfull \hbox (badness 5331) in paragraph at lines 61--61
+\T1/cmr/m/n/10.95 einen al-ter-na-ti-ven REST-Client,
  []
 
 
@@ -2319,7 +2325,13 @@ Overfull \hbox (47.99997pt too wide) in alignment at lines 57--63
  [] [] [] [] 
  []
 
-) (./teil_2/auswerten.tex [79]
+[80]
+<ressourcen/codeana.png, id=1300, 459.7175pt x 353.32pt>
+File: ressourcen/codeana.png Graphic file (type png)
+<use ressourcen/codeana.png>
+Package pdftex.def Info: ressourcen/codeana.png  used on input line 82.
+(pdftex.def)             Requested size: 334.60571pt x 257.17746pt.
+) (./teil_2/auswerten.tex [81 <./ressourcen/codeana.png>]
 Kapitel 14.
 ) (./global/glossar.tex) (./global/abbildungsverzeichnis.tex (./main.lof)
 \tf@lof=\write8
@@ -2331,7 +2343,7 @@ Package glossaries Warning: No \printglossary or \printglossaries found.
 (Remove \makeglossaries if you don't want any glossaries.) 
 This document will not have a glossary.
 
-[80
+[82
 
 ] 
 enddocument/afterlastpage: lastpage setting LastPage.
@@ -2340,21 +2352,17 @@ enddocument/afterlastpage: lastpage setting LastPage.
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
  ***********
-
-
-LaTeX Warning: There were multiply-defined labels.
-
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 2AF70070552F2C8B1DC7AEC4AFF0194B;12961.
+(rerunfilecheck)             Checksum: A40AD99490D9D312E2D39D9E3F00652A;13305.
 Package logreq Info: Writing requests to 'main.run.xml'.
 \openout1 = `main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 35129 strings out of 474222
- 627559 string characters out of 5748732
+ 35141 strings out of 474222
+ 627867 string characters out of 5748732
  2005975 words of memory out of 5000000
- 56297 multiletter control sequences out of 15000+600000
+ 56311 multiletter control sequences out of 15000+600000
  576061 words of font info for 81 fonts, out of 8000000 for 9000
  1143 hyphenation exceptions out of 8191
  109i,19n,117p,2373b,2463s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -2371,10 +2379,10 @@ m-super/sfrm1000.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm1095.pfb
 ></usr/share/texmf/fonts/type1/public/cm-super/sfrm1200.pfb></usr/share/texmf/f
 onts/type1/public/cm-super/sfrm1440.pfb></usr/share/texlive/texmf-dist/fonts/ty
 pe1/urw/zapfding/uzdr.pfb>
-Output written on main.pdf (81 pages, 1295535 bytes).
+Output written on main.pdf (83 pages, 1350977 bytes).
 PDF statistics:
- 1502 PDF objects out of 1728 (max. 8388607)
- 1331 compressed objects within 14 object streams
- 550 named destinations out of 1000 (max. 500000)
- 854 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1517 PDF objects out of 1728 (max. 8388607)
+ 1342 compressed objects within 14 object streams
+ 548 named destinations out of 1000 (max. 500000)
+ 875 words of extra memory for PDF output out of 10000 (max. 10000000)
 

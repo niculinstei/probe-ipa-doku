@@ -1,14 +1,16 @@
 \chapter{Versionierung und Sicherung der Arbeitsergebnisse}\label{ch:versionierung-und-sicherung-der-arbeitsergebnisse}
 
-Die Arbeitsergebnisse sollten gesichert werden. Damit, im Falle eines unerwarteten Ausfalls während der Probe-IPA, z.B des Rechners, von einem anderen Gerät wieder auf den Stand zugegriffen werden kann. Zu dem sollte es generell möglich sein jeder Zeit auf einen älteren Stand zurück zukommen. Dies gilt natürlich für den Quellcode und den Bericht.
+Die Arbeitsergebnisse sollten gesichert werden. Damit, im Falle eines unerwarteten Ausfalls während der Probe-IPA, z.B des Rechners, von einem anderen Gerät wieder auf den letzten Stand zugegriffen werden kann. Zu dem sollte es generell möglich sein jeder Zeit auf einen älteren Stand zurück zukommen. Dies gilt natürlich für den Quellcode und den Bericht.
 
 \section{Git als Versionierungstool}
 Für die Versionierung der Arbeitsergebnisse wurde Git verwendet. 
-Git ist weit verbreitet und ist auch aus der Schule und diversen anderen Projekten bekannt. Es wird verwendet um Änderungen am Code zu verfolgen und erstellt dabei eine Versionshistorie. \newline Zur Sicherung werden die Zwischenstände regelmässig in das jeweilige Remote-Repository gepushed.
+Git ist weit verbreitet und ist auch aus der Schule und diversen anderen Projekten bekannt. Es wird verwendet um Änderungen am Code zu verfolgen und erstellt dabei eine Versionshistorie. \newline Zur Sicherung werden die Zwischenstände regelmässig in das jeweilige Remote-Repository gepusht.
 Das Repository für den Bericht liegt auf dem Ergon Github Account des Kandidaten(\url{https://github.com/niculinstei/probe-ipa-doku.git}).
 Der Quellcode welcher das Produkt erweitert liegt in einem Repository auf Gerrit.
 
+
+
 \section{Git im Zusammenspiel mit Gerrit}
 Der Quellcode liegt in einem Git-Repository auf Gerrit. Gerrit dient dazu als Review und Code Management Tool. 
-Im Vergleich zur \flqq gewöhnlichen\frqq{}  Entwicklung mit Git, bei der man für neue Features Branches und Commits erstellt arbeitet man bei Gerrit sozusagen auf Commmitbasis. 
-Pusht man einen neuen Commit auf Gerrit, erstellt dieser ein neues\flqq Changeset\frqq{}  mit einem Patchset. Gibt es nun weitere Änderungen werden diese einfach Amandet, dies erstellt dann ein weiters Patchset in diesem Changeset. Für grössere und komplexere Änderungen können auch aufeinander aufbauende Changesets erstellt werden. 
+Im Vergleich zur \flqq gewöhnlichen\frqq{}  Entwicklung mit Git, bei der man für neue Features, Branches mit Commits erstellt, arbeitet man bei Gerrit sozusagen auf Commmitbasis. 
+Pusht man einen neuen Commit auf Gerrit, erstellt dieser ein neues\flqq Changeset\frqq{}  mit einem Patchset. Gibt es nun weitere Änderungen werden diese einfach Amandet, dies erstellt dann ein weiteres Patchset auf diesem Changeset. Für grössere und komplexere Änderungen können auch aufeinander aufbauende Changesets erstellt werden. Für die Probe-IPA wurde zuerst ein Change für die Implementation des Backends erstellt. Danach ein zweiter Change mit der Implementation des Frontends, welcher auf dem ersten Change aufbaut. Dies macht das Feature übersichtlicher, was vor allem für den Reviewer viel angenehmer ist.

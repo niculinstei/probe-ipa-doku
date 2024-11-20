@@ -3,8 +3,8 @@
 In diesem Kapitel geht es um die erste von 6 Phasen der IPERKA-Methode, dem Informieren. Es bietet Platz um aufzuzeigen, was während dieser Phase unternommen wurde.
 
 \section{Analyse}
-Als erster Schritt wurde die Aufgabe analysiert und einen Überblick verschaffen.
-\subsection*{Auftrag}
+Als erster Schritt wurde die Aufgabe analysiert, einen Überblick verschaffen und in folgender Kurzfassung zusammengefasst:
+\subsection*{Kurzfassung}
 Umzusetzen ist eine Funktion in der Admin App der Airlock IAM Applikation, welche es den Adminnuztern ermöglicht, die 16 stelligen Airlock 2FA Aktivierungscodes der Nutzer anzeigen zu lassen. Dies hilft Ihnen, die Endnutzer bei der Aktivierung der Airlock 2FA zu unterstützen. Der Aktivierungscode sollte per Konpfdruck angezeigt werden können, zum Beispiel als Popup. Dies ist jedoch noch zu evaluieren, vieleicht bieten sich auch noch andere Optionen an. Sicher ist, dass der Code im Airlock 2FA Management angezeigt werden soll und nur, falls durch den Admin gewollt. \newline
 Weiter soll es mögllich sein, dass nicht alle Admins sich den Code anzeigen können, sondern nur die mit der entsprechenden Rollen. \newline
 Das ganze muss mit UI, Unit und Integration Tests getestet werden, und in der Kundendokumentation ergänzt werden.
@@ -13,7 +13,7 @@ Das ganze muss mit UI, Unit und Integration Tests getestet werden, und in der Ku
 Es gibt bereits die Funktionalität, dass Admins pro Nutzer Aktivierungsbriefe generieren können. Im Rahmen dieses Auftrags, soll dieser Bereich nicht erweitert oder verändert werden.
 
 \subsection{Futurae}
-Die Airlock 2FA App wird von Futurae entwickelt. Das hat zur Folge das zwischen IAM und Futurae wichtige Informationen ausgetauscht werden müssen. Dafür bietet Futurae 3 verschiedene API's an: die Auth API, die Admin API und die Log API. Für die Probe-IPA ist nur die Admin-API relevant, da sich um Adminoperationen handelt. 
+Die Airlock 2FA App wird von Futurae entwickelt. Das hat zur Folge das zwischen IAM und Futurae wichtige Informationen ausgetauscht werden müssen. Dafür bietet Futurae 3 verschiedene API's an: die Auth API, die Admin API und die Log API. Für die Probe-IPA ist sowohl die Admin-API als auch die Auth-API relevant. Bei der Anfrage für den 16-stelligen Aktivierungscode wird zwar die Admin-API gebraucht, allerdings um den Code bei dem Start-Enrollment-Request zu erzwingen, wird auch die Auth-API verwendet werden müssen. Denn, Aktivierungen aus dem Protected so wie Public Self-Service führen über Auth-API. 
 
 \section{Technische Referenzen}
 Für die Techinschen Infos sind folgende zwei Links sehr hilfreich:
@@ -78,8 +78,8 @@ Folgend, sind die Anforderungen für die Kundendokumentation definiert.
 
 \subsection*{Funktionale Anforderungen}
 \begin{itemize}
-	\item FA 8: Die Kunden Doku wird sinnvoll um das neue Feature erweitert.
-	\item FA 9: Die Kundendoku ist auf Englisch geschrieben.
+	\item FA 9: Die Kunden Doku wird sinnvoll um das neue Feature erweitert.
+	\item FA 10: Die Kundendoku ist auf Englisch geschrieben.
 \end{itemize}
 
 \subsection*{Nicht-funktionale Anforderungen}

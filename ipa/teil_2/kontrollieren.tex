@@ -1,5 +1,5 @@
 \chapter{Kontrollieren}\label{ch:kontrollieren}
-Dieses Kapitel bietet Rahmen für die Arbeiten, welche in der IPERKA-Phase <<Kontrollieren>> angefallen sind. In dieser Phase wird die Qualität der Umsetzung geprüft. Es werden alle im Test und Qualitätsicherungskonzept definierten Checks durchgeführt. Falls Fehler auftreten werden diese behoben.
+Dieses Kapitel bietet Rahmen für die Arbeiten, welche in der IPERKA-Phase <<Kontrollieren>> angefallen sind. In dieser Phase wird die Qualität der Umsetzung geprüft. Es werden alle im Test und Qualitätssicherungskonzept definierten Checks durchgeführt. Falls Fehler auftreten, werden diese behoben.
 \section{Durchführen der Tests}
 In diesem Abschnitt sind die Ergebnisse der Tests dokumentiert. Die durchgeführten Tests sind im Testkonzept in Kapitel \ref{sec:testkonzept} aufgeführt.
 \begin{longtable}{|p{.50\textwidth}|p{.50\textwidth}|}
@@ -58,9 +58,29 @@ In der folgenden Tabelle sind die Resultate der Tests aufgelistet: \newpage
 	\hline
 	\textbf{Testfall} & \textbf{Erwartetes Resultat} & \textbf{Tatsächliches Resultat} &\textbf{Status} \\ \hline
 	M1 & Es öffnet sich ein Popup (kein Browserpupop), mit dem Aktivierungscode.  & Es öffnet sich ein Popup (kein Browserpupop), mit dem Aktivierungscode. &  \textcolor{green}{\checkmark} \\ \hline 
-	M2 & Der Button wird nicht angezeigt. Der Admin darf auch via Postman den Aktivierungscode nicht bekommen.  &  Der Button wird nicht angezeigt. Der Admin hat auch via Postman den Aktivierungscode nicht bekommen. & \textcolor{green}{\checkmark} \\ \hline 
+	M2 & Der Button wird nicht angezeigt. Der Admin darf auch via einen alternativen REST-Client, wie z.B Postman, den Aktivierungscode nicht bekommen. & Der Button wird nicht angezeigt. Der Admin hat auch via einen alternativen REST-Client, wie z.B Postman, den Aktivierungscode nicht bekommen. & \textcolor{green}{\checkmark} \\ \hline 
 	M3 & Der Button wird nicht angezeigt.  &  Der Button wird nicht angezeigt.   & \textcolor{green}{\checkmark} \\ \hline 
 \end{longtable}
 \noindent Alle Tests konnten erfolgreich durchgeführt werden. Somit funktioniert das neue Feature wie erwartet, und es mussten keine Fehler behoben werden.
 
-\section{Qualitätssicherungschecks}
+\section{Qualitätssicherung}
+Die Qualität wurde zum Teil manuell, sowie automatisiert durchgeführt.
+\subsection{Manuelle Refactorings}
+Um Schreibfehler und andere unschönheiten im Code zu finden und zu verbessern wurde nach dem Implementieren, der ganze, neu geschriebene Code nochmals durchgegangen und kleine Findings wurden direkt behoben oder refactored.
+
+\subsection{Automatisierte Code-Analyse}
+Die Qualitätssicherung wurde auch während der Entwicklung fortlaufend sichergestellt. Jeder Commit, welcher auf Gerrit landet löst automatisch die Build Pipeline auf dem Jenkins aus. Diese führt neben den ganzen Code-Tests auch statische Code-Analysen durch. Diese sind:
+\begin{itemize}
+	\item SpotBugs
+	\item PMD
+	\item CheckStyle
+\end{itemize}
+\newpage
+Resultate des letzten, finalen Commits:
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=0.8 \textwidth]{ressourcen/codeana}
+		\caption[Resultate Code-Analyse]{Resultate der Code-Analyse Tasks auf Jenkins}\label{fig:codeana}
+	\end{center}
+\end{figure}
+\noindent Wie im obigen Bild zusehen, sind alle Checks für diesen Build erfolgreich durchgelaufen. Dies bedeutet die Qualitätssicherung ist so gut wie möglich sichergestellt.
