@@ -30,65 +30,73 @@
 \contentsline {part}{II\hspace {1em}Projekt}{29}{part.2}%
 \contentsline {chapter}{\numberline {9}Informieren}{30}{chapter.9}%
 \contentsline {section}{\numberline {9.1}Analyse}{30}{section.9.1}%
-\contentsline {subsection}{\numberline {9.1.1}Futurae}{30}{subsection.9.1.1}%
+\contentsline {subsection}{\numberline {9.1.1}Kurzfassung}{30}{subsection.9.1.1}%
+\contentsline {subsection}{\numberline {9.1.2}Abgrenzug}{31}{subsection.9.1.2}%
+\contentsline {subsection}{\numberline {9.1.3}Futurae}{31}{subsection.9.1.3}%
 \contentsline {section}{\numberline {9.2}Technische Referenzen}{31}{section.9.2}%
 \contentsline {section}{\numberline {9.3}Anforderungen}{31}{section.9.3}%
 \contentsline {subsection}{\numberline {9.3.1}Rest / Backend}{31}{subsection.9.3.1}%
 \contentsline {subsection}{\numberline {9.3.2}SPA}{32}{subsection.9.3.2}%
-\contentsline {subsection}{\numberline {9.3.3}Kundendokumentation}{32}{subsection.9.3.3}%
-\contentsline {chapter}{\numberline {10}Planen}{33}{chapter.10}%
-\contentsline {section}{\numberline {10.1}Arbeitspakete}{33}{section.10.1}%
-\contentsline {subsection}{\numberline {10.1.1}Informieren}{33}{subsection.10.1.1}%
-\contentsline {subsection}{\numberline {10.1.2}Planen}{34}{subsection.10.1.2}%
-\contentsline {subsection}{\numberline {10.1.3}Entscheiden}{35}{subsection.10.1.3}%
-\contentsline {subsection}{\numberline {10.1.4}Realisieren}{36}{subsection.10.1.4}%
-\contentsline {subsection}{\numberline {10.1.5}Kontrollieren}{37}{subsection.10.1.5}%
-\contentsline {subsection}{\numberline {10.1.6}Auswerten}{38}{subsection.10.1.6}%
-\contentsline {subsection}{\numberline {10.1.7}Rahmenaufgaben}{38}{subsection.10.1.7}%
-\contentsline {section}{\numberline {10.2}Lösungskonzept Backend}{40}{section.10.2}%
-\contentsline {subsection}{\numberline {10.2.1}REST}{40}{subsection.10.2.1}%
-\contentsline {subsection}{\numberline {10.2.2}Rollenlogik}{42}{subsection.10.2.2}%
-\contentsline {subsection}{\numberline {10.2.3}Wichtige Klassen und Interfaces}{42}{subsection.10.2.3}%
-\contentsline {section}{\numberline {10.3}Lösungskonzept SPA}{43}{section.10.3}%
-\contentsline {subsection}{\numberline {10.3.1}Mockups}{43}{subsection.10.3.1}%
-\contentsline {subsection}{\numberline {10.3.2}Lösungsvariante ohne Popup}{45}{subsection.10.3.2}%
-\contentsline {subsection}{\numberline {10.3.3}Rollenlogik}{46}{subsection.10.3.3}%
-\contentsline {subsection}{\numberline {10.3.4}Wichtige Komponenten und Services}{46}{subsection.10.3.4}%
-\contentsline {subsection}{\numberline {10.3.5}Translation Keys}{47}{subsection.10.3.5}%
-\contentsline {section}{\numberline {10.4}Testkonzept}{47}{section.10.4}%
-\contentsline {subsection}{\numberline {10.4.1}Benötigte Testmittel}{47}{subsection.10.4.1}%
-\contentsline {subsection}{\numberline {10.4.2}Wiremock}{48}{subsection.10.4.2}%
-\contentsline {subsection}{\numberline {10.4.3}Unit-Tests}{48}{subsection.10.4.3}%
-\contentsline {subsection}{\numberline {10.4.4}REST-Integration-Tests}{48}{subsection.10.4.4}%
-\contentsline {subsection}{\numberline {10.4.5}UI-Integration-Tests}{49}{subsection.10.4.5}%
-\contentsline {subsection}{\numberline {10.4.6}Manuelle Tests}{50}{subsection.10.4.6}%
-\contentsline {section}{\numberline {10.5}Qualitätssicherungskonzept}{52}{section.10.5}%
-\contentsline {chapter}{\numberline {11}Entscheiden}{53}{chapter.11}%
-\contentsline {section}{\numberline {11.1}REST-Interface Backend}{53}{section.11.1}%
-\contentsline {section}{\numberline {11.2}SPA-Design}{54}{section.11.2}%
-\contentsline {chapter}{\numberline {12}Realisieren}{55}{chapter.12}%
-\contentsline {section}{\numberline {12.1}Backend erweitern}{55}{section.12.1}%
-\contentsline {subsection}{\numberline {12.1.1}Neuer REST-Endpunkt}{55}{subsection.12.1.1}%
-\contentsline {subsection}{\numberline {12.1.2}Requests zu Futurae}{57}{subsection.12.1.2}%
-\contentsline {subsection}{\numberline {12.1.3}Logging}{62}{subsection.12.1.3}%
-\contentsline {subsection}{\numberline {12.1.4}Resultat}{63}{subsection.12.1.4}%
-\contentsline {subsection}{\numberline {12.1.5}Tests}{63}{subsection.12.1.5}%
-\contentsline {subsection}{\numberline {12.1.6}Testen der Access Control}{67}{subsection.12.1.6}%
-\contentsline {section}{\numberline {12.2}SPA erweitern}{67}{section.12.2}%
-\contentsline {subsection}{\numberline {12.2.1}Request zur IAM API}{68}{subsection.12.2.1}%
-\contentsline {subsection}{\numberline {12.2.2}Darstellung im UI}{68}{subsection.12.2.2}%
-\contentsline {subsection}{\numberline {12.2.3}i18n Translation Keys}{71}{subsection.12.2.3}%
-\contentsline {subsection}{\numberline {12.2.4}UI Integration-Tests}{73}{subsection.12.2.4}%
-\contentsline {section}{\numberline {12.3}Kundendokumentation}{76}{section.12.3}%
-\contentsline {subsection}{\numberline {12.3.1}Kapitel 18.5 Airlock 2FA Configuration erweitern}{76}{subsection.12.3.1}%
-\contentsline {chapter}{\numberline {13}Kontrollieren}{77}{chapter.13}%
-\contentsline {section}{\numberline {13.1}Durchführen der Tests}{77}{section.13.1}%
-\contentsline {subsection}{\numberline {13.1.1}Unit-Tests}{77}{subsection.13.1.1}%
-\contentsline {subsection}{\numberline {13.1.2}REST-Integration-Tests}{78}{subsection.13.1.2}%
-\contentsline {subsection}{\numberline {13.1.3}UI-Integration-Tests}{79}{subsection.13.1.3}%
-\contentsline {subsection}{\numberline {13.1.4}Manuelle Tests}{79}{subsection.13.1.4}%
-\contentsline {section}{\numberline {13.2}Qualitätssicherung}{80}{section.13.2}%
-\contentsline {subsection}{\numberline {13.2.1}Manuelle Refactorings}{80}{subsection.13.2.1}%
-\contentsline {subsection}{\numberline {13.2.2}Automatisierte Code-Analyse}{80}{subsection.13.2.2}%
-\contentsline {chapter}{\numberline {14}Auswerten}{82}{chapter.14}%
-\contentsline {chapter}{Abbildungsverzeichnis}{82}{section*.19}%
+\contentsline {subsection}{\numberline {9.3.3}Kundendokumentation}{33}{subsection.9.3.3}%
+\contentsline {chapter}{\numberline {10}Planen}{34}{chapter.10}%
+\contentsline {section}{\numberline {10.1}Arbeitspakete}{34}{section.10.1}%
+\contentsline {subsection}{\numberline {10.1.1}Informieren}{34}{subsection.10.1.1}%
+\contentsline {subsection}{\numberline {10.1.2}Planen}{35}{subsection.10.1.2}%
+\contentsline {subsection}{\numberline {10.1.3}Entscheiden}{36}{subsection.10.1.3}%
+\contentsline {subsection}{\numberline {10.1.4}Realisieren}{37}{subsection.10.1.4}%
+\contentsline {subsection}{\numberline {10.1.5}Kontrollieren}{38}{subsection.10.1.5}%
+\contentsline {subsection}{\numberline {10.1.6}Auswerten}{39}{subsection.10.1.6}%
+\contentsline {subsection}{\numberline {10.1.7}Rahmenaufgaben}{39}{subsection.10.1.7}%
+\contentsline {section}{\numberline {10.2}Lösungskonzept Backend}{41}{section.10.2}%
+\contentsline {subsection}{\numberline {10.2.1}REST}{41}{subsection.10.2.1}%
+\contentsline {subsection}{\numberline {10.2.2}Rollenlogik}{43}{subsection.10.2.2}%
+\contentsline {subsection}{\numberline {10.2.3}Wichtige Klassen und Interfaces}{43}{subsection.10.2.3}%
+\contentsline {section}{\numberline {10.3}Lösungskonzept SPA}{44}{section.10.3}%
+\contentsline {subsection}{\numberline {10.3.1}Mockups}{44}{subsection.10.3.1}%
+\contentsline {subsection}{\numberline {10.3.2}Lösungsvariante ohne Popup}{46}{subsection.10.3.2}%
+\contentsline {subsection}{\numberline {10.3.3}Rollenlogik}{47}{subsection.10.3.3}%
+\contentsline {subsection}{\numberline {10.3.4}Wichtige Komponenten und Services}{47}{subsection.10.3.4}%
+\contentsline {subsection}{\numberline {10.3.5}Translation Keys}{48}{subsection.10.3.5}%
+\contentsline {section}{\numberline {10.4}Testkonzept}{48}{section.10.4}%
+\contentsline {subsection}{\numberline {10.4.1}Benötigte Testmittel}{48}{subsection.10.4.1}%
+\contentsline {subsection}{\numberline {10.4.2}Wiremock}{49}{subsection.10.4.2}%
+\contentsline {subsection}{\numberline {10.4.3}Unit-Tests}{49}{subsection.10.4.3}%
+\contentsline {subsection}{\numberline {10.4.4}REST-Integration-Tests}{49}{subsection.10.4.4}%
+\contentsline {subsection}{\numberline {10.4.5}UI-Integration-Tests}{50}{subsection.10.4.5}%
+\contentsline {subsection}{\numberline {10.4.6}Manuelle Tests}{51}{subsection.10.4.6}%
+\contentsline {section}{\numberline {10.5}Qualitätssicherungskonzept}{53}{section.10.5}%
+\contentsline {chapter}{\numberline {11}Entscheiden}{54}{chapter.11}%
+\contentsline {section}{\numberline {11.1}REST-Interface Backend}{54}{section.11.1}%
+\contentsline {section}{\numberline {11.2}SPA-Design}{55}{section.11.2}%
+\contentsline {chapter}{\numberline {12}Realisieren}{56}{chapter.12}%
+\contentsline {section}{\numberline {12.1}Backend erweitern}{56}{section.12.1}%
+\contentsline {subsection}{\numberline {12.1.1}Neuer REST-Endpunkt}{56}{subsection.12.1.1}%
+\contentsline {subsection}{\numberline {12.1.2}Requests zu Futurae}{58}{subsection.12.1.2}%
+\contentsline {subsection}{\numberline {12.1.3}Logging}{63}{subsection.12.1.3}%
+\contentsline {subsection}{\numberline {12.1.4}Resultat}{64}{subsection.12.1.4}%
+\contentsline {subsection}{\numberline {12.1.5}Tests}{64}{subsection.12.1.5}%
+\contentsline {subsection}{\numberline {12.1.6}Testen der Access Control}{68}{subsection.12.1.6}%
+\contentsline {section}{\numberline {12.2}SPA erweitern}{68}{section.12.2}%
+\contentsline {subsection}{\numberline {12.2.1}Request zur IAM API}{69}{subsection.12.2.1}%
+\contentsline {subsection}{\numberline {12.2.2}Darstellung im UI}{69}{subsection.12.2.2}%
+\contentsline {subsection}{\numberline {12.2.3}i18n Translation Keys}{72}{subsection.12.2.3}%
+\contentsline {subsection}{\numberline {12.2.4}UI Integration-Tests}{74}{subsection.12.2.4}%
+\contentsline {section}{\numberline {12.3}Kundendokumentation}{77}{section.12.3}%
+\contentsline {subsection}{\numberline {12.3.1}Kapitel 18.5 Airlock 2FA Configuration erweitern}{77}{subsection.12.3.1}%
+\contentsline {chapter}{\numberline {13}Kontrollieren}{78}{chapter.13}%
+\contentsline {section}{\numberline {13.1}Durchführen der Tests}{78}{section.13.1}%
+\contentsline {subsection}{\numberline {13.1.1}Unit-Tests}{78}{subsection.13.1.1}%
+\contentsline {subsection}{\numberline {13.1.2}REST-Integration-Tests}{79}{subsection.13.1.2}%
+\contentsline {subsection}{\numberline {13.1.3}UI-Integration-Tests}{80}{subsection.13.1.3}%
+\contentsline {subsection}{\numberline {13.1.4}Manuelle Tests}{80}{subsection.13.1.4}%
+\contentsline {section}{\numberline {13.2}Qualitätssicherung}{81}{section.13.2}%
+\contentsline {subsection}{\numberline {13.2.1}Manuelle Refactorings}{81}{subsection.13.2.1}%
+\contentsline {subsection}{\numberline {13.2.2}Automatisierte Code-Analyse}{81}{subsection.13.2.2}%
+\contentsline {chapter}{\numberline {14}Auswerten}{83}{chapter.14}%
+\contentsline {section}{\numberline {14.1}Projektmanagement}{83}{section.14.1}%
+\contentsline {section}{\numberline {14.2}Zeitmanagement}{83}{section.14.2}%
+\contentsline {section}{\numberline {14.3}Arbeitsprozess}{84}{section.14.3}%
+\contentsline {section}{\numberline {14.4}Ergebnis der Probe-IPA}{84}{section.14.4}%
+\contentsline {section}{\numberline {14.5}Schlusswort}{84}{section.14.5}%
+\contentsline {chapter}{Abbildungsverzeichnis}{86}{section*.19}%
+\contentsline {chapter}{Quellenverzeichnis}{87}{chapter*.20}%

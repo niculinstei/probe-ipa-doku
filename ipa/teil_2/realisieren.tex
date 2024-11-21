@@ -29,7 +29,7 @@ Dies bewirkt nun, dass die Action \flqq viewAirlock2FASecrets\frqq{}, welche es 
 Ein Problem hat sich nun hervorgehoben. Es gibt bereits folgendes Pattern:\\
  \flqq .rule(Rule.of(GET, "\verb*|text/users/[^/]+/tokens/airlock-2fa(/.*)?"))|\frqq{}
 \\
-Dieses Pattern matched auch auf den neuen Pfad. Da dieses Pattern in der allgemeine Action \flqq viewToken \frqq{} definiert wurde, könnte es nun zu Konflikten kommen. Deshalb wurde der neue Pfad in diesem Pattern mit Hilfe eines <<Negative Lookaheads>> ausgeklammert. Das neue Pattern für die viewToken Action sieht nun so aus:\\
+Dieses Pattern matched auch auf den neuen Pfad. Da dieses Pattern in der allgemeine Action \flqq viewToken \frqq{} definiert wurde, könnte es nun zu Konflikten kommen. Deshalb wurde der neue Pfad in diesem Pattern mit Hilfe eines <<Negative Lookaheads>> \cite{lookahead} ausgeklammert. Das neue Pattern für die viewToken Action sieht nun so aus:\\
 
 
 \noindent \verb @/users/[^/]+/tokens/airlock-2fa(?!/activation-code-short(?:/|$))(/.*)?\$ @\\\\
@@ -256,7 +256,7 @@ und sonst eine leere Response.
 \end{verbatim}
 Der Endpunkt ist durch den Role-Based Access Controller geschützt, sodass nur Admins mit den nötigen Rollen Zugriff haben. Alle anderen erhalten einen 403. Jeder erlaubte Zugriff wird nach den Anforderungen geloggt.
 \subsection{Tests}\label{subsec:testbackend}
-Die Unit-Tests so wie die Integration-Tests werden nach dem AAA(Arrange, Act, Assert)-Pattern gegliedert. Dies bedeutet, dass im ersten Abschnitt(Arrange) alles was für den Test gebraucht wird zusammengestellt wird. Im zweiten Abschnitt(Act) wird die zu testende Methode, resp. in den Integration-Tests der zu testende Endpunkt, aufgerufen. Und in einem dritten Abschnitt(Assert), wird das erwartete Resultat mit dem tatsächlichen Resultat verglichen. Dies dient der Übersicht und der Leserlichkeit des Tests. In einigen Fällen kann es sein, dass der erste Schritt weg fällt, da z.B nichts arranged werden muss, oder auf der Testklasse bereits arranged wurde. Nach jedem der Abschnitte kommt jeweils eine leere Zeile. \\
+Die Unit-Tests so wie die Integration-Tests werden nach dem AAA(Arrange, Act, Assert)-Pattern\cite{AAA} gegliedert. Dies bedeutet, dass im ersten Abschnitt(Arrange) alles was für den Test gebraucht wird zusammengestellt wird. Im zweiten Abschnitt(Act) wird die zu testende Methode, resp. in den Integration-Tests der zu testende Endpunkt, aufgerufen. Und in einem dritten Abschnitt(Assert), wird das erwartete Resultat mit dem tatsächlichen Resultat verglichen. Dies dient der Übersicht und der Leserlichkeit des Tests. In einigen Fällen kann es sein, dass der erste Schritt weg fällt, da z.B nichts arranged werden muss, oder auf der Testklasse bereits arranged wurde. Nach jedem der Abschnitte kommt jeweils eine leere Zeile. \\
 \\
 \textbf{Ausbau Api Stubber}\label{head:stubber}\\
 Wie in der Planung unter \ref{subsec:wiremock} bereits angesprochen, laufen die Tests nicht gegen das originale Futurae API, sondern gegen einen mit Wiremock simulierten Server.\\
@@ -448,7 +448,7 @@ Die Booleans wurden in der <<show>>-Methode bisher wie folgt versucht zu übersc
 this.showCancel = settings.showCancel || true;
 \end{lstlisting}
 Dies hat zwar für alle Stringvalues gut funkioniert, denn bei einem String kann so direkt geprüft werden, ob er undefined, empty oder null ist. Falls ja, wird der Defaultwert verwendet.
-Bei einem Boolean funktioniert das nicht, da dieser false als einen gültigen Wert hat. Sprich setzt man showCancel beim Aufruf auf false, wird hier automatisch true verwendet. Dies weil das erste Statement false ist und der Operator || auf falsy-Werte prüft, welches unteranderem auch der Wert false ist. Die Lösung für dieses Problem war, dass man den Boolean mit dem Nullish Coalescing Operator <<??>> explizit nur auf null und undefined prüft, und nicht auf andere falsy Werte, wie false:
+Bei einem Boolean funktioniert das nicht, da dieser false als einen gültigen Wert hat. Sprich setzt man showCancel beim Aufruf auf false, wird hier automatisch true verwendet. Dies weil das erste Statement false ist und der Operator || auf falsy-Werte prüft, welches unteranderem auch der Wert false ist. Die Lösung für dieses Problem war, dass man den Boolean mit dem Nullish Coalescing Operator <<??>> \cite{nullish} explizit nur auf null und undefined prüft, und nicht auf andere falsy Werte, wie false:
 \begin{lstlisting}[language=TypeScript]
 this.showCancel = settings.showCancel ?? true;
 \end{lstlisting}

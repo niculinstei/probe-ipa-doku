@@ -87,6 +87,8 @@ singlelinecheck=false
 \usepackage{pdfpages}
 \usepackage{pdflscape}
 \usepackage{amssymb}
+\usepackage{csquotes}
+
 
 \titleformat{\chapter}{\normalfont\bfseries\LARGE\raggedright}{\thechapter}{1ex}{}
 \titlespacing*{\chapter}{0pt}{30pt}{30pt}
@@ -100,6 +102,8 @@ singlelinecheck=false
 
 \usepackage[
 backend=biber,
+style=numeric,
+sorting=none
 ]{biblatex}
 \addbibresource{global/quellen.bib}
 
@@ -146,7 +150,7 @@ backend=biber,
 	\input{teil_2/realisieren}
 	\input{teil_2/kontrollieren}
 	\input{teil_2/auswerten}
-	\input{global/glossar}
 	\input{global/abbildungsverzeichnis}
+	\input{global/quellenverzeichnis}
 	
 \end{document}

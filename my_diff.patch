@@ -1,0 +1,2038 @@
+diff --git a/admin-app/src/main/java/com/airlock/iam/admin/app/internal/application/service/system/permissions/token/Airlock2FATokenPermissions.java b/admin-app/src/main/java/com/airlock/iam/admin/app/internal/application/service/system/permissions/token/Airlock2FATokenPermissions.java
+index 29c6aebdd2f..3a14116cd29 100644
+--- a/admin-app/src/main/java/com/airlock/iam/admin/app/internal/application/service/system/permissions/token/Airlock2FATokenPermissions.java
++++ b/admin-app/src/main/java/com/airlock/iam/admin/app/internal/application/service/system/permissions/token/Airlock2FATokenPermissions.java
+@@ -11,6 +11,7 @@ import static com.airlock.iam.admin.domain.model.administrator.permissions.Actio
+ import static com.airlock.iam.admin.domain.model.administrator.permissions.Actions.generateTokenIak;
+ import static com.airlock.iam.admin.domain.model.administrator.permissions.Actions.orderNewToken;
+ import static com.airlock.iam.admin.domain.model.administrator.permissions.Actions.unorderNewToken;
++import static com.airlock.iam.admin.domain.model.administrator.permissions.Actions.viewAirlock2FAActivationSecret;
+ 
+ import java.util.Optional;
+ 
+@@ -32,6 +33,7 @@ public class Airlock2FATokenPermissions implements TokenPermissionProvider {
+ 			addDevicePermissions(page);
+ 			addHardwareTokenPermissions(page);
+ 			addActivationLetterPermissions(page);
++			addActivationCodePermissions(page);
+ 		}
+ 	}
+ 
+@@ -63,4 +65,8 @@ public class Airlock2FATokenPermissions implements TokenPermissionProvider {
+ 		page.permission("createAirlock2FAActivationLetterOrder", accessController.isActionAllowed(orderNewToken));
+ 		page.permission("deleteAirlock2FAActivationLetterOrder", accessController.isActionAllowed(unorderNewToken));
+ 	}
++
++	private void addActivationCodePermissions (PagePermissionsBuilder page) {
++		page.permission("viewShortActivationCode", accessController.isActionAllowed(viewAirlock2FAActivationSecret));
++	}
+ }
+diff --git a/admin-int-test/src/test/java/com/airlock/iam/admin/inttest/rest/user/token/UserAirlock2FATokenAccountTest.java b/admin-int-test/src/test/java/com/airlock/iam/admin/inttest/rest/user/token/UserAirlock2FATokenAccountTest.java
+index c0fad7de8bd..2c192444216 100644
+--- a/admin-int-test/src/test/java/com/airlock/iam/admin/inttest/rest/user/token/UserAirlock2FATokenAccountTest.java
++++ b/admin-int-test/src/test/java/com/airlock/iam/admin/inttest/rest/user/token/UserAirlock2FATokenAccountTest.java
+@@ -4,6 +4,7 @@
+ 
+ package com.airlock.iam.admin.inttest.rest.user.token;
+ 
++import static com.airlock.iam.airlock2fa.FuturaeAdminApiStubber.DEFAULT_ACTIVATION_CODE_SHORT;
+ import static com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeAccountData.DEFAULT_ACCOUNT_CREATION_DATE;
+ import static com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeAccountData.DEFAULT_ACCOUNT_UPDATE_DATE;
+ import static com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeAccountData.FuturaeAccountStatus.DISABLED;
+@@ -14,8 +15,10 @@ import static com.airlock.iam.inttest.framework.admin.token.airlock2fa.UserAirlo
+ import static com.airlock.iam.inttest.framework.admin.token.airlock2fa.UserAirlock2FATokenRequests.deleteAirlock2FAAccount;
+ import static com.airlock.iam.inttest.framework.admin.token.airlock2fa.UserAirlock2FATokenRequests.getAirlock2FAAccount;
+ import static com.airlock.iam.inttest.framework.admin.token.airlock2fa.UserAirlock2FATokenRequests.getAirlock2FAAccountExpectingError;
++import static com.airlock.iam.inttest.framework.admin.token.airlock2fa.UserAirlock2FATokenRequests.getAirlock2FAShortActivationCode;
+ import static com.airlock.iam.inttest.framework.admin.token.airlock2fa.UserAirlock2FATokenRequests.lockAirlock2FAAccount;
+ import static com.airlock.iam.inttest.framework.admin.token.airlock2fa.UserAirlock2FATokenRequests.unlockAirlock2FAAccount;
++import static com.airlock.iam.inttest.framework.shared.configuration.AdminappPlugins.roleBasedAccessControl;
+ import static com.airlock.iam.inttest.framework.shared.configuration.Airlock2FAPlugins.airlock2FATokenController;
+ import static com.airlock.iam.inttest.framework.shared.configuration.IamConfig.iamConfig;
+ import static com.airlock.iam.inttest.framework.shared.configuration.StartPage.MANAGE_USER;
+@@ -46,7 +49,9 @@ import com.airlock.iam.airlock2fa.FuturaeAdminApiStubber;
+ import com.airlock.iam.airlock2fa.FuturaeApiTest;
+ import com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeAccountData.FuturaeAccountStatus;
+ import com.airlock.iam.inttest.client.response.ErrorResponse;
++import com.airlock.iam.inttest.client.response.JsonApiResourceResponse;
+ import com.airlock.iam.inttest.client.response.ResponseBase;
++import com.airlock.iam.inttest.framework.admin.token.airlock2fa.Airlock2FAShortActivationCodeAttributes;
+ import com.airlock.iam.inttest.framework.shared.configuration.IamConfig;
+ import com.airlock.iam.inttest.framework.shared.harness.CustomConfig;
+ import com.airlock.iam.inttest.framework.shared.harness.DefaultConfig;
+@@ -70,8 +75,13 @@ class UserAirlock2FATokenAccountTest {
+ 
+ 	@DefaultConfig
+ 	IamConfig defaultConfig () {
++		return adminApp("superadmin");
++	}
++
++	private IamConfig adminApp (String allowedToViewAirlock2FAActivationSecrets) {
+ 		return iamConfig()
+ 			.newAdminapp()
++			.addRoleBasedAccessControl(roleBasedAccessControl().viewAirlock2FAActivationSecret(allowedToViewAirlock2FAActivationSecrets))
+ 			.withStartPages(MANAGE_USER)
+ 			.addTokenController(airlock2FATokenController(futuraeApiUrl).build())
+ 			.build();
+@@ -342,4 +352,60 @@ class UserAirlock2FATokenAccountTest {
+ 
+ 		assertThat(response).hasStatus(FORBIDDEN);
+ 	}
++
++	@Test
++	@CustomConfig
++	void shouldGet403IfAccessNotAllowed () {
++		adminApp("helpdesk").activate();
++		addAirlock2FAAccount(DEFAULT_USERNAME);
++
++		var response = getAirlock2FAShortActivationCode(DEFAULT_USERNAME);
++
++		assertThat(response).hasStatus(FORBIDDEN);
++	}
++
++	@Test
++	void shouldGetAirlock2FAShortActivationCode (FuturaeAdminApiStubber stubber) {
++		addAirlock2FAAccount(DEFAULT_USERNAME);
++		stubber.withPresentPendingEnrollmentList(defaultAccount().userId().toString(), 1);
++
++		JsonApiResourceResponse<Airlock2FAShortActivationCodeAttributes> response = getAirlock2FAShortActivationCode(DEFAULT_USERNAME);
++
++		assertThat(response)
++			.hasStatus(OK)
++			.satisfies(r -> {
++				assertThat(r.getData().getAttributes()).isNotNull();
++				String actualCode = r.getData().getAttributes().getShortActivationCode();
++				assertThat(actualCode).isNotNull();
++				assertThat(actualCode).isEqualTo(DEFAULT_ACTIVATION_CODE_SHORT);
++			});
++	}
++
++	@Test
++	void shouldReturnEmptyActivationCode (FuturaeAdminApiStubber stubber) {
++		addAirlock2FAAccount(DEFAULT_USERNAME);
++		stubber.withEmptyPendingEnrollmentList(defaultAccount().userId().toString());
++
++		JsonApiResourceResponse<Airlock2FAShortActivationCodeAttributes> response = getAirlock2FAShortActivationCode(DEFAULT_USERNAME);
++
++		assertThat(response)
++			.hasStatus(OK)
++			.satisfies(r -> {
++				assertThat(r.getData().getAttributes()).isNotNull();
++				String actualCode = r.getData().getAttributes().getShortActivationCode();
++				assertThat(actualCode).isNotNull();
++				assertThat(actualCode).isEqualTo("");
++			});
++	}
++
++	@Test
++	void shouldReturnAccountNotFound (FuturaeAdminApiStubber stubber) {
++		addAirlock2FAAccount(DEFAULT_USERNAME);
++		stubber.withEmptyPendingEnrollmentList(defaultAccount().userId().toString());
++
++		JsonApiResourceResponse<Airlock2FAShortActivationCodeAttributes> response = getAirlock2FAShortActivationCode("unknown");
++
++		assertThat(response)
++			.hasStatus(NOT_FOUND);
++	}
+ }
+diff --git a/admin-ui-int-test/src/test/java/com/airlock/iam/admin/ui/inttest/user/tokens/UserDetailsAirlock2FATest.java b/admin-ui-int-test/src/test/java/com/airlock/iam/admin/ui/inttest/user/tokens/UserDetailsAirlock2FATest.java
+index 59f93c57076..bda0786a83a 100644
+--- a/admin-ui-int-test/src/test/java/com/airlock/iam/admin/ui/inttest/user/tokens/UserDetailsAirlock2FATest.java
++++ b/admin-ui-int-test/src/test/java/com/airlock/iam/admin/ui/inttest/user/tokens/UserDetailsAirlock2FATest.java
+@@ -4,6 +4,7 @@
+ 
+ package com.airlock.iam.admin.ui.inttest.user.tokens;
+ 
++import static com.airlock.iam.airlock2fa.FuturaeAdminApiStubber.DEFAULT_ACTIVATION_CODE_SHORT;
+ import static com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeAccountData.DEFAULT_ACCOUNT_CREATION_DATE;
+ import static com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeAccountData.DEFAULT_ACCOUNT_UPDATE_DATE;
+ import static com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeAccountData.defaultAccount;
+@@ -15,6 +16,7 @@ import static com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeUserId.DEF
+ import static com.airlock.iam.inttest.framework.admin.token.airlock2fa.UserAirlock2FATokenRequests.addAirlock2FAAccount;
+ import static com.airlock.iam.inttest.framework.admin.token.airlock2fa.UserAirlock2FATokenRequests.createAirlock2FAActivationLetterForUser;
+ import static com.airlock.iam.inttest.framework.admin.token.airlock2fa.UserAirlock2FATokenRequests.createAirlock2FAActivationLetterOrderForUser;
++import static com.airlock.iam.inttest.framework.shared.configuration.AdminappPlugins.roleBasedAccessControl;
+ import static com.airlock.iam.inttest.framework.shared.configuration.Airlock2FAPlugins.airlock2FAActivationLetterOrders;
+ import static com.airlock.iam.inttest.framework.shared.configuration.Airlock2FAPlugins.airlock2FATokenController;
+ import static com.airlock.iam.inttest.framework.shared.configuration.IamConfig.iamConfig;
+@@ -25,6 +27,7 @@ import static com.airlock.iam.inttest.framework.shared.rest.Constants.DEFAULT_US
+ import static com.airlock.iam.inttest.framework.shared.rest.response.JsonApiResourceResponseAssert.assertThatJsonApiResponse;
+ import static com.airlock.iam.inttest.framework.shared.rest.response.ResponseBaseAssert.assertThat;
+ import static com.airlock.iam.inttest.webflow.admin.page.AdminappLogin.showDefaultUser;
++import static com.airlock.iam.inttest.webflow.admin.page.AdminappPageAlert.AIRLOCK_2FA_ACTIVATION_NOT_PENDING_ANYMORE;
+ import static com.airlock.iam.inttest.webflow.admin.page.AdminappPageAlert.AIRLOCK_2FA_SHIPMENT_LETTER_CREATED;
+ import static com.airlock.iam.inttest.webflow.admin.page.AdminappPageAlert.AIRLOCK_2FA_TOKEN_NOT_SYNCHRONIZED;
+ import static com.airlock.iam.inttest.webflow.admin.page.AdminappPageAlert.AIRLOCK_2FA_TOKEN_SYNCHRONIZED;
+@@ -86,14 +89,19 @@ class UserDetailsAirlock2FATest {
+ 		this.futuraeApiUrl = futuraeApiUrl;
+ 	}
+ 
+-	private IamConfig config (Airlock2FATokenControllerConfigBuilder controller) {
++	private IamConfig config (Airlock2FATokenControllerConfigBuilder controller, String allowedToViewActivationSecrets) {
+ 		return iamConfig()
+ 			.newAdminapp()
+ 			.withStartPages(MANAGE_USER)
+ 			.addTokenController(controller.build())
++			.addRoleBasedAccessControl(roleBasedAccessControl().viewAirlock2FAActivationSecret(allowedToViewActivationSecrets))
+ 			.build();
+ 	}
+ 
++	private IamConfig config (Airlock2FATokenControllerConfigBuilder controller) {
++		return config(controller, "superadmin");
++	}
++
+ 	private Airlock2FATokenControllerConfigBuilder controller () {
+ 		return airlock2FATokenController(futuraeApiUrl);
+ 	}
+@@ -1177,6 +1185,90 @@ class UserDetailsAirlock2FATest {
+ 		}
+ 	}
+ 
++	@Nested
++	@SeleniumAdminTest
++	class ShortActivationCode {
++
++		@DefaultConfig
++		IamConfig defaultConfig () {
++			return config(controller());
++		}
++
++		@DefaultUser
++		PersistentUserBuilder user () {
++			return defaultUser();
++		}
++
++		@Test
++		void shouldShowShortActivationCodeInPopup (FuturaeAdminApiStubber stubber) {
++			stubber.withPresentPendingEnrollmentList(defaultAccount().userId().toString(), 1);
++
++			addAirlock2FA()
++				.assertViewShortActivationCodeButtonPresent(true)
++				.clickViewActivationButton()
++				.assertNoCancelButton()
++				.assertCloseButton()
++				.assertShortActivationCode(DEFAULT_ACTIVATION_CODE_SHORT)
++				.clickCloseButton()
++				.assertAirlock2FATabOpen();
++		}
++
++		@Test
++		@CustomConfig
++		void shouldNotHaveAccessToViewShortActivationCode (FuturaeAdminApiStubber stubber) {
++			config(controller(), "aRoleThisAdminDoesNotHave").activate();
++			stubber.withPresentPendingEnrollmentList(defaultAccount().userId().toString(), 1);
++
++			addAirlock2FA()
++				.assertViewShortActivationCodeButtonPresent(false);
++		}
++
++		@Test
++		void shouldNotShowViewActivationCodeButtonIfNoPendingCodePresent (FuturaeAdminApiStubber stubber) {
++			stubber.withEmptyPendingEnrollmentList(defaultAccount().userId().toString());
++
++			addAirlock2FA()
++				.assertViewShortActivationCodeButtonPresent(false);
++		}
++
++		@Test
++		void shouldShowNoShortActivationCodePendingAnymoreAlert (FuturaeAdminApiStubber stubber) {
++			stubber.withPresentPendingEnrollmentList(defaultAccount().userId().toString(), 1);
++			UserDetailsAirlock2FATabComponent airlock2FATabComponent = addAirlock2FA();
++
++			airlock2FATabComponent
++				.assertViewShortActivationCodeButtonPresent(true)
++				.clickViewActivationButton()
++				.assertShortActivationCode(DEFAULT_ACTIVATION_CODE_SHORT)
++				.clickCloseButton();
++
++			stubber.withEmptyPendingEnrollmentList(defaultAccount().userId().toString());
++
++			airlock2FATabComponent
++				.assertViewShortActivationCodeButtonPresent(true)
++				.clickViewActivationButton()
++				.assertAlertMessage(AIRLOCK_2FA_ACTIVATION_NOT_PENDING_ANYMORE);
++		}
++
++		@Test
++		void shouldRemoveViewShortCodeButtonOnUserReloadIfNoCodePendingAnymore (FuturaeAdminApiStubber stubber) {
++			stubber.withPresentPendingEnrollmentList(defaultAccount().userId().toString(), 1);
++			UserDetailsAirlock2FATabComponent airlock2FATabComponent = addAirlock2FA();
++
++			airlock2FATabComponent
++				.assertViewShortActivationCodeButtonPresent(true)
++				.clickViewActivationButton()
++				.assertShortActivationCode(DEFAULT_ACTIVATION_CODE_SHORT)
++				.clickCloseButton();
++
++			stubber.withEmptyPendingEnrollmentList(defaultAccount().userId().toString());
++
++			airlock2FATabComponent
++				.reload()
++				.assertViewShortActivationCodeButtonPresent(false);
++		}
++	}
++
+ 	private static UserDetailsAirlock2FATabComponent addAirlock2FA () {
+ 		return showDefaultUser()
+ 			.switchToAuthMethodsTab()
+diff --git a/admin-ui/src/app/layout/page-dialog.model.ts b/admin-ui/src/app/layout/page-dialog.model.ts
+index e44ca05c166..7e54f243e52 100644
+--- a/admin-ui/src/app/layout/page-dialog.model.ts
++++ b/admin-ui/src/app/layout/page-dialog.model.ts
+@@ -30,8 +30,8 @@ export class PageDialog {
+         this.text = settings.text;
+         this.size = settings.size || 'normal';
+         this.okText = settings.okText || 'button.ok';
+-        this.closeOnOk = settings.closeOnOk || true;
+-        this.showCancel = settings.showCancel || true;
++        this.closeOnOk = settings.closeOnOk ?? true;
++        this.showCancel = settings.showCancel ?? true;
+         this.cancelText = settings.cancelText || 'button.cancel';
+ 
+         this.visible = true;
+diff --git a/admin-ui/src/app/user/components/auth-methods/airlock-2fa/airlock-2fa.component.html b/admin-ui/src/app/user/components/auth-methods/airlock-2fa/airlock-2fa.component.html
+index 1cf2aedd695..e20d177e406 100644
+--- a/admin-ui/src/app/user/components/auth-methods/airlock-2fa/airlock-2fa.component.html
++++ b/admin-ui/src/app/user/components/auth-methods/airlock-2fa/airlock-2fa.component.html
+@@ -222,6 +222,15 @@
+         </iam-detail-container>
+ 
+         <iam-button-row>
++            <iam-button
++                    *ngIf="isCodePresent"
++                    [id]="viewShortActivationCodeButtonId"
++                    [hideOnAccessDenied]="true"
++                    [text]="'user.airlock-2fa.activation.view-activation-code.button'"
++                    [right]="true"
++                    [outsideOfCard]="true"
++                    (buttonClick)="viewActivationCode()">
++            </iam-button>
+             <iam-button
+                     *ngIf="canCreateActivationLetters(airlock2FA)"
+                     [id]="'createAirlock2FAActivationLetter'"
+diff --git a/admin-ui/src/app/user/components/auth-methods/airlock-2fa/airlock-2fa.component.ts b/admin-ui/src/app/user/components/auth-methods/airlock-2fa/airlock-2fa.component.ts
+index 075aa8a21c4..42c53be7e4c 100644
+--- a/admin-ui/src/app/user/components/auth-methods/airlock-2fa/airlock-2fa.component.ts
++++ b/admin-ui/src/app/user/components/auth-methods/airlock-2fa/airlock-2fa.component.ts
+@@ -1,13 +1,15 @@
+ import {Component, Input, OnInit} from '@angular/core';
+ import {Airlock2FAService} from './airlock-2fa.service';
+ import {combineLatest, merge, NEVER, Observable, Subject} from 'rxjs';
+-import {catchError, map, switchMap} from 'rxjs/operators';
++import {catchError, map, switchMap, tap} from 'rxjs/operators';
+ import {ObservableWrapperFactory} from '../../../../shared/request/observable.wrapper';
+-import {Airlock2FAActivationLetters, Airlock2FAData, Airlock2FASettings} from './airlock-2fa';
++import {Airlock2FAActivationLetters, Airlock2FAData, Airlock2FASettings, Airlock2FAShortActivationCode} from './airlock-2fa';
+ import {PageAlertService} from '../../../../layout/page-alert.service';
+ import {PageDialog} from '../../../../layout/page-dialog.model';
+ import {TabComponent} from '../../../../shared/components/bootstrap/tab.component';
+ import {UserSettings} from '../../../services/user-settings';
++import {AccessControlService} from '../../../../shared/security/access-control.service';
++import {LanguageService} from '../../../../shared/services/language.service';
+ 
+ @Component({
+     selector: 'user-detail-airlock-2fa',
+@@ -23,6 +25,8 @@ export class Airlock2FAComponent implements OnInit {
+     tokenIdToSynchronize: string;
+     showAssignAirlock2FATokenDialog = false;
+     showSynchronizeAirlock2FATokenDialog = false;
++    viewShortActivationCodeButtonId: string = 'viewShortActivationCode';
++    isCodePresent: boolean = false;
+ 
+     private readonly reloadAccount = new Subject<string>();
+     private readonly reloadDevices = new Subject<string>();
+@@ -33,7 +37,9 @@ export class Airlock2FAComponent implements OnInit {
+                  private userSettings: UserSettings,
+                  private pageDialog: PageDialog,
+                  private pageAlertService: PageAlertService,
+-                 private observableWrapperFactory: ObservableWrapperFactory) { }
++                 private observableWrapperFactory: ObservableWrapperFactory,
++                 private accessControl: AccessControlService,
++                 private languageService: LanguageService) { }
+ 
+     ngOnInit (): void {
+         const account = this.wrapError(this.onAccountReload().pipe(
+@@ -58,7 +64,22 @@ export class Airlock2FAComponent implements OnInit {
+                 hardwareDevices: hardwareDevicesData,
+                 activationLetters: activationLettersData,
+                 settings: airlock2FASettingsData
+-            }))
++            })),
++            tap(() => this.initShortCode())
++        );
++    }
++
++    initShortCode () {
++        if (this.accessControl.accessible(this.viewShortActivationCodeButtonId)) {
++            this.findPendingActivationCode().subscribe();
++        }
++    }
++
++    findPendingActivationCode (): Observable<Airlock2FAShortActivationCode> {
++        return this.service.getLatestPendingActivationCode(this.userId).pipe(
++            tap(code => {
++                this.isCodePresent = code.activationCodeShort !== '';
++            })
+         );
+     }
+ 
+@@ -125,6 +146,26 @@ export class Airlock2FAComponent implements OnInit {
+         );
+     }
+ 
++    viewActivationCode () {
++        this.findPendingActivationCode().subscribe({
++                next: res => {
++                    if (this.isCodePresent) {
++                        this.pageDialog.show({
++                            showCancel: false,
++                            okText: 'user.airlock-2fa.activation.view-activation-code.popup.close',
++                            title: 'user.airlock-2fa.activation.view-activation-code.popup.title',
++                            text: this.languageService.translate('user.airlock-2fa.activation.view-activation-code.popup.text.code')
++                                + ' '
++                                + res.activationCodeShort
++                        }).subscribe(() => NEVER);
++                    } else {
++                        this.pageAlertService.error('user.airlock-2fa.activation.view-activation-code.popup.text.not-pending').display();
++                    }
++                }
++            }
++        );
++    }
++
+     confirmDeleteActivationLetter (letterId: string) {
+         this.pageDialog.show({title: 'general.confirmation', text: 'general.are-you-sure'}).pipe(
+             catchError(() => NEVER),
+diff --git a/admin-ui/src/app/user/components/auth-methods/airlock-2fa/airlock-2fa.service.ts b/admin-ui/src/app/user/components/auth-methods/airlock-2fa/airlock-2fa.service.ts
+index 00ed91c9cc5..bfe9f0f3cbe 100644
+--- a/admin-ui/src/app/user/components/auth-methods/airlock-2fa/airlock-2fa.service.ts
++++ b/admin-ui/src/app/user/components/auth-methods/airlock-2fa/airlock-2fa.service.ts
+@@ -7,6 +7,7 @@ import {
+     Airlock2FAAppDevice,
+     Airlock2FAHardwareDevice,
+     Airlock2FAHardwareToken,
++    Airlock2FAShortActivationCode,
+     Airlock2FATokenSynchronizationPasscodes
+ } from './airlock-2fa';
+ import {Observable} from 'rxjs';
+@@ -32,6 +33,18 @@ export class Airlock2FAService {
+         );
+     }
+ 
++    getLatestPendingActivationCode (userId: string): Observable<Airlock2FAShortActivationCode> {
++        return this.http.get<JsonApiResponse<JsonApiResourceObject>>(restUrl(['/users', userId, 'tokens', 'airlock-2fa', 'activation-code-short'])).pipe(
++            map(res => this.toAirlock2FAShortActivationCode(res))
++        );
++    }
++
++    toAirlock2FAShortActivationCode (res: JsonApiResponse<JsonApiResourceObject>): Airlock2FAShortActivationCode {
++        const code = new Airlock2FAShortActivationCode();
++        code.activationCodeShort = res.data.attributes.shortActivationCode;
++        return code;
++    }
++
+     deleteAccount (userId: string): Observable<Object> {
+         return this.http.delete(restUrl(['/users', userId, 'tokens', 'airlock-2fa']));
+     }
+diff --git a/admin-ui/src/app/user/components/auth-methods/airlock-2fa/airlock-2fa.ts b/admin-ui/src/app/user/components/auth-methods/airlock-2fa/airlock-2fa.ts
+index 568c4dec31d..3a307e1449e 100644
+--- a/admin-ui/src/app/user/components/auth-methods/airlock-2fa/airlock-2fa.ts
++++ b/admin-ui/src/app/user/components/auth-methods/airlock-2fa/airlock-2fa.ts
+@@ -99,3 +99,7 @@ export interface Airlock2FATokenSynchronizationPasscodes {
+     passcode1: string;
+     passcode2: string;
+ }
++
++export class Airlock2FAShortActivationCode {
++    activationCodeShort: string;
++}
+diff --git a/admin-ui/src/i18n/de.json b/admin-ui/src/i18n/de.json
+index b7b34e2a7be..2a6dc9f23b8 100644
+--- a/admin-ui/src/i18n/de.json
++++ b/admin-ui/src/i18n/de.json
+@@ -490,6 +490,17 @@
+         }
+       },
+       "activation": {
++        "view-activation-code": {
++          "button": "Aktivierungs-Code anzeigen",
++          "popup": {
++            "close": "Schliessen",
++            "title": "16-stelliger Aktivierungs-Code",
++            "text": {
++              "code": "Aktivierungs-Code:",
++              "not-pending": "Die Aktivierung ist nicht mehr ausstehend."
++            }
++          }
++        },
+         "letter": {
+           "title": "Aktivierungsbrief",
+           "code": "Aktivierungs-Code",
+diff --git a/admin-ui/src/i18n/en.json b/admin-ui/src/i18n/en.json
+index ce830ab029f..b3407ed835e 100644
+--- a/admin-ui/src/i18n/en.json
++++ b/admin-ui/src/i18n/en.json
+@@ -490,6 +490,17 @@
+         }
+       },
+       "activation": {
++        "view-activation-code": {
++          "button": "View activation code",
++          "popup": {
++            "close": "Close",
++            "title": "16-digit activation code",
++            "text": {
++              "code": "Activation code:",
++              "not-pending": "The activation is not pending anymore."
++            }
++          }
++        },
+         "letter": {
+           "title": "Activation Letter",
+           "code": "Activation code",
+diff --git a/admin-ui/src/i18n/fr.json b/admin-ui/src/i18n/fr.json
+index 4147bf8b19f..1ae52983f55 100644
+--- a/admin-ui/src/i18n/fr.json
++++ b/admin-ui/src/i18n/fr.json
+@@ -490,9 +490,20 @@
+         }
+       },
+       "activation": {
++        "view-activation-code": {
++          "button": "Voir le code d'activation",
++          "popup": {
++            "close": "Fermer",
++            "title": "Code d'activation à 16 chiffres",
++            "text": {
++              "code": "Code d'activation:",
++              "not-pending": "L'activation n'est plus ouverte."
++            }
++          }
++        },
+         "letter": {
+           "title": "Lettre d'Activation",
+-          "code": "Créé à",
++          "code": "Code d'activation",
+           "created-at": "Créé à",
+           "valid-until": "Valide jusqu'au",
+           "missing": "Il n'y a pas de lettres d'activation pour cet utilisateur.",
+diff --git a/admin/src/main/java/com/airlock/iam/admin/application/configuration/ActionsToRest.java b/admin/src/main/java/com/airlock/iam/admin/application/configuration/ActionsToRest.java
+index d87e13e8b38..adb384fd2da 100644
+--- a/admin/src/main/java/com/airlock/iam/admin/application/configuration/ActionsToRest.java
++++ b/admin/src/main/java/com/airlock/iam/admin/application/configuration/ActionsToRest.java
+@@ -83,7 +83,8 @@ final class ActionsToRest {
+ 			RestActionDefinitions.createEditTechnicalClient(),
+ 			RestActionDefinitions.deleteTechnicalClient(),
+ 			RestActionDefinitions.lockTechnicalClient(),
+-			RestActionDefinitions.unlockTechnicalClient());
++			RestActionDefinitions.unlockTechnicalClient(),
++			RestActionDefinitions.viewAirlock2FAActivationCode());
+ 
+ 		// sendSms : no equivalent action
+ 		// smsDeliveryStatus : no equivalent action
+diff --git a/admin/src/main/java/com/airlock/iam/admin/application/configuration/RestActionDefinitions.java b/admin/src/main/java/com/airlock/iam/admin/application/configuration/RestActionDefinitions.java
+index 0c84f54b8f8..2575a2a3eea 100644
+--- a/admin/src/main/java/com/airlock/iam/admin/application/configuration/RestActionDefinitions.java
++++ b/admin/src/main/java/com/airlock/iam/admin/application/configuration/RestActionDefinitions.java
+@@ -43,6 +43,7 @@ import static com.airlock.iam.admin.domain.model.administrator.permissions.Actio
+ import static com.airlock.iam.admin.domain.model.administrator.permissions.Actions.unorderNewToken;
+ import static com.airlock.iam.admin.domain.model.administrator.permissions.Actions.unorderPassword;
+ import static com.airlock.iam.admin.domain.model.administrator.permissions.Actions.viewAdministrator;
++import static com.airlock.iam.admin.domain.model.administrator.permissions.Actions.viewAirlock2FAActivationSecret;
+ import static com.airlock.iam.admin.domain.model.administrator.permissions.Actions.viewContextData;
+ import static com.airlock.iam.admin.domain.model.administrator.permissions.Actions.viewLicense;
+ import static com.airlock.iam.admin.domain.model.administrator.permissions.Actions.viewLog;
+@@ -245,7 +246,7 @@ public final class RestActionDefinitions {
+ 			.rule(Rule.of(GET, "/tokens/vasco-(otp|cronto)/license/?"))
+ 			.rule(Rule.of(GET, "/tokens/airlock-2fa/hardware-tokens(/.*)?"))
+ 			.rule(Rule.of(GET, "/users/[^/]+/tokens/x509/certificates/?"))
+-			.rule(Rule.of(GET, "/users/[^/]+/tokens/airlock-2fa(/.*)?"))
++			.rule(Rule.of(GET, "/users/[^/]+/tokens/airlock-2fa(?!/activation-code-short(?:/|$))(/.*)?$"))
+ 			.rule(Rule.of(GET, "/users/[^/]+/tokens/fido/credentials/?"))
+ 			.rule(Rule.of(GET, "/users/[^/]+/account-links/?"))
+ 			.build();
+@@ -387,6 +388,14 @@ public final class RestActionDefinitions {
+ 			.build();
+ 	}
+ 
++	public static RestAction viewAirlock2FAActivationCode () {
++		return RestAction
++			.builder()
++			.action(viewAirlock2FAActivationSecret)
++			.rule(Rule.of(GET, "/users/[^/]+/tokens/airlock-2fa/activation-code-short"))
++			.build();
++	}
++
+ 	public static RestAction listMaintenanceMessages () {
+ 		return RestAction
+ 			.builder()
+diff --git a/admin/src/main/java/com/airlock/iam/admin/internal/infrastructure/resource/prot/user/tokens/UserAirlock2FADeviceResource.java b/admin/src/main/java/com/airlock/iam/admin/internal/infrastructure/resource/prot/user/tokens/UserAirlock2FADeviceResource.java
+index c887e2d41c2..9679c8f7183 100644
+--- a/admin/src/main/java/com/airlock/iam/admin/internal/infrastructure/resource/prot/user/tokens/UserAirlock2FADeviceResource.java
++++ b/admin/src/main/java/com/airlock/iam/admin/internal/infrastructure/resource/prot/user/tokens/UserAirlock2FADeviceResource.java
+@@ -50,6 +50,7 @@ import com.airlock.iam.admin.internal.infrastructure.transfer.response.user.toke
+ import com.airlock.iam.admin.internal.infrastructure.transfer.response.user.tokens.Airlock2FAActivationLetterOrderDataCollectionDocument;
+ import com.airlock.iam.admin.internal.infrastructure.transfer.response.user.tokens.Airlock2FAAppDeviceData;
+ import com.airlock.iam.admin.internal.infrastructure.transfer.response.user.tokens.Airlock2FAAppDeviceDataCollectionDocument;
++import com.airlock.iam.admin.internal.infrastructure.transfer.response.user.tokens.Airlock2FAShortActivationCodeData;
+ import com.airlock.iam.admin.internal.infrastructure.transfer.response.user.tokens.Airlock2FAUserAccountData;
+ import com.airlock.iam.admin.internal.infrastructure.transfer.response.user.tokens.Airlock2FAUserAccountDataResourceDocument;
+ import com.airlock.iam.admin.internal.infrastructure.transfer.response.user.tokens.UserAirlock2FAHardwareDeviceData;
+@@ -75,6 +76,7 @@ import com.airlock.iam.base.api.infrastructure.uri.ExternalUriInfo;
+ import com.airlock.iam.base.infrastructure.mapper.entity.RestMapper;
+ import com.airlock.iam.base.misc.result.Result;
+ import com.airlock.iam.common.application.UserParam;
++import com.airlock.iam.common.application.jsonapi.ResourceIdentifierUtils;
+ import com.airlock.iam.common.infrastructure.resource.Resources;
+ import com.airlock.iam.log.api.helpdesk.HelpdeskLogger;
+ import com.qmino.miredot.annotations.ReturnType;
+@@ -271,6 +273,63 @@ public class UserAirlock2FADeviceResource {
+ 		return ok(document).build();
+ 	}
+ 
++	/**
++	 * Retrieves the Airlock 2FA short activation code of the latest pending enrollment for the current user.
++	 *
++	 * @param userParam The identification of the user.
++	 * @return A resource document with the Airlock 2FA short activation code of the user. The Response can be empty, if no pending enrollment was found.
++	 * @servicetag Airlock 2FA
++	 * @statuscode 200 Retrieved Airlock 2FA short activation code.
++	 * @statuscode 404  <div class="iam-error-code">
++	 * 	     <table>
++	 * 	         <tr>
++	 * 	  			<td>ACCOUNT_NOT_FOUND</td>
++	 * 	  			<td>The user has no Airlock 2FA account.</td>
++	 * 	  		</tr>
++	 * 	  		<tr>
++	 * 	  			<td>USER_NOT_FOUND</td>
++	 * 	  			<td>The user does not exist.</td>
++	 * 	  		</tr>
++	 * 	  	</table>
++	 * 	</div>
++	 */
++	@ApiResponse(responseCode = "200",
++		description = "Retrieved Airlock 2FA short activation code.",
++		content = {@Content(mediaType = "application/vnd.api+json"), @Content(mediaType = "application/json")})
++	@ApiResponse(responseCode = "404", description = """
++		 <div class="iam-error-code">
++		     <table>
++		         <tr>
++		  			<td>ACCOUNT_NOT_FOUND</td>
++		  			<td>The user has no Airlock 2FA account.</td>
++		  		</tr>
++		  		<tr>
++		  			<td>USER_NOT_FOUND</td>
++		  			<td>The user does not exist.</td>
++		  		</tr>
++		  	</table>
++		</div>
++		""", content = {@Content(mediaType = "application/vnd.api+json"), @Content(mediaType = "application/json")})
++	@GET
++	@Operation(summary = "Retrieves the Airlock 2FA short activation code of the latest pending enrollment for the current user.", tags = {"Airlock 2FA"}, description = """
++		<div class="A resource document with the Airlock 2FA short activation code of the user. The Response can be empty, if no pending enrollment was found.</div>""")
++	@Produces({JSON_API, JSON_LESS_PREFERRED})
++	@JsonApiResource(attributes = Airlock2FAShortActivationCodeData.class)
++	@Path("activation-code-short")
++	public Response getShortActivationCode (@ExistingUser @PathParam("userId") @Parameter(schema = @Schema(type = "string")) UserParam userParam) {
++		Airlock2FAAdminService service = adminService.get();
++		Optional<Airlock2FAUserAccount> account = service.findAccountBy(userParam.getUserId());
++		if (account.isEmpty()) {
++			return noAirlock2FAAccountFound(userParam.getUserId());
++		}
++
++		Optional<String> latestPendingShortActivationCode = service.findLatestPendingShortActivationCode(account.get());
++
++		return ok(mapper.forElement(latestPendingShortActivationCode.orElse(""), Airlock2FAShortActivationCodeData.class)
++					  .withIdSupplier(ResourceIdentifierUtils::getIdFor)
++					  .toResourceDocument()).build();
++	}
++
+ 	/**
+ 	 * Deletes the Airlock 2FA account of the user.
+ 	 *
+diff --git a/admin/src/main/java/com/airlock/iam/admin/internal/infrastructure/transfer/response/user/tokens/Airlock2FAShortActivationCodeData.java b/admin/src/main/java/com/airlock/iam/admin/internal/infrastructure/transfer/response/user/tokens/Airlock2FAShortActivationCodeData.java
+new file mode 100644
+index 00000000000..c68ee9881f5
+--- /dev/null
++++ b/admin/src/main/java/com/airlock/iam/admin/internal/infrastructure/transfer/response/user/tokens/Airlock2FAShortActivationCodeData.java
+@@ -0,0 +1,32 @@
++/*
++ * Copyright (c) Ergon Informatik AG, Switzerland
++ */
++
++package com.airlock.iam.admin.internal.infrastructure.transfer.response.user.tokens;
++
++import static com.airlock.iam.admin.internal.infrastructure.transfer.response.user.tokens.Airlock2FAShortActivationCodeData.AIRLOCK_2FA_SHORT_ACTIVATION_CODE_TYPE;
++
++import jakarta.annotation.Nullable;
++
++import com.fasterxml.jackson.annotation.JsonTypeName;
++import io.swagger.v3.oas.annotations.media.Schema;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++@JsonTypeName(AIRLOCK_2FA_SHORT_ACTIVATION_CODE_TYPE)
++public class Airlock2FAShortActivationCodeData {
++
++	public static final String AIRLOCK_2FA_SHORT_ACTIVATION_CODE_TYPE = "user.token.airlock-2fa.short-activation-code";
++
++	/**
++	 * The short activation code. Can be empty, if no pending enrollment was found.
++	 */
++	@Nullable
++	@Schema(description = "The short activation code. Can be empty, if no pending enrollment was found.")
++	private String shortActivationCode;
++
++}
+diff --git a/admin/src/test/java/com/airlock/iam/admin/application/configuration/ActionsToRestTest.java b/admin/src/test/java/com/airlock/iam/admin/application/configuration/ActionsToRestTest.java
+index 085c7747c1a..0ba318cad33 100644
+--- a/admin/src/test/java/com/airlock/iam/admin/application/configuration/ActionsToRestTest.java
++++ b/admin/src/test/java/com/airlock/iam/admin/application/configuration/ActionsToRestTest.java
+@@ -16,12 +16,12 @@ import org.junit.jupiter.api.Test;
+ 
+ class ActionsToRestTest {
+ 
+-	private RoleBasedAccessControllerConfig config = mock(RoleBasedAccessControllerConfig.class);
++	private final RoleBasedAccessControllerConfig config = mock(RoleBasedAccessControllerConfig.class);
+ 
+ 	@Test
+ 	void shouldCheckNumberOfActions () {
+ 		ActionsToRest actionsToRest = new ActionsToRest(config, false);
+-		assertThat(actionsToRest.getMappings()).hasSize(46);
++		assertThat(actionsToRest.getMappings()).hasSize(47);
+ 	}
+ 
+ 	@Test
+diff --git a/admin/src/test/java/com/airlock/iam/admin/application/configuration/RestActionDefinitionsTest.java b/admin/src/test/java/com/airlock/iam/admin/application/configuration/RestActionDefinitionsTest.java
+index 74cfc6dd2ac..5dc54697e93 100644
+--- a/admin/src/test/java/com/airlock/iam/admin/application/configuration/RestActionDefinitionsTest.java
++++ b/admin/src/test/java/com/airlock/iam/admin/application/configuration/RestActionDefinitionsTest.java
+@@ -362,7 +362,7 @@ class RestActionDefinitionsTest {
+ 		@Test
+ 		void shouldHaveAirlock2FARules () {
+ 			assertThat(RestActionDefinitions.viewToken().getRules())
+-				.contains(Rule.of(GET, "/users/[^/]+/tokens/airlock-2fa(/.*)?"));
++				.contains(Rule.of(GET, "/users/[^/]+/tokens/airlock-2fa(?!/activation-code-short(?:/|$))(/.*)?$"));
+ 
+ 			assertThat(RestActionDefinitions.editToken().getRules())
+ 				.contains(Rule.of(POST, "/users/[^/]+/tokens/airlock-2fa/?"));
+@@ -385,6 +385,9 @@ class RestActionDefinitionsTest {
+ 
+ 			assertThat(RestActionDefinitions.unorderNewToken().getRules())
+ 				.contains(Rule.of(DELETE, "/users/[^/]+/tokens/airlock-2fa/activation-letter-orders/[^/]+/?"));
++
++			assertThat(RestActionDefinitions.viewAirlock2FAActivationCode().getRules())
++				.contains(Rule.of(GET, "/users/[^/]+/tokens/airlock-2fa/activation-code-short"));
+ 		}
+ 
+ 	}
+diff --git a/airlock2fa-admin/src/main/java/com/airlock/iam/airlock2fa/admin/application/service/Airlock2FAAdminService.java b/airlock2fa-admin/src/main/java/com/airlock/iam/airlock2fa/admin/application/service/Airlock2FAAdminService.java
+index 80c049928d3..518c75f145b 100644
+--- a/airlock2fa-admin/src/main/java/com/airlock/iam/airlock2fa/admin/application/service/Airlock2FAAdminService.java
++++ b/airlock2fa-admin/src/main/java/com/airlock/iam/airlock2fa/admin/application/service/Airlock2FAAdminService.java
+@@ -40,6 +40,7 @@ import com.airlock.iam.airlock2fa.api.domain.model.Airlock2FADeviceId;
+ import com.airlock.iam.airlock2fa.domain.model.order.Airlock2FAActivationLetterOrder;
+ import com.airlock.iam.airlock2fa.domain.model.order.Airlock2FAActivationLetterOrderCreator;
+ import com.airlock.iam.airlock2fa.domain.model.order.Airlock2FAActivationLetterOrderId;
++import com.airlock.iam.airlock2fa.domain.service.enrollment.Airlock2FAAdminApiEnrollmentService;
+ import com.airlock.iam.airlock2fa.domain.service.order.Airlock2FAActivationLetterOrderService;
+ import com.airlock.iam.airlock2fa.domain.service.order.Airlock2FAFindActivationLetterOrderService;
+ import com.airlock.iam.base.api.domain.model.exception.FailureException;
+@@ -63,6 +64,7 @@ public final class Airlock2FAAdminService {
+ 	private final Optional<Airlock2FAActivationLetterOrderService> activationOrderService;
+ 	private final Optional<Airlock2FAActivationLetterPrintingService> activationLetterPrintingService;
+ 	private final Optional<Airlock2FAShipmentLetterPrintingService> shipmentLetterPrintingService;
++	private final Airlock2FAAdminApiEnrollmentService adminApiEnrollmentService;
+ 	private final CurrentAdministrator administrator;
+ 	private final SigningLogger signingLogger;
+ 	private final HelpdeskLogger helpdeskLogger;
+@@ -78,7 +80,8 @@ public final class Airlock2FAAdminService {
+ 		@NonNull Optional<Airlock2FAShipmentLetterPrintingService> shipmentLetterPrintingService,
+ 		@NonNull CurrentAdministrator administrator,
+ 		@NonNull SigningLogger signingLogger,
+-		@NonNull HelpdeskLogger helpdeskLogger) {
++		@NonNull HelpdeskLogger helpdeskLogger,
++		@NonNull Airlock2FAAdminApiEnrollmentService adminApiEnrollmentService) {
+ 		this.accountRepository = accountRepository;
+ 		this.activationLetterService = activationLetterService;
+ 		this.findActivationOrderService = findActivationOrderService;
+@@ -88,6 +91,7 @@ public final class Airlock2FAAdminService {
+ 		this.administrator = administrator;
+ 		this.signingLogger = signingLogger;
+ 		this.helpdeskLogger = helpdeskLogger;
++		this.adminApiEnrollmentService = adminApiEnrollmentService;
+ 	}
+ 
+ 	public Optional<Airlock2FAUserAccount> findAccountBy (UserId userId) {
+@@ -255,6 +259,16 @@ public final class Airlock2FAAdminService {
+ 		return result(toShipmentLetter(userId, hardwareDevice));
+ 	}
+ 
++	public Optional<String> findLatestPendingShortActivationCode (Airlock2FAUserAccount account) {
++		return adminApiEnrollmentService.getLatestPendingEnrollment(account.getAccountId())
++			.map(enrollment -> {
++				signingLogger.log(format("Administrator '%s' accessed the Airlock 2FA short activation code of user '%s'.", administrator.getName(), account.getUserId()));
++				helpdeskLogger.log(account.getUserId(), format("Administrator '%s' accessed the Airlock 2FA short activation code.", administrator.getName()));
++				return enrollment.getActivationCodeShort();
++			})
++			.or(Optional::empty);
++	}
++
+ 	public enum CreateLetterFailure {
+ 		ACCOUNT_PERMANENTLY_DISABLED,
+ 		LETTER_NOT_CONFIGURED,
+diff --git a/airlock2fa-admin/src/test/java/com/airlock/iam/airlock2fa/admin/application/service/Airlock2FAAdminServiceTest.java b/airlock2fa-admin/src/test/java/com/airlock/iam/airlock2fa/admin/application/service/Airlock2FAAdminServiceTest.java
+index 2b3912b1843..d65192f901e 100644
+--- a/airlock2fa-admin/src/test/java/com/airlock/iam/airlock2fa/admin/application/service/Airlock2FAAdminServiceTest.java
++++ b/airlock2fa-admin/src/test/java/com/airlock/iam/airlock2fa/admin/application/service/Airlock2FAAdminServiceTest.java
+@@ -8,6 +8,7 @@ import static com.airlock.iam.airlock2fa.Airlock2FAActivationLetterOrderFactory.
+ import static com.airlock.iam.airlock2fa.Airlock2FAActivationLetterOrderFactory.DEFAULT_ACTIVATION_LETTER_ORDER_ID;
+ import static com.airlock.iam.airlock2fa.Airlock2FAActivationLetterOrderFactory.defaultActivationOrder;
+ import static com.airlock.iam.airlock2fa.admin.Airlock2FAActivationLetterFactory.defaultEnrollment;
++import static com.airlock.iam.airlock2fa.admin.Airlock2FAActivationLetterFactory.defaultEnrollmentBuilder;
+ import static com.airlock.iam.airlock2fa.admin.Airlock2FAShipmentLetterFactory.airlock2FAShipmentLetter;
+ import static com.airlock.iam.airlock2fa.admin.application.service.Airlock2FAAdminService.ActivationLetterOrderFailure.NOT_CONFIGURED;
+ import static com.airlock.iam.airlock2fa.admin.application.service.Airlock2FAAdminService.CreateLetterFailure.ACCOUNT_PERMANENTLY_DISABLED;
+@@ -58,6 +59,8 @@ import com.airlock.iam.airlock2fa.api.domain.model.Airlock2FAAccountId;
+ import com.airlock.iam.airlock2fa.api.domain.model.Airlock2FADeviceId;
+ import com.airlock.iam.airlock2fa.domain.model.Airlock2FAUser;
+ import com.airlock.iam.airlock2fa.domain.model.order.Airlock2FAActivationLetterOrder;
++import com.airlock.iam.airlock2fa.domain.service.enrollment.Airlock2FAAdminApiEnrollmentService;
++import com.airlock.iam.airlock2fa.domain.service.enrollment.Airlock2FAEnrollment;
+ import com.airlock.iam.airlock2fa.domain.service.order.Airlock2FAActivationLetterOrderService;
+ import com.airlock.iam.airlock2fa.domain.service.order.Airlock2FAFindActivationLetterOrderService;
+ import com.airlock.iam.base.api.domain.model.exception.FailureException;
+@@ -74,6 +77,7 @@ class Airlock2FAAdminServiceTest {
+ 	private static final Airlock2FAAccountId AIRLOCK_2FA_ACCOUNT_ID = airlock2FAAccountId("airlock2FAAccountId");
+ 	private static final Airlock2FADeviceId DEFAULT_DEVICE_ID = airlock2FADeviceId("123");
+ 	private static final Airlock2FAActivationLetterId DEFAULT_LETTER_ID = new Airlock2FAActivationLetterId("letter123");
++	private static final String SHORT_ACTIVATION_CODE = "1234 asdf 5678 ghjk";
+ 
+ 	private final Airlock2FAUserAccountRepository accountRepository = accountRepo();
+ 	private final SigningLogger signingLogger = mock(SigningLogger.class);
+@@ -83,6 +87,7 @@ class Airlock2FAAdminServiceTest {
+ 	private final Airlock2FAShipmentLetterPrintingService shipmentLetterPrintingService = mock(Airlock2FAShipmentLetterPrintingService.class);
+ 	private final Airlock2FAActivationLetterOrderService activationLetterOrderService = mock(Airlock2FAActivationLetterOrderService.class);
+ 	private final Airlock2FAFindActivationLetterOrderService findActivationLetterOrderService = mock(Airlock2FAFindActivationLetterOrderService.class);
++	private final Airlock2FAAdminApiEnrollmentService adminApiEnrollmentService = mock(Airlock2FAAdminApiEnrollmentService.class);
+ 
+ 	@Nested
+ 	class Airlock2FAAccountTest {
+@@ -524,6 +529,38 @@ class Airlock2FAAdminServiceTest {
+ 		}
+ 	}
+ 
++	@Nested
++	class FindLatestPendingEnrollmentsTest {
++
++		@Test
++		void shouldReturnShortActivationCode () {
++			Airlock2FAUserAccount account = account();
++			Airlock2FAEnrollment enrollment = defaultEnrollmentBuilder().activationCodeShort(SHORT_ACTIVATION_CODE).build();
++			when(adminApiEnrollmentService.getLatestPendingEnrollment(account.getAccountId())).thenReturn(Optional.of(enrollment));
++
++			Optional<String> shortActivationCode = adminService().findLatestPendingShortActivationCode(account);
++
++			assertThat(shortActivationCode).satisfies(c -> {
++				assertThat(c).isPresent();
++				assertThat(c.get()).isEqualTo(SHORT_ACTIVATION_CODE);
++			});
++			verify(signingLogger).log("Administrator 'admin' accessed the Airlock 2FA short activation code of user 'user'.");
++			verify(helpdeskLogger).log(account.getUserId(), "Administrator 'admin' accessed the Airlock 2FA short activation code.");
++		}
++
++		@Test
++		void shouldReturnAnEmptyString () {
++			Airlock2FAUserAccount account = account();
++			when(adminApiEnrollmentService.getLatestPendingEnrollment(account.getAccountId())).thenReturn(Optional.empty());
++
++			Optional<String> shortActivationCode = adminService().findLatestPendingShortActivationCode(account);
++
++			assertThat(shortActivationCode).isEmpty();
++			verifyNoInteractions(signingLogger);
++			verifyNoInteractions(helpdeskLogger);
++		}
++	}
++
+ 	private Airlock2FAAdminService adminService () {
+ 		return adminServiceBuilder().build();
+ 	}
+@@ -538,6 +575,7 @@ class Airlock2FAAdminServiceTest {
+ 			.activationLetterPrintingService(Optional.of(activationLetterPrintingService))
+ 			.shipmentLetterPrintingService(Optional.of(shipmentLetterPrintingService))
+ 			.administrator(administrator())
++			.adminApiEnrollmentService(adminApiEnrollmentService)
+ 			.signingLogger(signingLogger)
+ 			.helpdeskLogger(helpdeskLogger);
+ 	}
+@@ -556,6 +594,7 @@ class Airlock2FAAdminServiceTest {
+ 		Airlock2FAUserAccount account = mock(Airlock2FAUserAccount.class);
+ 		when(account.getAccountId()).thenReturn(AIRLOCK_2FA_ACCOUNT_ID);
+ 		when(account.isPermanentlyDisabled()).thenReturn(false);
++		when(account.getUserId()).thenReturn(UserId.userId(DEFAULT_USER));
+ 		return account;
+ 	}
+ 
+diff --git a/airlock2fa-futurae/src/main/java/com/airlock/iam/airlock2fa/futurae/infrastructure/rest/transfer/FuturaeAdminEnrollmentListResponse.java b/airlock2fa-futurae/src/main/java/com/airlock/iam/airlock2fa/futurae/infrastructure/rest/transfer/FuturaeAdminEnrollmentListResponse.java
+new file mode 100644
+index 00000000000..99f852c734a
+--- /dev/null
++++ b/airlock2fa-futurae/src/main/java/com/airlock/iam/airlock2fa/futurae/infrastructure/rest/transfer/FuturaeAdminEnrollmentListResponse.java
+@@ -0,0 +1,37 @@
++/*
++ * Copyright (c) Ergon Informatik AG, Switzerland
++ */
++
++package com.airlock.iam.airlock2fa.futurae.infrastructure.rest.transfer;
++
++import jakarta.validation.constraints.NotNull;
++import java.util.List;
++
++import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
++import com.fasterxml.jackson.annotation.JsonProperty;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Data
++@NoArgsConstructor
++@AllArgsConstructor
++@JsonIgnoreProperties(ignoreUnknown = true)
++public class FuturaeAdminEnrollmentListResponse {
++
++	@NotNull
++	@JsonProperty("count")
++	private Integer count;
++	@NotNull
++	@JsonProperty("enrollments")
++	private List<FuturaeAdminEnrollmentResponse> enrollmentResponseList;
++	@NotNull
++	@JsonProperty("limit")
++	private Integer limit;
++	@NotNull
++	@JsonProperty("offset")
++	private Integer offset;
++	@NotNull
++	@JsonProperty("total")
++	private Integer total;
++}
+diff --git a/airlock2fa-futurae/src/main/java/com/airlock/iam/airlock2fa/futurae/infrastructure/rest/transfer/FuturaeAdminEnrollmentResponse.java b/airlock2fa-futurae/src/main/java/com/airlock/iam/airlock2fa/futurae/infrastructure/rest/transfer/FuturaeAdminEnrollmentResponse.java
+index ea0150232a6..0fc2d8ff9fe 100644
+--- a/airlock2fa-futurae/src/main/java/com/airlock/iam/airlock2fa/futurae/infrastructure/rest/transfer/FuturaeAdminEnrollmentResponse.java
++++ b/airlock2fa-futurae/src/main/java/com/airlock/iam/airlock2fa/futurae/infrastructure/rest/transfer/FuturaeAdminEnrollmentResponse.java
+@@ -26,6 +26,8 @@ public class FuturaeAdminEnrollmentResponse {
+ 	@NotNull
+ 	@JsonProperty("activation_code")
+ 	private String activationCode;
++	@JsonProperty("activation_code_short")
++	private String activationCodeShort;
+ 	@NotNull
+ 	@JsonProperty("user_id")
+ 	private String userId;
+diff --git a/airlock2fa-futurae/src/testFixtures/java/com/airlock/iam/airlock2fa/futurae/test/transfer/FuturaeEnrollmentData.java b/airlock2fa-futurae/src/testFixtures/java/com/airlock/iam/airlock2fa/futurae/test/transfer/FuturaeEnrollmentData.java
+index 5f40db930dc..41cc2a173d5 100644
+--- a/airlock2fa-futurae/src/testFixtures/java/com/airlock/iam/airlock2fa/futurae/test/transfer/FuturaeEnrollmentData.java
++++ b/airlock2fa-futurae/src/testFixtures/java/com/airlock/iam/airlock2fa/futurae/test/transfer/FuturaeEnrollmentData.java
+@@ -19,6 +19,7 @@ import lombok.experimental.Accessors;
+ public class FuturaeEnrollmentData {
+ 
+ 	private String activationCode;
++	private String activationCodeShort;
+ 	private String activationQrCodeUrl;
+ 	private FuturaeUserId userId;
+ 	private String status;
+@@ -40,6 +41,7 @@ public class FuturaeEnrollmentData {
+ 	public Object toJsonObject () {
+ 		Map<String, Object> json = new HashMap<>();
+ 		ofNullable(activationCode).ifPresent(value -> json.put("activation_code", value));
++		ofNullable(activationCodeShort).ifPresent(value -> json.put("activation_code_short", value));
+ 		ofNullable(activationQrCodeUrl).ifPresent(value -> json.put("activation_qrcode_url", value));
+ 		ofNullable(userId).map(FuturaeUserId::value).ifPresent(value -> json.put("user_id", value));
+ 		ofNullable(status).ifPresent(value -> json.put("status", value));
+diff --git a/airlock2fa-futurae/src/testFixtures/java/com/airlock/iam/airlock2fa/futurae/test/transfer/FuturaeEnrollmentListData.java b/airlock2fa-futurae/src/testFixtures/java/com/airlock/iam/airlock2fa/futurae/test/transfer/FuturaeEnrollmentListData.java
+new file mode 100644
+index 00000000000..910b2c68b3e
+--- /dev/null
++++ b/airlock2fa-futurae/src/testFixtures/java/com/airlock/iam/airlock2fa/futurae/test/transfer/FuturaeEnrollmentListData.java
+@@ -0,0 +1,60 @@
++/*
++ * Copyright (c) Ergon Informatik AG, Switzerland
++ */
++
++package com.airlock.iam.airlock2fa.futurae.test.transfer;
++
++import static java.util.Collections.emptyList;
++import static java.util.Optional.ofNullable;
++
++import java.util.HashMap;
++import java.util.List;
++import java.util.Map;
++
++import lombok.Data;
++import lombok.experimental.Accessors;
++
++@Data
++@Accessors(chain = true, fluent = true)
++public class FuturaeEnrollmentListData {
++
++	private Integer count;
++
++	private List<Object> enrollmentResponseList;
++
++	private Integer limit;
++
++	private Integer offset;
++
++	private Integer total;
++
++	public static FuturaeEnrollmentListData defaultEnrollmentList (List<Object> enrollmentResponseList, Integer limit) {
++		FuturaeEnrollmentListData enrollmentListData = new FuturaeEnrollmentListData();
++		enrollmentListData.count = enrollmentResponseList.size();
++		enrollmentListData.enrollmentResponseList = enrollmentResponseList;
++		enrollmentListData.limit = limit;
++		enrollmentListData.offset = 0;
++		enrollmentListData.total = enrollmentResponseList.size();
++		return enrollmentListData;
++	}
++
++	public static FuturaeEnrollmentListData emptyEnrollmentList () {
++		FuturaeEnrollmentListData enrollmentListData = new FuturaeEnrollmentListData();
++		enrollmentListData.count = 0;
++		enrollmentListData.enrollmentResponseList = emptyList();
++		enrollmentListData.limit = 1;
++		enrollmentListData.offset = 0;
++		enrollmentListData.total = 0;
++		return enrollmentListData;
++	}
++
++	public Object toJsonObject () {
++		Map<String, Object> json = new HashMap<>();
++		ofNullable(count).ifPresent(value -> json.put("count", value));
++		ofNullable(enrollmentResponseList).ifPresent(value -> json.put("enrollments", value));
++		ofNullable(limit).ifPresent(value -> json.put("limit", value));
++		ofNullable(offset).ifPresent(value -> json.put("offset", value));
++		ofNullable(total).ifPresent(value -> json.put("total", value));
++		return json;
++	}
++}
+diff --git a/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/domain/service/enrollment/Airlock2FAAdminApiEnrollmentService.java b/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/domain/service/enrollment/Airlock2FAAdminApiEnrollmentService.java
+index 4dcd796b40f..119ce37d52e 100644
+--- a/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/domain/service/enrollment/Airlock2FAAdminApiEnrollmentService.java
++++ b/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/domain/service/enrollment/Airlock2FAAdminApiEnrollmentService.java
+@@ -52,6 +52,14 @@ public interface Airlock2FAAdminApiEnrollmentService {
+ 	 */
+ 	void deleteEnrollment (Airlock2FAActivationCode activationCode);
+ 
++	/**
++	 * Gets latest pending enrollment by the provided accountId.
++	 *
++	 * @param accountId ID of already existing Airlock 2FA account.
++	 * @return the enrollment or empty if no pending enrollment found.
++	 */
++	Optional<Airlock2FAEnrollment> getLatestPendingEnrollment (Airlock2FAAccountId accountId);
++
+ 	@Value
+ 	class StartEnrollmentAnswer {
+ 
+diff --git a/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/domain/service/enrollment/Airlock2FAEnrollment.java b/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/domain/service/enrollment/Airlock2FAEnrollment.java
+index 04db97cf803..8aa696fe808 100644
+--- a/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/domain/service/enrollment/Airlock2FAEnrollment.java
++++ b/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/domain/service/enrollment/Airlock2FAEnrollment.java
+@@ -19,6 +19,7 @@ import lombok.Value;
+ public final class Airlock2FAEnrollment {
+ 
+ 	private final Airlock2FAActivationCode activationCode;
++	private final String activationCodeShort;
+ 	private final Airlock2FAActivationUri appDeviceActivationUrl;
+ 	private final Airlock2FAQrCodeUrl activationQrCodeUrl;
+ 	private final Optional<Airlock2FADeviceId> enrolledDeviceId;
+diff --git a/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/infrastructure/FuturaeAdminApiEnrollmentServiceImpl.java b/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/infrastructure/FuturaeAdminApiEnrollmentServiceImpl.java
+index 392db2d93a5..f7f2e740267 100644
+--- a/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/infrastructure/FuturaeAdminApiEnrollmentServiceImpl.java
++++ b/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/infrastructure/FuturaeAdminApiEnrollmentServiceImpl.java
+@@ -1,96 +1,121 @@
+-/*
+- * Copyright (c) Ergon Informatik AG, Switzerland
+- */
+-
+-package com.airlock.iam.airlock2fa.infrastructure;
+-
+-import static com.airlock.iam.airlock2fa.infrastructure.rest.FuturaeAdminApiEnrollmentResponseMapper.mapEnrollment;
+-import static com.airlock.iam.airlock2fa.infrastructure.rest.FuturaeAdminApiEnrollmentResponseMapper.mapFrom;
+-import static com.airlock.iam.airlock2fa.infrastructure.rest.FuturaeResponseReader.readResponse;
+-import static jakarta.ws.rs.core.Response.Status.GONE;
+-import static jakarta.ws.rs.core.Response.Status.NOT_FOUND;
+-import static jakarta.ws.rs.core.Response.Status.OK;
+-
+-import jakarta.inject.Inject;
+-import jakarta.ws.rs.core.Response;
+-import jakarta.ws.rs.core.Response.StatusType;
+-import java.util.Optional;
+-
+-import com.airlock.iam.airlock2fa.api.domain.model.Airlock2FAAccountId;
+-import com.airlock.iam.airlock2fa.domain.model.Airlock2FAAccountDisplayName;
+-import com.airlock.iam.airlock2fa.domain.model.Airlock2FAActivationCode;
+-import com.airlock.iam.airlock2fa.domain.model.activation.Airlock2FAActivationSettings;
+-import com.airlock.iam.airlock2fa.domain.service.Airlock2FAAdminApiException;
+-import com.airlock.iam.airlock2fa.domain.service.enrollment.Airlock2FAAdminApiEnrollmentService;
+-import com.airlock.iam.airlock2fa.domain.service.enrollment.Airlock2FAEnrollment;
+-import com.airlock.iam.airlock2fa.futurae.infrastructure.rest.transfer.FuturaeAdminEnrollmentResponse;
+-import com.airlock.iam.airlock2fa.futurae.infrastructure.rest.transfer.FuturaeAdminStartEnrollmentResponse;
+-import com.airlock.iam.airlock2fa.infrastructure.rest.FuturaeAdminApiEnrollmentRequestFactory;
+-import com.airlock.iam.base.api.domain.model.exception.FailureException;
+-import com.airlock.iam.common.infrastructure.restclient.RestClient;
+-import com.airlock.iam.common.infrastructure.restclient.RestRequest;
+-import com.airlock.iam.elog.api.ELogger;
+-import com.airlock.iam.elog.api.ELoggerFactory;
+-
+-public final class FuturaeAdminApiEnrollmentServiceImpl implements Airlock2FAAdminApiEnrollmentService {
+-
+-	private static final ELogger LOG = ELoggerFactory.getLogger(FuturaeAdminApiEnrollmentServiceImpl.class);
+-
+-	private final RestClient restClient;
+-	private final FuturaeAdminApiEnrollmentRequestFactory adminApiRequestFactory;
+-
+-	@Inject
+-	public FuturaeAdminApiEnrollmentServiceImpl (RestClient restClient, FuturaeAdminApiEnrollmentRequestFactory adminApiRequestFactory) {
+-		this.restClient = restClient;
+-		this.adminApiRequestFactory = adminApiRequestFactory;
+-	}
+-
+-	@Override
+-	public StartEnrollmentAnswer startEnrollmentForNewUser (Optional<Airlock2FAAccountDisplayName> displayName, Airlock2FAActivationSettings activationSettings) {
+-		return mapFrom(
+-			invokeAndMap(
+-				adminApiRequestFactory.startEnrollmentForNewUser(displayName, activationSettings),
+-				FuturaeAdminStartEnrollmentResponse.class));
+-	}
+-
+-	@Override
+-	public StartEnrollmentAnswer startEnrollmentForExistingAccount (Airlock2FAAccountId accountId, Airlock2FAActivationSettings activationSettings) {
+-		return mapFrom(
+-			invokeAndMap(
+-				adminApiRequestFactory.startEnrollmentForExistingUser(accountId.getId(), activationSettings),
+-				FuturaeAdminStartEnrollmentResponse.class));
+-	}
+-
+-	@Override
+-	public Optional<Airlock2FAEnrollment> getEnrollment (Airlock2FAActivationCode activationCode) {
+-		RestRequest request = adminApiRequestFactory.getEnrollment(activationCode.getValue());
+-		return restClient.read(request, response -> {
+-			if (response.getStatusInfo().equals(NOT_FOUND)) {
+-				LOG.info("Failed to fetch enrollment details. The enrollment on Futurae might no longer exist.");
+-				return Optional.empty();
+-			}
+-			FuturaeAdminEnrollmentResponse result = readResponse(response, FuturaeAdminEnrollmentResponse.class, request)
+-				.orElseThrow(Airlock2FAAdminApiException::new);
+-			return Optional.of(mapEnrollment(result));
+-		});
+-	}
+-
+-	@Override
+-	public void deleteEnrollment (Airlock2FAActivationCode activationCode) {
+-		RestRequest request = adminApiRequestFactory.deleteEnrollment(activationCode.getValue());
+-		StatusType status = restClient.read(request, Response::getStatusInfo);
+-		if (status.equals(NOT_FOUND)) {
+-			LOG.info("Could not delete enrollment: invalid activation code: " + activationCode.getValue());
+-		} else if (status.equals(GONE)) {
+-			LOG.info("Could not delete enrollment: enrollment has already been deleted.");
+-		} else if (!status.equals(OK)) {
+-			throw new FailureException("Could not delete enrollment: HTTP status = " + status);
+-		}
+-	}
+-
+-	private <T> T invokeAndMap (RestRequest request, Class<T> responseClass) {
+-		return restClient.read(
+-			request,
+-			response -> readResponse(response, responseClass, request).orElseThrow(Airlock2FAAdminApiException::new));
+-	}
+-}
++/*
++ * Copyright (c) Ergon Informatik AG, Switzerland
++ */
++
++package com.airlock.iam.airlock2fa.infrastructure;
++
++import static com.airlock.iam.airlock2fa.infrastructure.rest.FuturaeAdminApiEnrollmentResponseMapper.mapEnrollment;
++import static com.airlock.iam.airlock2fa.infrastructure.rest.FuturaeAdminApiEnrollmentResponseMapper.mapFrom;
++import static com.airlock.iam.airlock2fa.infrastructure.rest.FuturaeResponseReader.readResponse;
++import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
++import static jakarta.ws.rs.core.Response.Status.GONE;
++import static jakarta.ws.rs.core.Response.Status.NOT_FOUND;
++import static jakarta.ws.rs.core.Response.Status.OK;
++
++import jakarta.inject.Inject;
++import jakarta.ws.rs.core.Response;
++import jakarta.ws.rs.core.Response.StatusType;
++import java.util.Optional;
++
++import com.airlock.iam.airlock2fa.api.domain.model.Airlock2FAAccountId;
++import com.airlock.iam.airlock2fa.domain.model.Airlock2FAAccountDisplayName;
++import com.airlock.iam.airlock2fa.domain.model.Airlock2FAActivationCode;
++import com.airlock.iam.airlock2fa.domain.model.activation.Airlock2FAActivationSettings;
++import com.airlock.iam.airlock2fa.domain.service.Airlock2FAAdminApiException;
++import com.airlock.iam.airlock2fa.domain.service.enrollment.Airlock2FAAdminApiEnrollmentService;
++import com.airlock.iam.airlock2fa.domain.service.enrollment.Airlock2FAEnrollment;
++import com.airlock.iam.airlock2fa.futurae.infrastructure.rest.transfer.FuturaeAdminEnrollmentListResponse;
++import com.airlock.iam.airlock2fa.futurae.infrastructure.rest.transfer.FuturaeAdminEnrollmentResponse;
++import com.airlock.iam.airlock2fa.futurae.infrastructure.rest.transfer.FuturaeAdminStartEnrollmentResponse;
++import com.airlock.iam.airlock2fa.infrastructure.rest.FuturaeAdminApiEnrollmentRequestFactory;
++import com.airlock.iam.base.api.domain.model.exception.FailureException;
++import com.airlock.iam.common.infrastructure.restclient.RestClient;
++import com.airlock.iam.common.infrastructure.restclient.RestRequest;
++import com.airlock.iam.elog.api.ELogger;
++import com.airlock.iam.elog.api.ELoggerFactory;
++
++public final class FuturaeAdminApiEnrollmentServiceImpl implements Airlock2FAAdminApiEnrollmentService {
++
++	private static final ELogger LOG = ELoggerFactory.getLogger(FuturaeAdminApiEnrollmentServiceImpl.class);
++
++	private final RestClient restClient;
++	private final FuturaeAdminApiEnrollmentRequestFactory adminApiRequestFactory;
++
++	@Inject
++	public FuturaeAdminApiEnrollmentServiceImpl (RestClient restClient, FuturaeAdminApiEnrollmentRequestFactory adminApiRequestFactory) {
++		this.restClient = restClient;
++		this.adminApiRequestFactory = adminApiRequestFactory;
++	}
++
++	@Override
++	public StartEnrollmentAnswer startEnrollmentForNewUser (Optional<Airlock2FAAccountDisplayName> displayName, Airlock2FAActivationSettings activationSettings) {
++		return mapFrom(
++			invokeAndMap(
++				adminApiRequestFactory.startEnrollmentForNewUser(displayName, activationSettings),
++				FuturaeAdminStartEnrollmentResponse.class));
++	}
++
++	@Override
++	public StartEnrollmentAnswer startEnrollmentForExistingAccount (Airlock2FAAccountId accountId, Airlock2FAActivationSettings activationSettings) {
++		return mapFrom(
++			invokeAndMap(
++				adminApiRequestFactory.startEnrollmentForExistingUser(accountId.getId(), activationSettings),
++				FuturaeAdminStartEnrollmentResponse.class));
++	}
++
++	@Override
++	public Optional<Airlock2FAEnrollment> getEnrollment (Airlock2FAActivationCode activationCode) {
++		RestRequest request = adminApiRequestFactory.getEnrollment(activationCode.getValue());
++		return restClient.read(request, response -> {
++			if (response.getStatusInfo().equals(NOT_FOUND)) {
++				LOG.info("Failed to fetch enrollment details. The enrollment on Futurae might no longer exist.");
++				return Optional.empty();
++			}
++			FuturaeAdminEnrollmentResponse result = readResponse(response, FuturaeAdminEnrollmentResponse.class, request)
++				.orElseThrow(Airlock2FAAdminApiException::new);
++			return Optional.of(mapEnrollment(result));
++		});
++	}
++
++	@Override
++	public void deleteEnrollment (Airlock2FAActivationCode activationCode) {
++		RestRequest request = adminApiRequestFactory.deleteEnrollment(activationCode.getValue());
++		StatusType status = restClient.read(request, Response::getStatusInfo);
++		if (status.equals(NOT_FOUND)) {
++			LOG.info("Could not delete enrollment: invalid activation code: " + activationCode.getValue());
++		} else if (status.equals(GONE)) {
++			LOG.info("Could not delete enrollment: enrollment has already been deleted.");
++		} else if (!status.equals(OK)) {
++			throw new FailureException("Could not delete enrollment: HTTP status = " + status);
++		}
++	}
++
++	@Override
++	public Optional<Airlock2FAEnrollment> getLatestPendingEnrollment (Airlock2FAAccountId accountId) {
++		RestRequest request = adminApiRequestFactory.getLatestPendigEnrollment(accountId.getId());
++		return restClient.read(request, response -> {
++			if (response.getStatusInfo().equals(BAD_REQUEST)) {
++				LOG.info("Invalid parameters for request to fetch latest pending enrollment for account with id: " + accountId.getId());
++				return Optional.empty();
++			}
++			if (!response.getStatusInfo().equals(OK)) {
++				LOG.info("Request to fetch the latest pending enrollment for account with id '" + accountId.getId() + "' failed with code: " + response.getStatusInfo());
++				return Optional.empty();
++			}
++			FuturaeAdminEnrollmentListResponse result = readResponse(response, FuturaeAdminEnrollmentListResponse.class, request)
++				.orElseThrow(Airlock2FAAdminApiException::new);
++			if (result.getEnrollmentResponseList().isEmpty()) {
++				LOG.info("Could not find a pending enrollment for account with id: " + accountId.getId());
++				return Optional.empty();
++			}
++			LOG.info("Latest pending Enrollment fetched successfully for account with id: " + accountId.getId());
++			return Optional.of(mapEnrollment(result.getEnrollmentResponseList().getFirst()));
++		});
++	}
++
++	private <T> T invokeAndMap (RestRequest request, Class<T> responseClass) {
++		return restClient.read(
++			request,
++			response -> readResponse(response, responseClass, request).orElseThrow(Airlock2FAAdminApiException::new));
++	}
++}
+diff --git a/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/infrastructure/rest/FuturaeAdminApiEnrollmentRequestFactory.java b/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/infrastructure/rest/FuturaeAdminApiEnrollmentRequestFactory.java
+index ca7391ed9ab..2673244b71a 100644
+--- a/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/infrastructure/rest/FuturaeAdminApiEnrollmentRequestFactory.java
++++ b/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/infrastructure/rest/FuturaeAdminApiEnrollmentRequestFactory.java
+@@ -10,6 +10,7 @@ import static com.airlock.iam.base.misc.exception.Exceptions.wrapException;
+ import jakarta.annotation.Nullable;
+ import jakarta.inject.Inject;
+ import java.time.Duration;
++import java.util.Map;
+ import java.util.Optional;
+ 
+ import com.airlock.iam.airlock2fa.domain.model.Airlock2FAAccountDisplayName;
+@@ -53,7 +54,8 @@ public final class FuturaeAdminApiEnrollmentRequestFactory {
+ 		return AdminEnrollmentRequest.builder()
+ 			.activationFlowBindingEnabled(activationSettings.activationFlowBindingEnabled())
+ 			.recoveryFlowBindingEnabled(activationSettings.recoveryFlowBindingEnabled())
+-			.validity(activationSettings.enrollmentTimeout());
++			.validity(activationSettings.enrollmentTimeout())
++			.shortCode(true);
+ 	}
+ 
+ 	public RestRequest getEnrollment (String activationCodeValue) {
+@@ -64,6 +66,18 @@ public final class FuturaeAdminApiEnrollmentRequestFactory {
+ 		return futuraeRequestFactory.createDeleteRequest(ENROLLMENTS.subPath(activationCodeValue));
+ 	}
+ 
++	public RestRequest getLatestPendigEnrollment (String airlock2FAAccountId) {
++		return futuraeRequestFactory.createGetRequest(ENROLLMENTS.usersPath(), getQueryParams(airlock2FAAccountId));
++	}
++
++	private static Map<String, Object> getQueryParams (String airlock2FAAccountId) {
++		return Map.of("user_id", airlock2FAAccountId,
++					  "status", "pending",
++					  "sort_by", "created_at",
++					  "order", "desc",
++					  "limit", "1");
++	}
++
+ 	@Value
+ 	@JsonInclude(Include.NON_NULL)
+ 	static final class AdminEnrollmentRequest {
+@@ -81,12 +95,16 @@ public final class FuturaeAdminApiEnrollmentRequestFactory {
+ 		@JsonProperty("account_recovery_flow_binding_enabled")
+ 		private final boolean recoveryFlowBindingEnabled;
+ 
++		@JsonProperty("short_code")
++		private final boolean shortCode;
++
+ 		@Builder
+-		private AdminEnrollmentRequest (@Nullable String displayName, Duration validity, boolean activationFlowBindingEnabled, boolean recoveryFlowBindingEnabled) {
++		private AdminEnrollmentRequest (@Nullable String displayName, Duration validity, boolean activationFlowBindingEnabled, boolean recoveryFlowBindingEnabled, boolean shortCode) {
+ 			this.displayName = displayName;
+ 			validSecs = (int) validity.toSeconds();
+ 			enrollmentFlowBindingEnabled = activationFlowBindingEnabled;
+ 			this.recoveryFlowBindingEnabled = recoveryFlowBindingEnabled;
++			this.shortCode = shortCode;
+ 		}
+ 	}
+ }
+diff --git a/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/infrastructure/rest/FuturaeAdminApiEnrollmentResponseMapper.java b/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/infrastructure/rest/FuturaeAdminApiEnrollmentResponseMapper.java
+index 02c060d4aa9..7f85608a10d 100644
+--- a/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/infrastructure/rest/FuturaeAdminApiEnrollmentResponseMapper.java
++++ b/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/infrastructure/rest/FuturaeAdminApiEnrollmentResponseMapper.java
+@@ -42,6 +42,7 @@ public final class FuturaeAdminApiEnrollmentResponseMapper {
+ 		Airlock2FAEnrollmentStatus status = mapStatus(futuraeResponse.getStatus());
+ 		return Airlock2FAEnrollment.builder()
+ 			.activationCode(activationCode)
++			.activationCodeShort(futuraeResponse.getActivationCodeShort())
+ 			.appDeviceActivationUrl(activationCodeUri)
+ 			.activationQrCodeUrl(activationQrCodeUrl)
+ 			.enrolledDeviceId(enrolledDeviceId)
+diff --git a/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/infrastructure/rest/FuturaeAuthApiEnrollmentRequestFactory.java b/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/infrastructure/rest/FuturaeAuthApiEnrollmentRequestFactory.java
+index 1426315408c..8f603fca100 100644
+--- a/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/infrastructure/rest/FuturaeAuthApiEnrollmentRequestFactory.java
++++ b/airlock2fa/src/main/java/com/airlock/iam/airlock2fa/infrastructure/rest/FuturaeAuthApiEnrollmentRequestFactory.java
+@@ -7,6 +7,7 @@ package com.airlock.iam.airlock2fa.infrastructure.rest;
+ import static com.airlock.iam.airlock2fa.futurae.infrastructure.rest.FuturaeAuthApiEnrollmentPath.ENROLL;
+ import static com.airlock.iam.airlock2fa.futurae.infrastructure.rest.FuturaeAuthApiEnrollmentPath.ENROLL_STATUS;
+ import static com.airlock.iam.airlock2fa.futurae.infrastructure.rest.FuturaeAuthApiEnrollmentPath.FLOW_BINDING_TOKEN;
++import static java.lang.Boolean.TRUE;
+ 
+ import jakarta.inject.Inject;
+ import java.time.Duration;
+@@ -46,6 +47,7 @@ public final class FuturaeAuthApiEnrollmentRequestFactory {
+ 		displayName.ifPresent(name -> request.setDisplayName(name.getValue()));
+ 		request.setEnrollmentFlowBindingEnabled(activationSettings.activationFlowBindingEnabled());
+ 		request.setRecoveryFlowBindingEnabled(activationSettings.recoveryFlowBindingEnabled());
++		request.setShortCode(TRUE);
+ 		return requestFactory.createPostRequest(ENROLL.path(), request);
+ 	}
+ 
+@@ -55,6 +57,7 @@ public final class FuturaeAuthApiEnrollmentRequestFactory {
+ 		request.setValidSecs((int) activationSettings.enrollmentTimeout().toSeconds());
+ 		request.setEnrollmentFlowBindingEnabled(activationSettings.activationFlowBindingEnabled());
+ 		request.setRecoveryFlowBindingEnabled(activationSettings.recoveryFlowBindingEnabled());
++		request.setShortCode(TRUE);
+ 		return requestFactory.createPostRequest(ENROLL.path(), request);
+ 	}
+ 
+diff --git a/airlock2fa/src/test/java/com/airlock/iam/airlock2fa/infrastructure/FuturaeAdminApiEnrollmentServiceImplTest.java b/airlock2fa/src/test/java/com/airlock/iam/airlock2fa/infrastructure/FuturaeAdminApiEnrollmentServiceImplTest.java
+index ac231af03f5..efca366b4f5 100644
+--- a/airlock2fa/src/test/java/com/airlock/iam/airlock2fa/infrastructure/FuturaeAdminApiEnrollmentServiceImplTest.java
++++ b/airlock2fa/src/test/java/com/airlock/iam/airlock2fa/infrastructure/FuturaeAdminApiEnrollmentServiceImplTest.java
+@@ -10,16 +10,20 @@ import static com.airlock.iam.airlock2fa.domain.model.Airlock2FAActivationCode.a
+ import static com.airlock.iam.airlock2fa.domain.service.enrollment.Airlock2FAEnrollmentStatus.PENDING;
+ import static com.airlock.iam.common.infrastructure.restclient.RequestEntityProcessing.CHUNKED;
+ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
++import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+ import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+ import static com.github.tomakehurst.wiremock.client.WireMock.get;
+ import static com.github.tomakehurst.wiremock.client.WireMock.notFound;
+ import static com.github.tomakehurst.wiremock.client.WireMock.post;
++import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
++import static java.lang.Boolean.TRUE;
+ import static java.time.ZonedDateTime.now;
+ import static java.util.Collections.singletonList;
+ import static org.assertj.core.api.Assertions.assertThat;
+ 
+ import java.time.Duration;
+ import java.time.Instant;
++import java.util.Map;
+ import java.util.Optional;
+ 
+ import com.airlock.iam.airlock2fa.api.domain.model.Airlock2FAAccountId;
+@@ -37,6 +41,7 @@ import com.airlock.iam.common.infrastructure.restclient.NoRetryPolicy;
+ import com.airlock.iam.core.misc.util.TestTimeProvider;
+ import com.airlock.iam.test.shared.junit5.WireMockExtension;
+ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
++import com.github.tomakehurst.wiremock.matching.StringValuePattern;
+ import org.junit.jupiter.api.Test;
+ import org.junit.jupiter.api.extension.RegisterExtension;
+ 
+@@ -49,6 +54,7 @@ class FuturaeAdminApiEnrollmentServiceImplTest {
+ 	private static final Airlock2FAAccountId NEW_ACCOUNT_ID = airlock2FAAccountId("any-new-futurae-user-id");
+ 	private static final Airlock2FAAccountId EXISTING_FUTURAE_USER_ID = airlock2FAAccountId("any-existing-futurae-user-id");
+ 	private static final String ACTIVATION_CODE = "MGg4R2pMQ3VjMUNHcFBNOE9tcXJ2Y3NVNnpkNmMwcDN5ZjJyaHhDODBuMDo1NThkZmYyOS0zZjhkLTRkNmYtYTY5Ni0wYWY3ODZlNmEzYjc6dGVzdHNydi5mdXR1cmFlLmNvbToxOTA4MA";
++	private static final String ACTIVATION_CODE_SHORT = "a3a3a b3b3b c3c3 d3d3d";
+ 	private static final String ACTIVATION_QR_CODE_URL = "https://api.futurae.com/srv/auth/v1/qr?enroll=" + ACTIVATION_CODE;
+ 	private static final int EXPIRES_EPOCH_MILLIS = 1503661649;
+ 	private static final Instant EXPIRES = Instant.ofEpochSecond(EXPIRES_EPOCH_MILLIS);
+@@ -175,12 +181,53 @@ class FuturaeAdminApiEnrollmentServiceImplTest {
+ 			});
+ 	}
+ 
++	@Test
++	void shouldGetLatestPendingEnrollmentWithShortActivationCode () {
++		withEnrollmentListResponse(EXISTING_FUTURAE_USER_ID.getId(),
++								   aJsonResponse()
++									   .withBody(enrollmentListResponse(EXISTING_FUTURAE_USER_ID)));
++
++		Optional<Airlock2FAEnrollment> enrollmentOptional = adminApiEnrollmentService().getLatestPendingEnrollment(EXISTING_FUTURAE_USER_ID);
++
++		assertThat(enrollmentOptional).hasValueSatisfying(enrollment -> {
++			assertThat(enrollment.getStatus()).isEqualTo(PENDING);
++			assertThat(enrollment.getActivationCodeShort()).isEqualTo(ACTIVATION_CODE_SHORT);
++			assertThat(enrollment.getEnrolledDeviceId()).isEmpty();
++		});
++
++	}
++
++	@Test
++	void getLatestPendingEnrollmentShouldBeEmtpy () {
++		withEnrollmentListResponse(EXISTING_FUTURAE_USER_ID.getId(),
++								   aJsonResponse()
++									   .withBody(emptyEnrollmentList()));
++
++		Optional<Airlock2FAEnrollment> enrollmentOptional = adminApiEnrollmentService().getLatestPendingEnrollment(EXISTING_FUTURAE_USER_ID);
++
++		assertThat(enrollmentOptional).isEmpty();
++
++	}
++
++	@Test
++	void getLatestPendingEnrollmentShouldBeEmtpyIfResponseIsHasStatus400 () {
++		withEnrollmentListResponse(EXISTING_FUTURAE_USER_ID.getId(),
++								   aJsonResponse()
++									   .withStatus(400));
++
++		Optional<Airlock2FAEnrollment> enrollmentOptional = adminApiEnrollmentService().getLatestPendingEnrollment(EXISTING_FUTURAE_USER_ID);
++
++		assertThat(enrollmentOptional).isEmpty();
++
++	}
++
+ 	private static void withStartEnrollResponseForPathAndUser (String path, Airlock2FAAccountId accountId, boolean flowBindingEnabled, boolean recoveryFlowBindingEnabled) {
+ 		FUTURAE_SERVER.givenThat(
+ 			post(FUTURAE_ADMIN_PATH + path)
+ 				.withRequestBody(equalToJson("{\"valid_secs\":" + VALIDITY.getSeconds() + "," +
+ 												 "\"enrollment_flow_binding_enabled\":" + flowBindingEnabled + "," +
+-												 "\"account_recovery_flow_binding_enabled\":" + recoveryFlowBindingEnabled +
++												 "\"account_recovery_flow_binding_enabled\":" + recoveryFlowBindingEnabled + "," +
++												 "\"short_code\":" + TRUE +
+ 												 "}"))
+ 				.willReturn(
+ 					aJsonResponse()
+@@ -202,7 +249,8 @@ class FuturaeAdminApiEnrollmentServiceImplTest {
+ 							+ "\"display_name\": \"" + displayName.getValue() + "\","
+ 							+ "\"valid_secs\":" + validity.getSeconds() + ","
+ 							+ "\"enrollment_flow_binding_enabled\":" + flowBindingEnabled + ","
+-							+ "\"account_recovery_flow_binding_enabled\":" + recoveryFlowBindingEnabled
++							+ "\"account_recovery_flow_binding_enabled\":" + recoveryFlowBindingEnabled + ","
++							+ "\"short_code\":" + TRUE
+ 							+ "}"))
+ 				.willReturn(
+ 					aJsonResponse()
+@@ -214,6 +262,7 @@ class FuturaeAdminApiEnrollmentServiceImplTest {
+ 		return "{\n"
+ 			+ "\"activation_code_uri\": \"futurae://enroll?activation_code=" + ACTIVATION_CODE + "\",\n"
+ 			+ "\"activation_qrcode_url\": \"" + ACTIVATION_QR_CODE_URL + "\",\n"
++			+ "\"activation_code_short\": \"" + ACTIVATION_CODE_SHORT + "\",\n"
+ 			+ "\"expiration\": " + now().plus(validity).toInstant().toEpochMilli() + ",\n"
+ 			+ "\"user_id\": \"" + accountId.getId() + "\",\n"
+ 			+ "\"username\": \"someuser@domain.com\"\n"
+@@ -231,16 +280,64 @@ class FuturaeAdminApiEnrollmentServiceImplTest {
+ 				.willReturn(responseDefBuilder));
+ 	}
+ 
++	private static void withEnrollmentListResponse (String accountId, ResponseDefinitionBuilder responseDefBuilder) {
++		FUTURAE_SERVER.givenThat(
++			get(urlPathEqualTo(FUTURAE_ADMIN_PATH + "/enrollments"))
++				.withQueryParams(getQueryParams(accountId))
++				.willReturn(responseDefBuilder));
++	}
++
++	private static Map<String, StringValuePattern> getQueryParams (String airlock2FAAccountId) {
++		return Map.of("user_id", equalTo(airlock2FAAccountId),
++					  "status", equalTo("pending"),
++					  "sort_by", equalTo("created_at"),
++					  "order", equalTo("desc"),
++					  "limit", equalTo("1"));
++	}
++
+ 	private String enrollmentResponseWithoutEnrolledDeviceId (Airlock2FAAccountId accountId, String activationCode) {
+-		return "{\n"
+-			+ "\"activation_code\": \"" + activationCode + "\",\n"
+-			+ "\"activation_qrcode_url\": \"https://api.futurae.com/srv/auth/v1/qr?enroll=" + activationCode + "\",\n"
+-			+ "\"created_at\": " + CREATED_EPOCH_MILLIS + ",\n"
+-			+ "\"expires_at\": " + EXPIRES_EPOCH_MILLIS + ",\n"
+-			+ "\"status\": \"pending\",\n"
+-			+ "\"updated_at\": " + CREATED_EPOCH_MILLIS + ",\n"
+-			+ "\"user_id\": \"" + accountId.getId() + "\"\n"
+-			+ "}";
++		return
++			"{\n"
++				+ "\"activation_code\": \"" + activationCode + "\",\n"
++				+ "\"activation_qrcode_url\": \"https://api.futurae.com/srv/auth/v1/qr?enroll=" + activationCode + "\",\n"
++				+ "\"created_at\": " + CREATED_EPOCH_MILLIS + ",\n"
++				+ "\"expires_at\": " + EXPIRES_EPOCH_MILLIS + ",\n"
++				+ "\"status\": \"pending\",\n"
++				+ "\"updated_at\": " + CREATED_EPOCH_MILLIS + ",\n"
++				+ "\"user_id\": \"" + accountId.getId() + "\"\n"
++				+ "}";
++	}
++
++	private String enrollmentListResponse (Airlock2FAAccountId accountId) {
++		return "{\n" +
++			"    \"count\": 1,\n" +
++			"    \"enrollments\": [\n" +
++			"        {\n" +
++			"            \"activation_code\": \"" + ACTIVATION_CODE + "\",\n" +
++			"            \"activation_qrcode_url\": \"https://api.futurae.com/srv/auth/v1/qr?enroll=" + ACTIVATION_CODE + "\",\n" +
++			"            \"activation_code_short\": \"" + ACTIVATION_CODE_SHORT + "\",\n" +
++			"            \"created_at\": " + CREATED_EPOCH_MILLIS + ",\n" +
++			"            \"expires_at\": " + EXPIRES_EPOCH_MILLIS + ",\n" +
++			"            \"status\": \"pending\",\n" +
++			"            \"updated_at\": " + CREATED_EPOCH_MILLIS + ",\n" +
++			"            \"user_id\": \"" + accountId.getId() + "\"\n" +
++			"        }\n" +
++			"    ],\n" +
++			"    \"limit\": 1,\n" +
++			"    \"offset\": 0,\n" +
++			"    \"total\": 1\n" +
++			"}";
++	}
++
++	private String emptyEnrollmentList () {
++		return """
++			{
++			    "count": 0,
++			    "enrollments": [],
++			    "limit": 1,
++			    "offset": 0,
++			    "total": 0
++			}""";
+ 	}
+ 
+ 	private Airlock2FAAdminApiEnrollmentService adminApiEnrollmentService () {
+diff --git a/airlock2fa/src/test/java/com/airlock/iam/airlock2fa/infrastructure/rest/FuturaeAdminApiEnrollmentResponseMapperTest.java b/airlock2fa/src/test/java/com/airlock/iam/airlock2fa/infrastructure/rest/FuturaeAdminApiEnrollmentResponseMapperTest.java
+index 486224ca321..fdf533d6bfa 100644
+--- a/airlock2fa/src/test/java/com/airlock/iam/airlock2fa/infrastructure/rest/FuturaeAdminApiEnrollmentResponseMapperTest.java
++++ b/airlock2fa/src/test/java/com/airlock/iam/airlock2fa/infrastructure/rest/FuturaeAdminApiEnrollmentResponseMapperTest.java
+@@ -30,6 +30,7 @@ class FuturaeAdminApiEnrollmentResponseMapperTest {
+ 	private static final Instant CREATED = Instant.ofEpochSecond(1580751000);
+ 	private static final Instant EXPIRES = Instant.ofEpochSecond(1580751060);
+ 	private static final String PENDING = "pending";
++	private static final String ACTIVATION_CODE_SHORT = "3a3a 4a4a 5a5a 6a6a";
+ 
+ 	@Test
+ 	void shouldNotMapStartEnrollmentResponseWithInvalidActivationQrCodeUrl () {
+@@ -103,7 +104,7 @@ class FuturaeAdminApiEnrollmentResponseMapperTest {
+ 
+ 	@Test
+ 	void shouldNotMapEnrollmentResponseWithInvalidActivationQrCodeUrl () {
+-		FuturaeAdminEnrollmentResponse response = enrollmentResponse("invalid://url", ACTIVATION_CODE, ENROLLED_DEVICE_ID, PENDING);
++		FuturaeAdminEnrollmentResponse response = enrollmentResponse("invalid://url", ACTIVATION_CODE, ACTIVATION_CODE_SHORT, ENROLLED_DEVICE_ID, PENDING);
+ 
+ 		assertThatThrownBy(() -> mapEnrollment(response))
+ 			.isInstanceOf(FailureException.class);
+@@ -111,7 +112,7 @@ class FuturaeAdminApiEnrollmentResponseMapperTest {
+ 
+ 	@Test
+ 	void shouldNotMapEnrollmentResponseWithBlankActivationCodeUri () {
+-		FuturaeAdminEnrollmentResponse response = enrollmentResponse(VALID_ACTIVATION_QR_CODE_URL, " ", ENROLLED_DEVICE_ID, PENDING);
++		FuturaeAdminEnrollmentResponse response = enrollmentResponse(VALID_ACTIVATION_QR_CODE_URL, " ", ACTIVATION_CODE_SHORT, ENROLLED_DEVICE_ID, PENDING);
+ 
+ 		assertThatThrownBy(() -> mapEnrollment(response))
+ 			.isInstanceOf(IllegalArgumentException.class)
+@@ -120,7 +121,7 @@ class FuturaeAdminApiEnrollmentResponseMapperTest {
+ 
+ 	@Test
+ 	void shouldNotMapEnrollmentResponseFromUriWithBlankActivationCodeParameter () {
+-		FuturaeAdminEnrollmentResponse response = enrollmentResponse(VALID_ACTIVATION_QR_CODE_URL, " ", ENROLLED_DEVICE_ID, PENDING);
++		FuturaeAdminEnrollmentResponse response = enrollmentResponse(VALID_ACTIVATION_QR_CODE_URL, " ", ACTIVATION_CODE_SHORT, ENROLLED_DEVICE_ID, PENDING);
+ 
+ 		assertThatThrownBy(() -> mapEnrollment(response))
+ 			.isInstanceOf(IllegalArgumentException.class)
+@@ -129,11 +130,12 @@ class FuturaeAdminApiEnrollmentResponseMapperTest {
+ 
+ 	@Test
+ 	void shouldMapEnrollmentResponseWithoutEnrolledDeviceId () {
+-		FuturaeAdminEnrollmentResponse response = enrollmentResponse(VALID_ACTIVATION_QR_CODE_URL, ACTIVATION_CODE, null, PENDING);
++		FuturaeAdminEnrollmentResponse response = enrollmentResponse(VALID_ACTIVATION_QR_CODE_URL, ACTIVATION_CODE, ACTIVATION_CODE_SHORT, null, PENDING);
+ 
+ 		Airlock2FAEnrollment enrollment = mapEnrollment(response);
+ 
+ 		assertThat(enrollment.getActivationCode().getValue()).isEqualTo(ACTIVATION_CODE);
++		assertThat(enrollment.getActivationCodeShort()).isEqualTo(ACTIVATION_CODE_SHORT);
+ 		assertThat(enrollment.getActivationQrCodeUrl().getUrl().toString()).isEqualTo(VALID_ACTIVATION_QR_CODE_URL);
+ 		assertThat(enrollment.getEnrolledDeviceId()).isEmpty();
+ 		assertThat(enrollment.getStatus()).isEqualTo(Airlock2FAEnrollmentStatus.PENDING);
+@@ -143,11 +145,12 @@ class FuturaeAdminApiEnrollmentResponseMapperTest {
+ 
+ 	@Test
+ 	void shouldMapEnrollmentResponseWithEnrolledDeviceId () {
+-		FuturaeAdminEnrollmentResponse response = enrollmentResponse(VALID_ACTIVATION_QR_CODE_URL, ACTIVATION_CODE, ENROLLED_DEVICE_ID, PENDING);
++		FuturaeAdminEnrollmentResponse response = enrollmentResponse(VALID_ACTIVATION_QR_CODE_URL, ACTIVATION_CODE, ACTIVATION_CODE_SHORT, ENROLLED_DEVICE_ID, PENDING);
+ 
+ 		Airlock2FAEnrollment enrollment = mapEnrollment(response);
+ 
+ 		assertThat(enrollment.getActivationCode().getValue()).isEqualTo(ACTIVATION_CODE);
++		assertThat(enrollment.getActivationCodeShort()).isEqualTo(ACTIVATION_CODE_SHORT);
+ 		assertThat(enrollment.getActivationQrCodeUrl().getUrl().toString()).isEqualTo(VALID_ACTIVATION_QR_CODE_URL);
+ 		assertThat(enrollment.getEnrolledDeviceId()).map(Airlock2FADeviceId::getId).contains(ENROLLED_DEVICE_ID);
+ 		assertThat(enrollment.getStatus()).isEqualTo(Airlock2FAEnrollmentStatus.PENDING);
+@@ -155,13 +158,14 @@ class FuturaeAdminApiEnrollmentResponseMapperTest {
+ 		assertThat(enrollment.getExpires()).isEqualTo(EXPIRES);
+ 	}
+ 
+-	private static FuturaeAdminEnrollmentResponse enrollmentResponse (String activationQrCodeUrl, String activationCode, String enrolledDeviceId, String status) {
+-		return enrollmentResponse(activationQrCodeUrl, activationCode, enrolledDeviceId, status, EXPIRES, CREATED);
++	private static FuturaeAdminEnrollmentResponse enrollmentResponse (String activationQrCodeUrl, String activationCode, String activationCodeShort, String enrolledDeviceId, String status) {
++		return enrollmentResponse(activationQrCodeUrl, activationCode, activationCodeShort, enrolledDeviceId, status, EXPIRES, CREATED);
+ 	}
+ 
+ 	private static FuturaeAdminEnrollmentResponse enrollmentResponse (
+ 		String activationQrCodeUrl,
+ 		String activationCode,
++		String activationCodeShort,
+ 		String enrolledDeviceId,
+ 		String status,
+ 		Instant expires,
+@@ -169,6 +173,7 @@ class FuturaeAdminApiEnrollmentResponseMapperTest {
+ 		return new FuturaeAdminEnrollmentResponse(
+ 			activationQrCodeUrl,
+ 			activationCode,
++			activationCodeShort,
+ 			USER_ID,
+ 			status,
+ 			enrolledDeviceId,
+diff --git a/airlock2fa/src/testFixtures/java/com/airlock/iam/airlock2fa/FuturaeAdminApiStubber.java b/airlock2fa/src/testFixtures/java/com/airlock/iam/airlock2fa/FuturaeAdminApiStubber.java
+index 799c5097a22..268afa1907f 100644
+--- a/airlock2fa/src/testFixtures/java/com/airlock/iam/airlock2fa/FuturaeAdminApiStubber.java
++++ b/airlock2fa/src/testFixtures/java/com/airlock/iam/airlock2fa/FuturaeAdminApiStubber.java
+@@ -10,6 +10,8 @@ import static com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeAccountDat
+ import static com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeAccountData.defaultAccount;
+ import static com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeAccountData.emptyAccount;
+ import static com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeEnrollmentCreationData.defaultCreateEnrollment;
++import static com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeEnrollmentListData.defaultEnrollmentList;
++import static com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeEnrollmentListData.emptyEnrollmentList;
+ import static com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeUserId.DEFAULT_FUTURAE_USER_ID;
+ import static com.airlock.iam.base.misc.json.JsonCoding.toJson;
+ import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.responseDefinition;
+@@ -32,7 +34,9 @@ import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
+ import static jakarta.ws.rs.core.Response.Status.FORBIDDEN;
+ import static jakarta.ws.rs.core.Response.Status.GONE;
+ import static jakarta.ws.rs.core.Response.Status.OK;
++import static java.lang.Boolean.TRUE;
+ import static java.lang.String.format;
++import static java.lang.String.valueOf;
+ import static lombok.AccessLevel.PRIVATE;
+ 
+ import java.awt.image.BufferedImage;
+@@ -43,6 +47,7 @@ import java.util.Collection;
+ import java.util.HashMap;
+ import java.util.List;
+ import java.util.Map;
++import java.util.Optional;
+ import javax.imageio.ImageIO;
+ 
+ import com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeAccountData;
+@@ -57,9 +62,11 @@ import com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeHardwareTokensDat
+ import com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeUserDisplayName;
+ import com.airlock.iam.airlock2fa.futurae.test.transfer.FuturaeUserId;
+ import com.airlock.iam.test.shared.junit5.WireMockExtension;
++import com.github.tomakehurst.wiremock.client.MappingBuilder;
+ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+ import com.github.tomakehurst.wiremock.client.WireMock;
+ import com.github.tomakehurst.wiremock.matching.EqualToPattern;
++import com.github.tomakehurst.wiremock.matching.StringValuePattern;
+ import com.github.tomakehurst.wiremock.stubbing.Scenario;
+ import com.google.zxing.BarcodeFormat;
+ import com.google.zxing.WriterException;
+@@ -76,21 +83,26 @@ public class FuturaeAdminApiStubber {
+ 	private static final String FUTURAE_ADMIN_USERS_PATH = FUTURAE_ADMIN_PATH + "/users";
+ 	private static final String FUTURAE_ADMIN_DEVICES_PATH = FUTURAE_ADMIN_PATH + "/devices";
+ 	private static final String FUTURAE_ADMIN_HWTOKENS_PATH = FUTURAE_ADMIN_PATH + "/hwtokens";
++	private static final String FUTURAE_ADMIN_ENROLLMENTS_PATH = FUTURAE_ADMIN_PATH + "/enrollments";
++
+ 	private static final String QR_CODE_PATH = "/qr";
+ 	private static final String DEFAULT_ACTIVATION_CODE = "G4nSSly7nLmrZ1pVpD1C2FzO0wmJzzjy9z3pFSqYdyU";
++	public static final String DEFAULT_ACTIVATION_CODE_SHORT = "1234 asdf 5678 ghjk";
+ 
+ 	private final WireMock wireMockClient;
+ 	private final String externalWireMockUrl;
+ 	private final HardwareTokens hardwareTokens = new HardwareTokens();
+ 	private final Devices devices = new Devices();
+ 
++	private Optional<MappingBuilder> pendingEnrollmentList;
++
+ 	public static FuturaeAdminApiStubber futuraeAdminApiStubber (WireMockExtension wireMockExtension) {
+ 		wireMockExtension.ensureStarted();
+ 		return futuraeAdminApiStubber(wireMockExtension.getClient(), wireMockExtension.externalBaseUrl().toString());
+ 	}
+ 
+ 	public static FuturaeAdminApiStubber futuraeAdminApiStubber (WireMock wireMockClient, String externalWireMockUrl) {
+-		return new FuturaeAdminApiStubber(wireMockClient, externalWireMockUrl);
++		return new FuturaeAdminApiStubber(wireMockClient, externalWireMockUrl, Optional.empty());
+ 	}
+ 
+ 	public FuturaeAdminApiStubber withAccountAndNoDevices () {
+@@ -124,6 +136,7 @@ public class FuturaeAdminApiStubber {
+ 		body.put("valid_secs", 60);
+ 		body.put("enrollment_flow_binding_enabled", false);
+ 		body.put("account_recovery_flow_binding_enabled", false);
++		body.put("short_code", true);
+ 
+ 		wireMockClient.register(
+ 			post(FUTURAE_ADMIN_USERS_PATH)
+@@ -137,6 +150,41 @@ public class FuturaeAdminApiStubber {
+ 		return withEnrollmentForExistingUser(defaultEnrollment(DEFAULT_ACTIVATION_CODE));
+ 	}
+ 
++	public FuturaeAdminApiStubber withPresentPendingEnrollmentList (String accountId, int limit) {
++		withPendingEnrollmentList(get(urlPathEqualTo(FUTURAE_ADMIN_ENROLLMENTS_PATH))
++									  .withQueryParams(getQueryParams(accountId, limit))
++									  .willReturn(aJsonResponse(
++										  defaultEnrollmentList(List.of(
++											  defaultEnrollment(DEFAULT_ACTIVATION_CODE)
++												  .activationCodeShort(DEFAULT_ACTIVATION_CODE_SHORT)
++												  .toJsonObject()), limit)
++											  .toJsonObject())));
++		return this;
++	}
++
++	public FuturaeAdminApiStubber withEmptyPendingEnrollmentList (String accountId) {
++		withPendingEnrollmentList(get(FUTURAE_ADMIN_ENROLLMENTS_PATH)
++									  .withQueryParams(getQueryParams(accountId, 1))
++									  .willReturn(aJsonResponse(emptyEnrollmentList().toJsonObject())));
++		return this;
++	}
++
++	private void withPendingEnrollmentList (MappingBuilder newEnrollmentListMapping) {
++		if (pendingEnrollmentList.isPresent()) {
++			wireMockClient.removeStubMapping(pendingEnrollmentList.get());
++		}
++		pendingEnrollmentList = Optional.of(newEnrollmentListMapping);
++		wireMockClient.register(newEnrollmentListMapping);
++	}
++
++	private static Map<String, StringValuePattern> getQueryParams (String airlock2FAAccountId, int limit) {
++		return Map.of("user_id", equalTo(airlock2FAAccountId),
++					  "status", equalTo("pending"),
++					  "sort_by", equalTo("created_at"),
++					  "order", equalTo("desc"),
++					  "limit", equalTo(valueOf(limit)));
++	}
++
+ 	public FuturaeAdminApiStubber withEnrollmentForExistingDefaultUserWithActivationFlowBinding () {
+ 		return withEnrollmentForExistingUser(defaultEnrollment(DEFAULT_ACTIVATION_CODE), true, false);
+ 	}
+@@ -162,14 +210,15 @@ public class FuturaeAdminApiStubber {
+ 				.withRequestBody(equalToJson(toJson(Map.of(
+ 					"valid_secs", 604800,
+ 					"enrollment_flow_binding_enabled", flowBindingEnabled,
+-					"account_recovery_flow_binding_enabled", recoveryflowBindingEnabled
++					"account_recovery_flow_binding_enabled", recoveryflowBindingEnabled,
++					"short_code", TRUE
+ 				))))
+ 				.willReturn(aJsonResponse(data.toJsonObject())));
+ 		return this;
+ 	}
+ 
+ 	private FuturaeAdminApiStubber singleEnrollmentEntry (FuturaeEnrollmentData data) {
+-		String path = FUTURAE_ADMIN_PATH + "/enrollments/" + data.activationCode();
++		String path = FUTURAE_ADMIN_ENROLLMENTS_PATH + "/" + data.activationCode();
+ 		wireMockClient.register(
+ 			get(path)
+ 				.willReturn(aJsonResponse(data.toJsonObject())));
+@@ -273,7 +322,7 @@ public class FuturaeAdminApiStubber {
+ 		}
+ 
+ 		public void verifyLimitOf (int limit) {
+-			wireMockClient.verifyThat(getRequestedFor(urlPathEqualTo(FUTURAE_ADMIN_HWTOKENS_PATH)).withQueryParam("limit", new EqualToPattern(String.valueOf(limit))));
++			wireMockClient.verifyThat(getRequestedFor(urlPathEqualTo(FUTURAE_ADMIN_HWTOKENS_PATH)).withQueryParam("limit", new EqualToPattern(valueOf(limit))));
+ 		}
+ 
+ 		public void verifyFilteringForEnrolledAndUnenrolledTokens () {
+diff --git a/airlock2fa/src/testFixtures/java/com/airlock/iam/airlock2fa/FuturaeAuthApiStubber.java b/airlock2fa/src/testFixtures/java/com/airlock/iam/airlock2fa/FuturaeAuthApiStubber.java
+index 251b63b7ee8..b5e98f1fccc 100644
+--- a/airlock2fa/src/testFixtures/java/com/airlock/iam/airlock2fa/FuturaeAuthApiStubber.java
++++ b/airlock2fa/src/testFixtures/java/com/airlock/iam/airlock2fa/FuturaeAuthApiStubber.java
+@@ -44,6 +44,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+ import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
++import static java.lang.Boolean.TRUE;
+ import static java.lang.String.format;
+ import static java.time.Instant.now;
+ import static java.time.ZoneOffset.UTC;
+@@ -195,6 +196,7 @@ public final class FuturaeAuthApiStubber {
+ 		request.put("valid_secs", 300);
+ 		request.put("enrollment_flow_binding_enabled", false);
+ 		request.put("account_recovery_flow_binding_enabled", false);
++		request.put("short_code", true);
+ 		wireMock
+ 			.verifyThat(
+ 				postRequestedFor(urlEqualTo("/srv/auth/v1/user/enroll"))
+@@ -767,6 +769,8 @@ public final class FuturaeAuthApiStubber {
+ 	public final class FuturaeEnrollmentStubber {
+ 
+ 		public static final String ENROLLMENT_ACTIVATION_CODE = "ZHd3UE9OYmJ6ZGtMQXI0X1hpV3h4R1RDZWZRc3dpOVZwbm5XcFJZejVORHQ6OWJkMGIxMTgtNDI2Yi00MzNmLTgzNTQtMGU0YTMzMjVlYzE4OmFwaS5mdXR1cmFlLmNvbQ";
++		public static final String ENROLLMENT_ACTIVATION_CODE_SHORT = "aafg degd asge asdf";
++
+ 		public static final String ENROLLMENT_FLOW_BINDING_TOKEN =
+ 			"eyJhbGciOiJBMjU2S1ciLCJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwidHlwIjoiSldUIn0.2Eoq8t4f5Z66GHXzKI5W6d9JLyATqG5xICFjpDaSUkpBidlEWDJnZA.T2bjWYffXO3ujIJG.4N2IWwpPUq0E8Mqwh9i0CnKp1gQbLIjXbA9B1"
+ 				+ "hmgxghJcy3onxGRJiDDnw6bG3vgNrBe7tx7iGyI3DXo1O5MnP46YTObYCHroM6JmCIY5E_x-gL45u_yklpivrlO8IMC2T7k0UMtE-dVf0Yr-I7BQOJRMSuhebr66a_lxTdVMxmGdEZ1yGUYlUL5-uVrFqbVzPXwos1bzOIWvJVES"
+@@ -866,6 +870,7 @@ public final class FuturaeAuthApiStubber {
+ 			request.put("valid_secs", DEFAULT_ENROLLMENT_VALIDITY_SECONDS);
+ 			request.put("enrollment_flow_binding_enabled", activationFlowBindingEnabled);
+ 			request.put("account_recovery_flow_binding_enabled", recoveryFlowBindingEnabled);
++			request.put("short_code", true);
+ 			wireMock.register(
+ 				post("/srv/auth/v1/user/enroll")
+ 					.withRequestBody(equalToJson(toJson(request)))
+@@ -890,15 +895,16 @@ public final class FuturaeAuthApiStubber {
+ 		}
+ 
+ 		private FuturaeEnrollmentStubber withExistingUser (boolean activationFlowBindingEnabled, boolean recoveryFlowBindingEnabled) {
+-			return withExistingUser(ENROLLMENT_ACTIVATION_CODE, activationFlowBindingEnabled, recoveryFlowBindingEnabled);
++			return withExistingUser(ENROLLMENT_ACTIVATION_CODE, ENROLLMENT_ACTIVATION_CODE_SHORT, activationFlowBindingEnabled, recoveryFlowBindingEnabled);
+ 		}
+ 
+-		private FuturaeEnrollmentStubber withExistingUser (String activationCode, boolean activationFlowBindingEnabled, boolean recoveryFlowBindingEnabled) {
++		private FuturaeEnrollmentStubber withExistingUser (String activationCode, String activationCodeShort, boolean activationFlowBindingEnabled, boolean recoveryFlowBindingEnabled) {
+ 			var request = new HashMap<String, Object>();
+ 			request.put("user_id", futuraeUserId.value());
+ 			request.put("valid_secs", DEFAULT_ENROLLMENT_VALIDITY_SECONDS);
+ 			request.put("enrollment_flow_binding_enabled", activationFlowBindingEnabled);
+ 			request.put("account_recovery_flow_binding_enabled", recoveryFlowBindingEnabled);
++			request.put("short_code", TRUE);
+ 			wireMock.register(
+ 				post("/srv/auth/v1/user/enroll")
+ 					.withRequestBody(equalToJson(toJson(request)))
+diff --git a/global-test/archunit_store/shouldOnlyInjectProviders b/global-test/archunit_store/shouldOnlyInjectProviders
+index 5d128e71863..52e008fa377 100644
+--- a/global-test/archunit_store/shouldOnlyInjectProviders
++++ b/global-test/archunit_store/shouldOnlyInjectProviders
+@@ -48,7 +48,7 @@ Constructor <com.airlock.iam.admin.internal.infrastructure.resource.prot.techcli
+ Constructor <com.airlock.iam.admin.internal.infrastructure.resource.prot.techclient.TechClientResource.<init>(com.airlock.iam.base.infrastructure.mapper.entity.RestMapper, jakarta.inject.Provider, jakarta.inject.Provider, jakarta.inject.Provider, jakarta.inject.Provider, com.airlock.iam.common.infrastructure.validation.JsonApiUpdateResourceIdValidator, com.airlock.iam.log.api.signing.SigningLogger)> does not have raw parameter types only Plugins or Providers with exceptions in (TechClientResource.java:83)
+ Constructor <com.airlock.iam.admin.internal.infrastructure.resource.prot.token.Airlock2FAHardwareTokenResource.<init>(jakarta.inject.Provider, com.airlock.iam.base.infrastructure.mapper.entity.RestMapper, com.airlock.iam.admin.internal.infrastructure.resource.prot.token.Airlock2FAHardwareTokenFilterValidator)> does not have raw parameter types only Plugins or Providers with exceptions in (Airlock2FAHardwareTokenResource.java:55)
+ Constructor <com.airlock.iam.admin.internal.infrastructure.validation.AdminExistingUserService.<init>(com.airlock.iam.admin.api.domain.service.user.ManagedUserRepository)> does not have raw parameter types only Plugins or Providers with exceptions in (AdminExistingUserService.java:17)
+-Constructor <com.airlock.iam.airlock2fa.admin.application.service.Airlock2FAAdminService.<init>(com.airlock.iam.airlock2fa.admin.domain.service.Airlock2FAUserAccountRepository, java.util.Optional, java.util.Optional, java.util.Optional, java.util.Optional, java.util.Optional, com.airlock.iam.admin.api.domain.model.administrator.CurrentAdministrator, com.airlock.iam.log.api.signing.SigningLogger, com.airlock.iam.log.api.helpdesk.HelpdeskLogger)> does not have raw parameter types only Plugins or Providers with exceptions in (Airlock2FAAdminService.java:73)
++Constructor <com.airlock.iam.airlock2fa.admin.application.service.Airlock2FAAdminService.<init>(com.airlock.iam.airlock2fa.admin.domain.service.Airlock2FAUserAccountRepository, java.util.Optional, java.util.Optional, java.util.Optional, java.util.Optional, java.util.Optional, com.airlock.iam.admin.api.domain.model.administrator.CurrentAdministrator, com.airlock.iam.log.api.signing.SigningLogger, com.airlock.iam.log.api.helpdesk.HelpdeskLogger, com.airlock.iam.airlock2fa.domain.service.enrollment.Airlock2FAAdminApiEnrollmentService)> does not have raw parameter types only Plugins or Providers with exceptions in (Airlock2FAAdminService.java:75)
+ Constructor <com.airlock.iam.airlock2fa.admin.application.service.Airlock2FAHardwareTokenService.<init>(com.airlock.iam.airlock2fa.domain.service.repository.Airlock2FAUserRepository, com.airlock.iam.airlock2fa.admin.domain.service.Airlock2FAAdminApiHardwareTokenService, com.airlock.iam.airlock2fa.admin.domain.service.Airlock2FAAdminApiDeviceService, com.airlock.iam.admin.api.domain.model.administrator.CurrentAdministrator, com.airlock.iam.log.api.helpdesk.HelpdeskLogger, com.airlock.iam.log.api.signing.SigningLogger, com.airlock.iam.airlock2fa.admin.application.service.Airlock2FAHardwareTokenSettings)> does not have raw parameter types only Plugins or Providers with exceptions in (Airlock2FAHardwareTokenService.java:60)
+ Constructor <com.airlock.iam.airlock2fa.admin.infrastructure.Airlock2FAActivationLetterServiceImpl.<init>(com.airlock.iam.airlock2fa.admin.domain.service.repository.Airlock2FAActivationLetterRepository, com.airlock.iam.airlock2fa.domain.service.enrollment.Airlock2FAAdminApiEnrollmentService, com.airlock.iam.log.api.signing.SigningLogger, com.airlock.iam.log.api.helpdesk.HelpdeskLogger, com.airlock.iam.airlock2fa.domain.model.activation.Airlock2FAActivationSettings)> does not have raw parameter types only Plugins or Providers with exceptions in (Airlock2FAActivationLetterServiceImpl.java:45)
+ Constructor <com.airlock.iam.airlock2fa.admin.infrastructure.FuturaeAdminApiDeviceServiceImpl.<init>(com.airlock.iam.common.infrastructure.restclient.RestClient, com.airlock.iam.airlock2fa.admin.infrastructure.request.FuturaeAdminApiRequestFactory, com.airlock.iam.airlock2fa.admin.application.service.Airlock2FAHardwareTokenSettings)> does not have raw parameter types only Plugins or Providers with exceptions in (FuturaeAdminApiDeviceServiceImpl.java:48)
+diff --git a/int-test-framework/src/main/java/com/airlock/iam/inttest/framework/admin/token/airlock2fa/Airlock2FAShortActivationCodeAttributes.java b/int-test-framework/src/main/java/com/airlock/iam/inttest/framework/admin/token/airlock2fa/Airlock2FAShortActivationCodeAttributes.java
+new file mode 100644
+index 00000000000..83140a9562a
+--- /dev/null
++++ b/int-test-framework/src/main/java/com/airlock/iam/inttest/framework/admin/token/airlock2fa/Airlock2FAShortActivationCodeAttributes.java
+@@ -0,0 +1,27 @@
++/*
++ * Copyright (c) Ergon Informatik AG, Switzerland
++ */
++
++package com.airlock.iam.inttest.framework.admin.token.airlock2fa;
++
++import static com.airlock.iam.admin.internal.infrastructure.transfer.response.user.tokens.Airlock2FAShortActivationCodeData.AIRLOCK_2FA_SHORT_ACTIVATION_CODE_TYPE;
++
++import jakarta.annotation.Nullable;
++
++import com.airlock.iam.admin.internal.infrastructure.transfer.response.user.tokens.Airlock2FAShortActivationCodeData;
++import com.fasterxml.jackson.annotation.JsonTypeName;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++/**
++ * Integration test equivalent to
++ * {@link Airlock2FAShortActivationCodeData}.
++ */
++@Data
++@NoArgsConstructor
++@JsonTypeName(AIRLOCK_2FA_SHORT_ACTIVATION_CODE_TYPE)
++public class Airlock2FAShortActivationCodeAttributes {
++
++	@Nullable
++	private String shortActivationCode;
++}
+diff --git a/int-test-framework/src/main/java/com/airlock/iam/inttest/framework/admin/token/airlock2fa/UserAirlock2FATokenRequests.java b/int-test-framework/src/main/java/com/airlock/iam/inttest/framework/admin/token/airlock2fa/UserAirlock2FATokenRequests.java
+index a145f2d427f..9807fa2ad75 100644
+--- a/int-test-framework/src/main/java/com/airlock/iam/inttest/framework/admin/token/airlock2fa/UserAirlock2FATokenRequests.java
++++ b/int-test-framework/src/main/java/com/airlock/iam/inttest/framework/admin/token/airlock2fa/UserAirlock2FATokenRequests.java
+@@ -63,6 +63,10 @@ public final class UserAirlock2FATokenRequests {
+ 		return invoke(emptyJsonApiRequestWithAdminAuth(GET, airlock2FAUrl(userId)), adminHttpClient()).expectingResource(Airlock2FAAccountAttributes.class);
+ 	}
+ 
++	public static JsonApiResourceResponse<Airlock2FAShortActivationCodeAttributes> getAirlock2FAShortActivationCode (String userId) {
++		return invoke(emptyJsonApiRequestWithAdminAuth(GET, shortActivationCodeUrl(userId)), adminHttpClient()).expectingResource(Airlock2FAShortActivationCodeAttributes.class);
++	}
++
+ 	public static ErrorResponse getAirlock2FAAccountExpectingError (String userId) {
+ 		return invoke(emptyJsonApiRequestWithAdminAuth(GET, airlock2FAUrl(userId)), adminHttpClient()).expectingError();
+ 	}
+@@ -193,6 +197,12 @@ public final class UserAirlock2FATokenRequests {
+ 			.build(userId);
+ 	}
+ 
++	private static URI shortActivationCodeUrl (String userId) {
++		return fromUri(config().adminappRestUrl())
++			.path("users/{userId}/tokens/airlock-2fa/activation-code-short")
++			.build(userId);
++	}
++
+ 	private static URI lockUrl (String userId) {
+ 		return fromUri(config().adminappRestUrl())
+ 			.path("users/{userId}/tokens/airlock-2fa/lock")
+diff --git a/int-test-framework/src/main/java/com/airlock/iam/inttest/framework/shared/configuration/AdminappConfigBuilder.java b/int-test-framework/src/main/java/com/airlock/iam/inttest/framework/shared/configuration/AdminappConfigBuilder.java
+index ef7b5cac809..eb0ffc33478 100644
+--- a/int-test-framework/src/main/java/com/airlock/iam/inttest/framework/shared/configuration/AdminappConfigBuilder.java
++++ b/int-test-framework/src/main/java/com/airlock/iam/inttest/framework/shared/configuration/AdminappConfigBuilder.java
+@@ -89,6 +89,7 @@ import com.airlock.iam.admin.api.application.configuration.event.AdminappDomainE
+ import com.airlock.iam.admin.app.application.configuration.Adminapp;
+ import com.airlock.iam.admin.app.application.configuration.Adminapp.AdminappBuilder;
+ import com.airlock.iam.admin.application.configuration.AdminappRestConfig.AdminappRestConfigBuilder;
++import com.airlock.iam.admin.application.configuration.RoleBasedAccessControllerConfig.RoleBasedAccessControllerConfigBuilder;
+ import com.airlock.iam.admin.application.configuration.administrators.AdministratorsConfiguration.AdministratorsConfigurationBuilder;
+ import com.airlock.iam.admin.application.configuration.certificate.CertificateTokenController.CertificateTokenControllerBuilder;
+ import com.airlock.iam.admin.application.configuration.csp.AdminappContentSecurityPolicyConfig.AdminappContentSecurityPolicyConfigBuilder;
+@@ -309,6 +310,14 @@ public final class AdminappConfigBuilder extends ConfigBuilder<AdminappConfigBui
+ 		return this;
+ 	}
+ 
++	public AdminappConfigBuilder addRoleBasedAccessControl (RoleBasedAccessControllerConfigBuilder roleBasedAccessControllerConfigBuilder) {
++		AdminappBuilder builder = copyBuilderFor(adminapp);
++		adminapp = builder
++			.accessControl(roleBasedAccessControllerConfigBuilder.build())
++			.build();
++		return this;
++	}
++
+ 	public AdminappConfigBuilder addUserManagementExtensions (String... ids) {
+ 		PluginChange<UsersConfigurationBuilder> usersChange = changePluginAt(adminapp, "users");
+ 		usersChange.getBuilder().userManagementExtensions(Arrays.stream(ids).map(id -> builder(UserManagementExtensionConfigBuilder.class).id(id).build()).toList());
+diff --git a/int-test-webflow/src/main/java/com/airlock/iam/inttest/webflow/admin/page/AdminappPageAlert.java b/int-test-webflow/src/main/java/com/airlock/iam/inttest/webflow/admin/page/AdminappPageAlert.java
+index b78cd4886a7..01ae66b60bf 100644
+--- a/int-test-webflow/src/main/java/com/airlock/iam/inttest/webflow/admin/page/AdminappPageAlert.java
++++ b/int-test-webflow/src/main/java/com/airlock/iam/inttest/webflow/admin/page/AdminappPageAlert.java
+@@ -31,6 +31,7 @@ public enum AdminappPageAlert implements AlertMessage {
+ 	VASCO_OTP_DEVICE_NOT_SYNCHRONIZED("user.vasco.device.synchronize.failed"),
+ 	AIRLOCK_2FA_TOKEN_SYNCHRONIZED("token.airlock-2fa.hardware-token.synchronize.success"),
+ 	AIRLOCK_2FA_TOKEN_NOT_SYNCHRONIZED("token.airlock-2fa.hardware-token.synchronize.failed"),
++	AIRLOCK_2FA_ACTIVATION_NOT_PENDING_ANYMORE("user.airlock-2fa.activation.view-activation-code.popup.text.not-pending"),
+ 	NO_VASCO_LICENSE_AVAILABLE("user.auth-methods.add-failed.no-vasco-license-available"),
+ 	ADMIN_CREATE_SUCCESS("admin.create.success"),
+ 	USER_CREATE_SUCCESS("user.create.success");
+diff --git a/int-test-webflow/src/main/java/com/airlock/iam/inttest/webflow/admin/page/userdetails/components/UserDetailsAirlock2FATabComponent.java b/int-test-webflow/src/main/java/com/airlock/iam/inttest/webflow/admin/page/userdetails/components/UserDetailsAirlock2FATabComponent.java
+index d84c932736e..f9715dce61e 100644
+--- a/int-test-webflow/src/main/java/com/airlock/iam/inttest/webflow/admin/page/userdetails/components/UserDetailsAirlock2FATabComponent.java
++++ b/int-test-webflow/src/main/java/com/airlock/iam/inttest/webflow/admin/page/userdetails/components/UserDetailsAirlock2FATabComponent.java
+@@ -52,6 +52,11 @@ public class UserDetailsAirlock2FATabComponent extends TabComponent<UserDetailsP
+ 		return Optional.of(new Airlock2FAAccountComponent(this));
+ 	}
+ 
++	public UserDetailsAirlock2FATabComponent reload () {
++		page().reloadUser();
++		return this;
++	}
++
+ 	public UserDetailsAirlock2FATabComponent assertNumberOfAppDevices (int count) {
+ 		return assertNumberOfDevices(count, "airlock2FAAppDevice");
+ 	}
+@@ -145,6 +150,16 @@ public class UserDetailsAirlock2FATabComponent extends TabComponent<UserDetailsP
+ 		return this;
+ 	}
+ 
++	public Airlock2FAShortActivationCodeDialogComponent clickViewActivationButton () {
++		clickById("viewShortActivationCode");
++		return new Airlock2FAShortActivationCodeDialogComponent(page());
++	}
++
++	public UserDetailsAirlock2FATabComponent assertViewShortActivationCodeButtonPresent (boolean isPresent) {
++		assertElementPresentById("viewShortActivationCode", isPresent);
++		return this;
++	}
++
+ 	public static final class Airlock2FAAccountComponent extends PageComponent<UserDetailsPage, Airlock2FAAccountComponent> {
+ 
+ 		private final UserDetailsAirlock2FATabComponent tab;
+@@ -589,6 +604,34 @@ public class UserDetailsAirlock2FATabComponent extends TabComponent<UserDetailsP
+ 		}
+ 	}
+ 
++	public static final class Airlock2FAShortActivationCodeDialogComponent extends DialogComponent<UserDetailsPage, Airlock2FAShortActivationCodeDialogComponent> {
++
++		public Airlock2FAShortActivationCodeDialogComponent (UserDetailsPage page) {
++			super(page, "pageDialog");
++		}
++
++		public Airlock2FAShortActivationCodeDialogComponent assertNoCancelButton () {
++			assertElementNotPresentById("pageDialog-dialog-cancel");
++			return this;
++		}
++
++		public Airlock2FAShortActivationCodeDialogComponent assertCloseButton () {
++			assertElementPresentById("pageDialog-dialog-ok");
++			return this;
++		}
++
++		public Airlock2FAShortActivationCodeDialogComponent assertShortActivationCode (String shortActivationCode) {
++			assertTagWithIdContains("pageDialog", translate("user.airlock-2fa.activation.view-activation-code.popup.text.code") + " " + shortActivationCode);
++			return this;
++		}
++
++		public UserDetailsPage clickCloseButton () {
++			clickById("pageDialog-dialog-ok");
++			return page();
++		}
++
++	}
++
+ 	public enum Airlock2FAAComponentDeviceType {
+ 
+ 		IOS,

@@ -4,12 +4,19 @@ In diesem Kapitel geht es um die erste von 6 Phasen der IPERKA-Methode, dem Info
 
 \section{Analyse}
 Als erster Schritt wurde die Aufgabe analysiert, einen Überblick verschaffen und in folgender Kurzfassung zusammengefasst:
-\subsection*{Kurzfassung}
-Umzusetzen ist eine Funktion in der Admin App der Airlock IAM Applikation, welche es den Adminnuztern ermöglicht, die 16 stelligen Airlock 2FA Aktivierungscodes der Nutzer anzeigen zu lassen. Dies hilft Ihnen, die Endnutzer bei der Aktivierung der Airlock 2FA zu unterstützen. Der Aktivierungscode sollte per Konpfdruck angezeigt werden können, zum Beispiel als Popup. Dies ist jedoch noch zu evaluieren, vieleicht bieten sich auch noch andere Optionen an. Sicher ist, dass der Code im Airlock 2FA Management angezeigt werden soll und nur, falls durch den Admin gewollt. \newline
-Weiter soll es mögllich sein, dass nicht alle Admins sich den Code anzeigen können, sondern nur die mit der entsprechenden Rollen. \newline
-Das ganze muss mit UI, Unit und Integration Tests getestet werden, und in der Kundendokumentation ergänzt werden.
-
-\subsection*{Abgrenzug}
+\subsection {Kurzfassung}
+\textbf{Ausgangssituation}\\
+Umzusetzen ist eine Funktion in der Admin App der Airlock IAM Applikation, welche es den Adminnuztern ermöglicht, die 16 stelligen Airlock 2FA Aktivierungscodes der Nutzer anzeigen zu lassen. Dies hilft Ihnen, die Endnutzer bei der Aktivierung der Airlock 2FA zu unterstützen.\\
+\\
+\textbf{Umsetzung}\\
+Der Aktivierungscode sollte per Konpfdruck angezeigt werden können, zum Beispiel als Popup. Dies ist jedoch noch zu evaluieren, vieleicht bieten sich auch noch andere Optionen an. Sicher ist, dass der Code im Airlock 2FA Management angezeigt werden soll und nur, falls durch den Admin gewollt. 
+ \\\\
+Weiter soll es mögllich sein, dass nicht alle Admins sich den Code anzeigen können, sondern nur die mit der entsprechenden Rollen. Hierfür wird eine bereits bestehende Action im Access Controller wiederverwendet werden können. Das ganze muss mit UI, Unit und Integration Tests getestet werden, und in der Kundendokumentation ergänzt werden.\\
+\\
+\textbf{Ergebnis}\\
+Das Ergebnis ist nach den definierten Anforderungen umgesetzt. Es wurde in der Dokumentation ergänzt und mit Tests abgedeckt. Die nötigen IT-Sicherheitsaspekte wurden beachtet, und in der Dokumentation darauf hingewiesen. Die Implementierung ist auf Gerrit in 2 aufeinander aufbauenden Changens abgelegt.
+\newpage
+\subsection{Abgrenzug}
 Es gibt bereits die Funktionalität, dass Admins pro Nutzer Aktivierungsbriefe generieren können. Im Rahmen dieses Auftrags, soll dieser Bereich nicht erweitert oder verändert werden.
 
 \subsection{Futurae}
